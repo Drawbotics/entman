@@ -45,6 +45,7 @@
     "webpack-dev-server": "^1.14.1"
   },
   "dependencies": {
+    "babel-polyfill": "^6.13.0",
     "denormalizr": "git://github.com/larsbs/denormalizr",
     "lodash": "^4.15.0"
   }
