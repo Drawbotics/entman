@@ -12,6 +12,7 @@ import UnionSchema from 'normalizr/lib/UnionSchema';
 const isRelationship = (prop) => (prop instanceof EntitySchema) ||
   (prop instanceof IterableSchema) || (prop instanceof UnionSchema);
 
+
 export function inverseSchema(schema) {
   const result = Object.keys(schema).reduce((result, key) => {
     const prop = schema[key];
