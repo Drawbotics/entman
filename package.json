@@ -5,9 +5,11 @@
   "author": "Lorenzo Ruiz <lars.bs@hotmail.com>",
   "main": "index.js",
   "scripts": {
+    "clean": "rimraf lib/",
     "build": "webpack --progress",
     "test-watch": "karma start",
-    "test": "karma start --single-run --browsers PhantomJS"
+    "test": "karma start --single-run --browsers PhantomJS",
+    "start": "npm run clean && npm run build"
   },
   "keywords": [],
   "license": "UNLICENSED",
@@ -38,6 +40,7 @@
     "normalizr": "^2.2.1",
     "phantomjs": "^2.1.7",
     "redux": "^3.5.2",
+    "rimraf": "^2.5.4",
     "webpack": "^1.13.1",
     "webpack-dev-server": "^1.14.1"
   },
