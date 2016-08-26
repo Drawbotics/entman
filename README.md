@@ -73,38 +73,130 @@ Create selectors for the entities. This way the entities access code is abstract
 from the rest of the system.
 
 ```javascript
-import { getEntity } from '_InsetName_';
+import { getEntity } from '_InsertName_';
 
 export function getGroup(state, id) {
   return getEntity(state, 'Group', id);
 }
 ```
 
+### actions.js
+
+```javascript
+import {
+  loadEntity,
+  createEntity,
+  saveEntity,
+  createAndSaveEntity,
+} from '_InsertName_';
+
+export const LOAD_GROUP = 'LOAD_GROUP';
+
+export function loadGroup(id) {
+  /**
+   * loadEntity() will generate automatically
+   * LOAD_${ENTITY}_SUCCESS and LOAD_${ENTITY}_FAIL
+   * to report about the result of the operation.
+   */
+  return loadEntity('Group', id);  // 'GET /groups/id'
+}
+
+export const CREATE_USER = 'CREATE_USER';
+
+export function createUser(user) {
+  return createEntity('User', user);  // Add user to the store
+}
+
+export const SAVE_USER = 'SAVE_USER';
+
+export function saveUser(id) {
+  return saveEntity('User', id);  // 'POST /users'
+}
+
+export const CREATE_AND_SAVE_USER = 'CREATE_AND_SAVE_USER';
+
+export function createAndSaveUser(user) {
+  return createAndSaveEntity('User', user);
+}
+```
+
 ### Component.jsx
 
 ```jsx
+import React from 'react';
 import { connect } from 'react-redux';
 import { getGroup } from './selectors';
+import { loadGroup } from './actions';
 
-const Group = ({
-  group,
-}) => (
-  <div>
-    <h1>{group.name}</h1>
-    <h2>{group.getNumberOfUsers()} members</h2>
-    <ul>
-      {group.users.map(u => (
-        <li>{u.name}</li>
-      ))}
-    </ul>
-  </div>
-);
+class Group extends React.Component {
+  constructor(props) {
+    super(props);
+    this._handleInput = this._handleInput.bind(this);
+    this._handleAddUser = this._handleAddUser.bind(this);
+  }
+
+  componentDidMount() {
+    const { loadGroup, params } = this.props;
+    loadGroup(params.groupId);
+  }
+
+  render() {
+    const { group } = this.props;
+    return (
+      <div>
+        <h1>{group.name}</h1>
+        <h2>{group.getNumberOfUsers()} members</h2>
+        <ul>
+          {group.users.map(u => (
+            <li>{u.name}</li>
+          ))}
+        </ul>
+        {this.state.showForm &this.setState({ showForm: true });&
+          this._renderUserForm()
+        }
+        { ! this.state.showForm &&
+          <button type="button" onClick={() => this.setState({ showForm: true })}>
+            Add
+          </button>
+        }
+      </div>
+    );
+  }
+
+  _renderUserForm() {
+    return (
+      <div>
+        <input type="text" onChange={this._handleInput} />
+        <button type="button" onClick={() => this.setState({ showForm: false })}>
+          Cancel
+        </button>
+        <button type="button" onClick={this._handleAddUser}>Save</button>
+      </div>
+    );
+  }
+
+  _handleInput(e) {
+    this.setState({ name: e.target.value });
+  }
+
+  _handleAddUser(e) {
+    const { group, createAndSaveUser } = this.props;
+    const { name } = this.state;
+    const user = { group, name };
+    createAndSaveUser(user);
+  }
+}
 
 const mapStateToProps = (state, ownProps) => ({
   group: getGroup(state, ownProps.params.groupId),
 });
 
-export default connect(mapStateToProps)(Group);
+const mapDispatchToProps = {
+  loadGroup,
+  createAndSaveUser,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Group);
 ```
 
 More examples in the [examples]() folder.
