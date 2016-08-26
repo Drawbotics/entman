@@ -67,6 +67,26 @@ export default combineReducers({
 })
 ```
 
+### store.js
+
+Connect the middleware to your store.
+
+```javascript
+import { createStore, applyMiddleware, compose } from 'redux';
+import { entitiesMiddleware } from '_InsertName_';
+import reducer from './reducer';
+
+export default createStore(
+  reducer,
+  compose(
+    applyMiddleware(
+      // Other middlewares,
+      entitiesMiddleware,
+    ),
+  ),
+);
+```
+
 ### selectors.js
 
 Create selectors for the entities. This way the entities access code is abstracted
