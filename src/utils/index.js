@@ -42,7 +42,7 @@ export function inverseSchemas(schemas) {
 
 
 export function getEmptyEntities(inversedSchemas={}) {
-  return mapValues(inversedSchemas, s => ({}));
+  return mapValues(inversedSchemas, () => ({}));
 }
 
 
@@ -89,7 +89,7 @@ export function setIn(obj, field, value) {
   const result = cloneDeep(obj);
   set(result, field, value);
   return result;
-};
+}
 
 
 export function update(obj, data) {
@@ -97,7 +97,7 @@ export function update(obj, data) {
   return Object.keys(flattenedData).reduce((result, k) => {
     return setIn(result, k, flattenedData[k]);
   }, obj);
-};
+}
 
 
 export function mergeEntities(state={}, action, name) {
