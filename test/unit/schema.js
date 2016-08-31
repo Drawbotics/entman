@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import {
   defineSchema,
   hasMany,
-  generateSchema,
+  generateSchemas,
 } from 'schema';
 
 
@@ -56,6 +56,28 @@ describe('@Schema', function () {
       expect(result.isArray).to.equal(true);
     });
   });
-  describe('generateSchemas()', function () {
+  describe('generateSchemas(schemas)', function () {
+    it('should throw an error if `schemas` is empty', function () {
+      expect(() => generateSchemas()).to.throw(/INVALID SCHEMAS/);
+    });
+    it('should throw an error if `schemas` is not an array', function () {
+      expect(() => generateSchemas({})).to.throw(/INVALID SCHEMAS/);
+      expect(() => generateSchemas(123)).to.throw(/INVALID SCHEMAS/);
+    });
+    it('should return an object', function () {
+      const user = defineSchema('User');
+      const group = defineSchema('Group');
+      const result = generateSchemas([user, group]);
+      expect(result).to.be.an('object');
+    });
+    it('the keys of the resulted object should match the schemas names', function () {
+      const user = defineSchema('User');
+      const group = defineSchema('Group');
+      const result = generateSchemas([user, group]);
+      expect(result.User).to.exist;
+      expect(result.Group).to.exist;
+    });
+    it('the resulted object should contain valid schemas', function () {
+    });
   });
 });

@@ -30,5 +30,16 @@ export function hasMany(schema) {
 }
 
 
-export function generateSchemas() {
+export function generateSchemas(schemas) {
+  if (isEmpty(schemas)) {
+    throw new Error('[INVALID SCHEMAS]');
+  }
+  if ( ! Array.isArray(schemas)) {
+    throw new Error('[INVALID SCHEMAS]');
+  }
+  const schemasBag = schemas.reduce((bag, s) => ({
+    ...bag,
+    [s.name]: {},
+  }), {});
+  return schemasBag;
 }
