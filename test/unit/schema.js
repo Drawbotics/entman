@@ -30,6 +30,7 @@ describe('@Schema', function () {
       const attributes = { user: 'User' };
       const result = defineSchema(name, attributes);
       expect(result.attributes).to.deep.equal(attributes);
+      expect(defineSchema(name).attributes).to.be.an('object');
     });
   });
   describe('hasMany(schema)', function () {
@@ -46,10 +47,10 @@ describe('@Schema', function () {
       const result = hasMany('User');
       expect(result).to.be.an('object');
     });
-    it('the resulted object should have a property called `relatedEntity` with the name of the passed schema', function () {
+    it('the resulted object should have a property called `relatedSchema` with the name of the passed schema', function () {
       const name = 'User';
       const result = hasMany(name);
-      expect(result.relatedEntity).to.equal(name);
+      expect(result.relatedSchema).to.equal(name);
     });
     it('the resulted object should have a property called `isArray` with value `true`', function () {
       const result = hasMany('User');
@@ -74,10 +75,22 @@ describe('@Schema', function () {
       const user = defineSchema('User');
       const group = defineSchema('Group');
       const result = generateSchemas([user, group]);
-      expect(result.User).to.exist;
-      expect(result.Group).to.exist;
+      expect(result).to.include.keys('User');
+      expect(result).to.include.keys('Group');
     });
     it('the resulted object should contain valid schemas', function () {
+      const user = defineSchema('User', {
+        group: 'Group',
+      });
+      const group = defineSchema('Group', {
+        users: hasMany('User'),
+        getNumberOfUsers() {
+          return this.users.length;
+        }
+      });
+      const result = generateSchemas([user, group]);
+      expect(result.Group.getKey()).to.equal('Group');
+      expect(result.User.getKey()).to.equal('User');
     });
   });
 });
