@@ -94,9 +94,10 @@ from the rest of the system.
 
 ```javascript
 import { getEntity } from '_InsertName_';
+import schemas from './schemas';
 
 export function getGroup(state, id) {
-  return getEntity(state, 'Group', id);
+  return getEntity(state, schemas.Group, id);
 }
 ```
 
@@ -109,6 +110,7 @@ import {
   saveEntity,
   createAndSaveEntity,
 } from '_InsertName_';
+import schemas from './schemas';
 
 export const LOAD_GROUP = 'LOAD_GROUP';
 
@@ -118,25 +120,25 @@ export function loadGroup(id) {
    * LOAD_${ENTITY}_SUCCESS and LOAD_${ENTITY}_FAIL
    * to report about the result of the operation.
    */
-  return loadEntity('Group', id);  // 'GET /groups/id'
+  return loadEntity(schemas.Group, id);  // 'GET /groups/id'
 }
 
 export const CREATE_USER = 'CREATE_USER';
 
 export function createUser(user) {
-  return createEntity('User', user);  // Add user to the store
+  return createEntity(schemas.User, user);  // Add user to the store
 }
 
 export const SAVE_USER = 'SAVE_USER';
 
 export function saveUser(id) {
-  return saveEntity('User', id);  // 'POST /users'
+  return saveEntity(schemas.User, id);  // 'POST /users'
 }
 
 export const CREATE_AND_SAVE_USER = 'CREATE_AND_SAVE_USER';
 
 export function createAndSaveUser(user) {
-  return createAndSaveEntity('User', user);
+  return createAndSaveEntity(schemas.User, user);
 }
 ```
 
