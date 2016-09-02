@@ -48,6 +48,7 @@
   "dependencies": {
     "babel-polyfill": "^6.13.0",
     "denormalizr": "git://github.com/larsbs/denormalizr",
-    "lodash": "^4.15.0"
+    "lodash": "^4.15.0",
+    "node-uuid": "^1.4.7"
   }
 }

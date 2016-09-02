@@ -1,4 +1,5 @@
 import omit from 'lodash/omit';
+import isEmpty from 'lodash/isEmpty';
 import mapValues from 'lodash/mapValues';
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -82,7 +83,7 @@ const updateRelationship = (state, action) => {
 };
 
 
-function reducer(state, action) {
+function reducer_old(state, action) {
   switch (action.type) {
     case EntitiesActions.CREATE_ENTITY: {
       const { name, data } = action.payload;
@@ -137,12 +138,37 @@ function reducer(state, action) {
 }
 
 
+function updateRelationsWhenCreating() {
+}
+
+
+function reducer(state, action) {
+  switch (action.type) {
+    case EntitiesActions.CREATE_ENTITY: {
+      const { schema, data } = action.payload;
+      const { entities, result } = data;
+      const createdEntityName = schema.getKey();
+      const createdEntityId = result;
+      return mapValues(state, (currentEntities, name) => {
+        if (name.startsWith('_')) return currentEntities;
+        const entitySchema = state._schemas[name];
+        return {
+          ...currentEntities,
+          ...entities[name],
+        };
+      });
+    }
+    default:
+      return state;
+  }
+}
+
+
 export default function entities(schemas) {
-  const inversedSchemas = inverseSchemas(values(schemas));
-  const initialState = {
-    _originalSchemas: values(schemas).reduce((result, s) => ({ ...result, [s._key]: s }), {}),
-    _schemas: inversedSchemas,
-    ...getEmptyEntities(inversedSchemas),
-  };
-  return (state = initialState, action) => reducer(state, action);
+  if (isEmpty(schemas)) {
+    throw new Error('[INVALID SCHEMAS]');
+  }
+  const emptyEntities = mapValues(schemas, () => ({}));
+  const initialState = { ...emptyEntities, _schemas: schemas };
+  return (state=initialState, action) => reducer(state, action);
 }

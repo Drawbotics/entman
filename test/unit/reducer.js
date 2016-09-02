@@ -1,224 +1,105 @@
 import { expect } from 'chai';
-import { Schema, arrayOf } from 'normalizr';
 import deepFreeze from 'deep-freeze';
 
-import entities from 'reducer';
-import { inverseSchemas } from 'utils';
 import {
   createEntity,
   updateEntity,
   updateEntityId,
   deleteEntity,
 } from 'actions';
+import {
+  defineSchema,
+  generateSchemas,
+  hasMany,
+} from 'schema';
+import entities from 'reducer';
 
 
 describe('@Reducer', function () {
-  let reducer;
   let schemas;
-  let schemasObj;
   before(function () {
-    const cart = new Schema('cart');
-    const estate = new Schema('estate');
-    const user = new Schema('user');
-    cart.define({
-      estates: arrayOf(estate),
-      user: user,
+    const group = defineSchema('Group', {
+      users: hasMany('User'),
     });
-    estate.define({
-      cart: cart,
+    const user = defineSchema('User', {
+      group: 'Group',
+      tasks: hasMany('Task'),
     });
-    user.define({
-      carts: arrayOf(cart),
+    const task = defineSchema('Task', {
+      user: 'User',
+      //TODO: users: hasMany('User'),
     });
-    schemas = [cart, estate, user];
-    schemasObj = { cart, estate, user };
-    reducer = entities(schemas);
+    schemas = generateSchemas([group, user, task]);
   });
-  it('should return a reducer', function () {
-    expect(reducer).to.be.a('function');
-  });
-  it('should return the initialState when received undefined as `state`', function() {
-    const inversedSchemas = inverseSchemas(schemas);
-    const expected = {
-      _originalSchemas: Object.values(schemas).reduce((result, s) => ({ ...result, [s._key]: s }), {}),
-      _schemas: inversedSchemas,
-      cart: {},
-      estate: {},
-      user: {},
-    };
-    const result = reducer(undefined, deepFreeze({}));
-    expect(result).to.deep.equal(expected);
-  });
-  it('should merge entities into the state when `CREATE_ENTITY`', function () {
-    const schemas = inverseSchemas(schemas);
-    const initialState = deepFreeze({
-      ...reducer(undefined, {}),
-      cart: { 2: { id: 2, estates: [] }},
+  describe('entities(schemas)', function () {
+    it('should throw an error when `schemas` is empty', function () {
+      expect(() => entities()).to.throw('INVALID SCHEMAS');
     });
-    const data = {
-      id: 1,
-      estates: [{
-        id: 1,
-        cart: 1,
-      }, {
-        id: 2,
-        cart: 1,
-      }],
-    };
-    const action = createEntity(schemasObj.cart, data);
-    const expected = {
-      ...initialState,
-      cart: {
-        1: { id: 1, estates: [1, 2] },
-        2: { id: 2, estates: [] },
-      },
-      estate: {
-        1: { id: 1, cart: 1 },
-        2: { id: 2, cart: 1 },
-      },
-    };
-    const result = reducer(initialState, action);
-    expect(result).to.deep.equal(expected);
-  });
-  it('should update relationships when `CREATE_ENTITY`', function () {
-    const schemas = inverseSchemas(schemas);
-    const initialState = deepFreeze({
-      ...reducer(undefined, {}),
-      cart: {
-        1: { id: 1, estates: [1, 2] },
-      },
-      estate: {
-        1: { id: 1, cart: 1 },
-        2: { id: 2, cart: 1 },
-      }
+    it('should return a reducer function', function () {
+      const result = entities(schemas);
+      expect(result).to.be.a('function');
     });
-    const data = {
-      id: 3,
-      cart: 1,
-    };
-    const action = createEntity(schemasObj.estate, data);
-    const expected = {
-      ...initialState,
-      cart: {
-        1: { id: 1, estates: [1, 2, 3] },
-      },
-      estate: {
-        1: { id: 1, cart: 1 },
-        2: { id: 2, cart: 1 },
-        3: { id: 3, cart: 1 },
-      },
-    };
-    const result = reducer(initialState, action);
-    expect(result).to.deep.equal(expected);
   });
-  it('should update an entity when `UPDATE_ENTITY`', function () {
-    const schemas = inverseSchemas(schemas);
-    const initialState = deepFreeze({
-      ...reducer(undefined, {}),
-      user: {
-        1: { id: 1, name: 'Lars', carts: [] },
-      },
+  describe('reducer(state, action)', function () {
+    let reducer;
+    before(function () {
+      reducer = entities(schemas);
     });
-    const data = {
-      name: 'Stan'
-    };
-    const action = updateEntity(schemasObj.user, 1, data);
-    const expected = {
-      ...initialState,
-      user: {
-        1: { id: 1, name: 'Stan', carts: [] },
-      },
-    };
-    const result = reducer(initialState, action);
-    expect(result).to.deep.equal(expected);
-  });
-  it.skip('should update relationships when `UPDATE_ENTITY`', function () {
-  });
-  it('should update the id of an entity when `UPDATE_ENTITY_ID`', function () {
-    const schemas = inverseSchemas(schemas);
-    const initialState = deepFreeze({
-      ...reducer(undefined, {}),
-      user: {
-        12: { id: 12, name: 'Lars', carts: [] },
-      },
+    it('should return the initialState when received undefined as `state`', function() {
+      const expected = {
+        _schemas: schemas,
+        Group: {},
+        User: {},
+        Task: {},
+      };
+      const result = reducer(undefined, {});
+      expect(result).to.deep.equal(expected);
     });
-    const action = updateEntityId(schemasObj.user, 12, 1);
-    const expected = {
-      ...initialState,
-      user: {
-        1: { id: 1, name: 'Lars', carts: [] },
-      },
-    };
-    const result = reducer(initialState, action);
-    expect(result).to.deep.equal(expected);
-  });
-  it('should update relationships when `UPDATE_ENTITY_ID`', function () {
-    const schemas = inverseSchemas(schemas);
-    const initialState = deepFreeze({
-      ...reducer(undefined, {}),
-      cart: {
-        1: { id: 1, estates: [1, 2] },
-      },
-      estate: {
-        1: { id: 1, cart: 1 },
-        2: { id: 2, cart: 1 },
-      }
+    describe.skip('when `LOAD_ENTITY` is received as action', function () {
+      it('should merge all the entities into the state', function () {
+      });
     });
-    const action = updateEntityId(schemasObj.estate, 1, 3);
-    const expected = {
-      ...initialState,
-      cart: {
-        1: { id: 1, estates: [2, 3] },
-      },
-      estate: {
-        3: { id: 3, cart: 1 },
-        2: { id: 2, cart: 1 },
-      },
-    };
-    const result = reducer(initialState, action);
-    expect(result).to.deep.equal(expected);
-  });
-  it('should delete an entity when `DELETE_ENTITY`', function () {
-    const schemas = inverseSchemas(schemas);
-    const initialState = deepFreeze({
-      ...reducer(undefined, {}),
-      user: {
-        1: { id: 1, carts: [] },
-      },
+    describe('when `CREATE_ENTITY` is received as action', function () {
+      let finalState;
+      const group = { name: 'Group 1', id: 1 };
+      const user = { name: 'Lars', group: 1, id: 1 };
+      const task = { title: 'Do something', user: 1, id: 1 };
+      before(function () {
+        const initialState = deepFreeze(reducer(undefined, {}));
+        const createGroup = createEntity(schemas.Group, group);
+        const createUser = createEntity(schemas.User, user);
+        const createTask = createEntity(schemas.Task, task);
+        finalState = deepFreeze(reducer(initialState, createGroup));
+        finalState = deepFreeze(reducer(finalState, createUser));
+        finalState = deepFreeze(reducer(finalState, createTask));
+      });
+      it('should add the new entity to the state', function () {
+        expect(finalState.Group[group.id].name).to.equal(group.name);
+        expect(finalState.User[user.id].name).to.equal(user.name);
+        expect(finalState.Task[task.id].name).to.equal(task.name);
+      });
+      it('should update relationships', function () {
+        expect(finalState.Group[group.id].users).to.deep.equal([user.id]);
+        //expect(finalState.User[user.id].tasks).to.deep.equal([tasks.id]);
+      });
     });
-    const action = deleteEntity(schemasObj.user, 1);
-    const expected = {
-      ...initialState,
-      user: {},
-    };
-    const result = reducer(initialState, action);
-    expect(result).to.deep.equal(expected);
-  });
-  it('should update relationships when `DELETE_ENTITY`', function () {
-    const schemas = inverseSchemas(schemas);
-    const initialState = deepFreeze({
-      ...reducer(undefined, {}),
-      cart: {
-        1: { id: 1, estates: [1, 2, 3] },
-      },
-      estate: {
-        1: { id: 1, cart: 1 },
-        2: { id: 2, cart: 1 },
-        3: { id: 3, cart: 1 },
-      }
+    describe('when `UPDATE_ENTITY` is received as action', function () {
+      it('should update an entity when `UPDATE_ENTITY`', function () {
+      });
+      it.skip('should update relationships when `UPDATE_ENTITY`', function () {
+      });
     });
-    const action = deleteEntity(schemasObj.estate, 3);
-    const expected = {
-      ...initialState,
-      cart: {
-        1: { id: 1, estates: [1, 2] },
-      },
-      estate: {
-        1: { id: 1, cart: 1 },
-        2: { id: 2, cart: 1 },
-      },
-    };
-    const result = reducer(initialState, action);
-    expect(result).to.deep.equal(expected);
-  })
+    describe('when `UPDATE_ENTITY_ID` is received as action', function () {
+      it('should update the id of an entity when `UPDATE_ENTITY_ID`', function () {
+      });
+      it('should update relationships when `UPDATE_ENTITY_ID`', function () {
+      });
+    });
+    describe('when `DELETE_ENTITY` is received as action', function () {
+      it('should delete an entity when `DELETE_ENTITY`', function () {
+      });
+      it('should update relationships when `DELETE_ENTITY`', function () {
+      });
+    });
+  });
 });
