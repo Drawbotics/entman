@@ -1,4 +1,3 @@
-import { inverseSchema } from './utils';
 import { normalize } from 'normalizr';
 
 
@@ -14,7 +13,7 @@ export function createEntity(schema, data) {
   return {
     type: CREATE_ENTITY,
     payload: {
-      name: inverseSchema(schema).name,
+      name: schema.getKey(),
       data: normalize(data, schema),
     },
     meta: {
@@ -36,26 +35,10 @@ export function updateEntity(schema, id, data, defaulting) {
   return {
     type: UPDATE_ENTITY,
     payload: {
-      name: inverseSchema(schema).name,
+      name: schema.getKey(),
       id,
       data: normalize({ id, ...data }, schema),
       defaulting,
-    },
-    meta: {
-      isEntityAction: true,
-    },
-  };
-}
-
-
-export const DELETE_ENTITY = 'DELETE_ENTITY';
-
-export function deleteEntity(schema, id) {
-  return {
-    type: DELETE_ENTITY,
-    payload: {
-      name: inverseSchema(schema).name,
-      id,
     },
     meta: {
       isEntityAction: true,
@@ -70,9 +53,25 @@ export function updateEntityId(schema, oldId, newId) {
   return {
     type: UPDATE_ENTITY_ID,
     payload: {
-      name: inverseSchema(schema).name,
+      name: schema.getKey(),
       oldId,
       newId,
+    },
+    meta: {
+      isEntityAction: true,
+    },
+  };
+}
+
+
+export const DELETE_ENTITY = 'DELETE_ENTITY';
+
+export function deleteEntity(schema, id) {
+  return {
+    type: DELETE_ENTITY,
+    payload: {
+      name: schema.getKey(),
+      id,
     },
     meta: {
       isEntityAction: true,

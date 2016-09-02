@@ -1,8 +1,8 @@
 describe('UNIT TESTS', function () {
-  //require('./actions');
+  require('./actions');
   //require('./reducer');
   //require('./selectors');
   //require('./utils');
-  require('./helpers');
+  //require('./helpers');
   //require('./schema');
 });
