@@ -1,3 +1,4 @@
+import { v4 } from 'node-uuid';
 import { normalize } from 'normalizr';
 
 
@@ -10,11 +11,15 @@ export const CREATE_ENTITY = 'CREATE_ENTITY';
  * because resemblance with CRUD operations.
  */
 export function createEntity(schema, data) {
+  if ( ! data.hasOwnProperty('id')) {
+    data = { ...data, id: v4() };
+  }
   return {
     type: CREATE_ENTITY,
     payload: {
       name: schema.getKey(),
       data: normalize(data, schema),
+      _rawData: data,
     },
     meta: {
       isEntityAction: true,

@@ -37,11 +37,24 @@ describe('@Actions', function () {
       const result = createEntity(Cart, data);
       expect(result.payload.name).to.equal('Cart');
     });
-    it('should include the data in the payload', function () {
+    it('should include the data normalized in the payload', function () {
+      const { Cart } = schemas;
+      const data = { foo: 'bar', id: 1 };
+      const result = createEntity(Cart, data);
+      expect(result.payload.data).to.deep.equal(normalize(data, Cart));
+    });
+    it('should generate an id if it\'s not present in the data', function () {
       const { Cart } = schemas;
       const data = { foo: 'bar' };
       const result = createEntity(Cart, data);
-      expect(result.payload.data).to.deep.equal(normalize(data, Cart));
+      expect(result.payload._rawData).to.contain.key('id');
+    });
+    it('should keep the id present in the data', function () {
+      const { Cart } = schemas;
+      const id = 1;
+      const data = { foo: 'bar', id };
+      const result = createEntity(Cart, data);
+      expect(result.payload._rawData.id).to.equal(id);
     });
   });
   describe('updateEntity(schema, id, data)', function () {
