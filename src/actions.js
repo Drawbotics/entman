@@ -79,3 +79,11 @@ export function updateEntityId(schema, oldId, newId) {
     },
   };
 }
+
+
+export default {
+  createEntity,
+  updateEntity,
+  deleteEntity,
+  updateEntityId,
+};

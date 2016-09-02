@@ -3,6 +3,6 @@ describe('UNIT TESTS', function () {
   //require('./reducer');
   //require('./selectors');
   //require('./utils');
-  //require('./helpers');
-  require('./schema');
+  require('./helpers');
+  //require('./schema');
 });
