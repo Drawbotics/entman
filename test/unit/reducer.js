@@ -78,7 +78,8 @@ describe('@Reducer', function () {
         expect(finalState.User[user.id].name).to.equal(user.name);
         expect(finalState.Task[task.id].name).to.equal(task.name);
       });
-      it.skip('should update relationships', function () {
+      it('should update relationships', function () {
+        console.log(finalState.Group[group.id]);
         expect(finalState.Group[group.id].users).to.deep.equal([user.id]);
         //expect(finalState.User[user.id].tasks).to.deep.equal([tasks.id]);
       });

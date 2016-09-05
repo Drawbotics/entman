@@ -58,15 +58,37 @@ function generateSchema(schema, bag) {
       return relatedEntities.map(e => e.entity).includes(entityName);
     },
   });
+  Object.defineProperty(finalSchema, 'getRelatedThroughTo', {
+    enumerable: false,
+    value(relatedEntityName) {
+      return Object.keys(this).find(k => {
+        console.groupCollapsed(this.getKey())
+        console.log('this', this);
+        console.log('relatedTo', relatedEntityName);
+        console.groupEnd(this.getKey());
+        if (k.startsWith('_')) return false;
+        if (this[k].getKey) {
+          return this[k].getKey() === relatedEntityName;
+        }
+        else if (this[k].getItemSchema) {
+          return this[k].getItemSchema().getKey() === relatedEntityName;
+        }
+        return false;
+      });
+    }
+  });
   Object.defineProperty(finalSchema, 'getRelation', {
     enumerable: false,
     value(entity, relatedEntityName) {
+      console.log('entity', entity);
+      console.log('relatedEntityName', relatedEntityName);
       const { prop } = relatedEntities.find(e => e.entity === relatedEntityName);
-      const relatedEntityId = entity[prop];
+      const relatedId = entity[prop];
+      const relatedPropName = bag[relatedEntityName].getRelatedThroughTo(this.getKey());
       return {
         related: relatedEntityName,
-        relatedPropName: prop,
-        relatedId: relatedEntityId,
+        relatedPropName,
+        relatedId,
       };
     },
   });

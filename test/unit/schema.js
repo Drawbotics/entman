@@ -115,7 +115,7 @@ describe('@Schema', function () {
       expect(result.User.getRelation).to.exist;
       expect(result.Group.getRelation).to.exist;
     });
-    it('the method `getRelation(entity, name)` should return an object with the info for the relation between entities', function () {
+    it('the method `getRelation(entity, name)` should return an object with the info for the relation between entities when single relation', function () {
       const user = defineSchema('User', {
         group: 'Group',
       });
@@ -124,11 +124,12 @@ describe('@Schema', function () {
       const userEntity = { id: 1, group: 1, name: 'Lars' };
       const expected = {
         related: 'Group',
-        relatedPropName: 'group',
+        relatedPropName: 'users',
         relatedId: 1,
       };
       const result = schemas.User.getRelation(userEntity, 'Group');
       expect(result).to.deep.equal(expected);
     });
+    it('the method `getRelation(entity, name)` should return an object with the info for the relation between entities when array relation');
   });
 });

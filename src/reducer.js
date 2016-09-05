@@ -142,6 +142,17 @@ function updateRelationsWhenCreating() {
 }
 
 
+function pushIn(entities, id, prop, value) {
+  return {
+    ...entities,
+    [id]: {
+      ...entities[id],
+      [prop]: [ ...(entities[id][prop] || []), value ],
+    },
+  };
+}
+
+
 function reducer(state, action) {
   switch (action.type) {
     case EntitiesActions.CREATE_ENTITY: {
@@ -152,21 +163,16 @@ function reducer(state, action) {
         if (name.startsWith('_')) {
           return currentEntities;
         }
+        const mergedEntities = { ...currentEntities, ...entities[name] };
         if ( ! schema.isRelatedTo(name)) {
-          return { ...currentEntities, ...entities[name] };
+          return mergedEntities;
         }
         const { related, relatedPropName, relatedId } = schema.getRelation(createdEntity, name);
         // Only update related arrays?
-        // stateWithEntities[related][relatedId][relatedPropName].push(createdEntity.id);
-        // This ↓ is basically this ↑ without mutating the state
-        return {
-          ...currentEntities,
-          ...entities[name],
-          [relatedId]: {
-            ...entities[name][relatedId],
-            [relatedPropName]: [ ...entities[name][relatedId][relatedPropName], createdEntity.id ],
-          },
-        };
+        if ( ! relatedId) {
+          return mergedEntities;
+        }
+        return pushIn(mergedEntities, relatedId, relatedPropName, createdEntity.id);
       });
     }
     default:
