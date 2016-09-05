@@ -78,24 +78,24 @@ describe('@Reducer', function () {
         expect(finalState.User[user.id].name).to.equal(user.name);
         expect(finalState.Task[task.id].name).to.equal(task.name);
       });
-      it('should update relationships', function () {
+      it.skip('should update relationships', function () {
         expect(finalState.Group[group.id].users).to.deep.equal([user.id]);
         //expect(finalState.User[user.id].tasks).to.deep.equal([tasks.id]);
       });
     });
-    describe('when `UPDATE_ENTITY` is received as action', function () {
+    describe.skip('when `UPDATE_ENTITY` is received as action', function () {
       it('should update an entity when `UPDATE_ENTITY`', function () {
       });
       it.skip('should update relationships when `UPDATE_ENTITY`', function () {
       });
     });
-    describe('when `UPDATE_ENTITY_ID` is received as action', function () {
+    describe.skip('when `UPDATE_ENTITY_ID` is received as action', function () {
       it('should update the id of an entity when `UPDATE_ENTITY_ID`', function () {
       });
       it('should update relationships when `UPDATE_ENTITY_ID`', function () {
       });
     });
-    describe('when `DELETE_ENTITY` is received as action', function () {
+    describe.skip('when `DELETE_ENTITY` is received as action', function () {
       it('should delete an entity when `DELETE_ENTITY`', function () {
       });
       it('should update relationships when `DELETE_ENTITY`', function () {

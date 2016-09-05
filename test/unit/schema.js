@@ -92,5 +92,43 @@ describe('@Schema', function () {
       expect(result.Group.getKey()).to.equal('Group');
       expect(result.User.getKey()).to.equal('User');
     });
+    it('should add a method called `isRelatedTo` to the generated schemas', function () {
+      const user = defineSchema('User');
+      const group = defineSchema('Group');
+      const result = generateSchemas([user, group]);
+      expect(result.User.isRelatedTo).to.exist;
+      expect(result.Group.isRelatedTo).to.exist;
+    });
+    it('the method `isRelatedTo(entityName)` should return true when the entity is related to `entityName`', function () {
+      const user = defineSchema('User', {
+        group: 'Group',
+      });
+      const group = defineSchema('Group');
+      const result = generateSchemas([user, group]);
+      expect(result.User.isRelatedTo('Group')).to.be.true;
+      expect(result.User.isRelatedTo('assdfa')).to.be.false;
+    });
+    it('should add a method called `getRelation` to the generated schemas', function () {
+      const user = defineSchema('User');
+      const group = defineSchema('Group');
+      const result = generateSchemas([user, group]);
+      expect(result.User.getRelation).to.exist;
+      expect(result.Group.getRelation).to.exist;
+    });
+    it('the method `getRelation(entity, name)` should return an object with the info for the relation between entities', function () {
+      const user = defineSchema('User', {
+        group: 'Group',
+      });
+      const group = defineSchema('Group');
+      const schemas = generateSchemas([user, group]);
+      const userEntity = { id: 1, group: 1, name: 'Lars' };
+      const expected = {
+        related: 'Group',
+        relatedPropName: 'group',
+        relatedId: 1,
+      };
+      const result = schemas.User.getRelation(userEntity, 'Group');
+      expect(result).to.deep.equal(expected);
+    });
   });
 });

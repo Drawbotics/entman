@@ -147,14 +147,25 @@ function reducer(state, action) {
     case EntitiesActions.CREATE_ENTITY: {
       const { schema, data } = action.payload;
       const { entities, result } = data;
-      const createdEntityName = schema.getKey();
-      const createdEntityId = result;
+      const createdEntity = entities[schema.getKey()][result];
       return mapValues(state, (currentEntities, name) => {
-        if (name.startsWith('_')) return currentEntities;
-        const entitySchema = state._schemas[name];
+        if (name.startsWith('_')) {
+          return currentEntities;
+        }
+        if ( ! schema.isRelatedTo(name)) {
+          return { ...currentEntities, ...entities[name] };
+        }
+        const { related, relatedPropName, relatedId } = schema.getRelation(createdEntity, name);
+        // Only update related arrays?
+        // stateWithEntities[related][relatedId][relatedPropName].push(createdEntity.id);
+        // This ↓ is basically this ↑ without mutating the state
         return {
           ...currentEntities,
           ...entities[name],
+          [relatedId]: {
+            ...entities[name][relatedId],
+            [relatedPropName]: [ ...entities[name][relatedId][relatedPropName], createdEntity.id ],
+          },
         };
       });
     }

@@ -18,6 +18,7 @@ export function createEntity(schema, data) {
     type: CREATE_ENTITY,
     payload: {
       name: schema.getKey(),
+      schema: schema,
       data: normalize(data, schema),
       _rawData: data,
     },

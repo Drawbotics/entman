@@ -31,6 +31,7 @@ export function hasMany(schema) {
 
 
 function generateSchema(schema, bag) {
+  const relatedEntities = [];
   const schemaDefinition = Object.keys(schema.attributes).reduce((result, a) => {
     const attribute = schema.attributes[a];
     if (typeof attribute === 'function') {
@@ -39,16 +40,36 @@ function generateSchema(schema, bag) {
     }
     else if (typeof attribute === 'string') {
       // Single reference to another schema
+      relatedEntities.push({ prop: a, entity: attribute });
       return { ...result, [a]: bag[attribute] };
     }
     else if (attribute.isArray) {
       // Array reference to another schema
+      relatedEntities.push({ prop: a, entity: attribute.relatedSchema });
       return { ...result, [a]: arrayOf(bag[attribute.relatedSchema]) };
     }
     return result;  // Shouldn't never come to here
   }, {});
   const finalSchema = bag[schema.name];
   finalSchema.define(schemaDefinition);
+  Object.defineProperty(finalSchema, 'isRelatedTo', {
+    enumerable: false,
+    value(entityName) {
+      return relatedEntities.map(e => e.entity).includes(entityName);
+    },
+  });
+  Object.defineProperty(finalSchema, 'getRelation', {
+    enumerable: false,
+    value(entity, relatedEntityName) {
+      const { prop } = relatedEntities.find(e => e.entity === relatedEntityName);
+      const relatedEntityId = entity[prop];
+      return {
+        related: relatedEntityName,
+        relatedPropName: prop,
+        relatedId: relatedEntityId,
+      };
+    },
+  });
   return finalSchema;
 }
 
