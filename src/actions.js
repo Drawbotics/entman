@@ -38,14 +38,15 @@ export function createEntity(schema, data) {
 
 export const UPDATE_ENTITY = 'UPDATE_ENTITY';
 
-export function updateEntity(schema, id, data, defaulting) {
+export function updateEntity(schema, id, data, useDefault) {
   return {
     type: UPDATE_ENTITY,
     payload: {
       name: schema.getKey(),
+      schema: schema,
       id,
       data: normalize({ id, ...data }, schema),
-      defaulting,
+      useDefault,
     },
     meta: {
       isEntityAction: true,

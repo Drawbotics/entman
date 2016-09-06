@@ -59,7 +59,7 @@ describe('@Reducer', function () {
       it('should merge all the entities into the state', function () {
       });
     });
-    describe('when `CREATE_ENTITY` is received as action', function () {
+    describe.skip('when `CREATE_ENTITY` is received as action', function () {
       let finalState;
       const group = { name: 'Group 1', id: 1 };
       const user = { name: 'Lars', group: 1, id: 1 };
@@ -83,10 +83,32 @@ describe('@Reducer', function () {
         expect(finalState.User[user.id].tasks).to.deep.equal([task.id]);
       });
     });
-    describe.skip('when `UPDATE_ENTITY` is received as action', function () {
-      it('should update an entity when `UPDATE_ENTITY`', function () {
+    describe('when `UPDATE_ENTITY` is received as action', function () {
+      let finalState;
+      const group = { name: 'Group 1', id: 1 };
+      const group2 = { name: 'Group 2', id: 2 };
+      const user = { name: 'Lars', group: 1, id: 1 };
+      const task = { title: 'Do something', user: 1, id: 1 };
+      const newName = 'Grishan';
+      before(function () {
+        const initialState = deepFreeze(reducer(undefined, {}));
+        const createGroup = createEntity(schemas.Group, group);
+        const createGroup2 = createEntity(schemas.Group, group2);
+        const createUser = createEntity(schemas.User, user);
+        const createTask = createEntity(schemas.Task, task);
+        const updateUser = updateEntity(schemas.User, 1, { name: newName, group: 2 });
+        finalState = deepFreeze(reducer(initialState, createGroup));
+        finalState = deepFreeze(reducer(finalState, createGroup2));
+        finalState = deepFreeze(reducer(finalState, createUser));
+        finalState = deepFreeze(reducer(finalState, createTask));
+        finalState = deepFreeze(reducer(finalState, updateUser));
       });
-      it.skip('should update relationships when `UPDATE_ENTITY`', function () {
+      it('should update an entity', function () {
+        expect(finalState.User[user.id].name).to.equal(newName);
+      });
+      it('should update relationships', function () {
+        expect(finalState.Group[group.id].users).to.not.contain(user.id);
+        expect(finalState.Group[group2.id].users).to.contain(user.id);
       });
     });
     describe.skip('when `UPDATE_ENTITY_ID` is received as action', function () {
@@ -95,7 +117,7 @@ describe('@Reducer', function () {
       it('should update relationships when `UPDATE_ENTITY_ID`', function () {
       });
     });
-    describe('when `DELETE_ENTITY` is received as action', function () {
+    describe.skip('when `DELETE_ENTITY` is received as action', function () {
       let finalState;
       const group = { name: 'Group 1', id: 1 };
       const user = { name: 'Lars', group: 1, id: 1 };

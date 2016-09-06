@@ -2,47 +2,13 @@ import omit from 'lodash/omit';
 import isEmpty from 'lodash/isEmpty';
 import mapValues from 'lodash/mapValues';
 import cloneDeep from 'lodash/cloneDeep';
+import set from 'lodash/set';
 
 import * as EntitiesActions from './actions';
 import {
-  inverseSchemas,
-  getEmptyEntities,
   flatten,
-  values,
   defaultsDeep,
-  update,
 } from './utils';
-
-
-// Sample relation
-const relation = {
-  from: 'user',
-  to: 'group',
-  withId: 1,
-  through: 'users',
-  isArray: true,
-};
-
-
-const getRelationships = (schema) => {
-  return [relation];
-};
-
-
-function updateAfterCreate(state, action) {
-  const { schema, data } = action.payload;
-  const relationships = getRelationships(schema);
-  return relationships.reduce((newState, relationship) => {
-    const { from, to, withId, through, isArray } = relationship;
-    if (isArray) {
-      const value = newState[to][withId][through];
-      newState[to][withId][through] = value.concat(data.result);
-    }
-    else {
-      newState[to][withId][through] = data.result;
-    }
-  }, cloneDeep(state));
-}
 
 
 const updateRelationship = (state, action) => {
@@ -170,24 +136,46 @@ function setIn(entities, id, prop, value) {
 }
 
 
+function update(state, entityName, id, newData) {
+  const flattenedData = flatten(newData);
+  return {
+    ...state,
+    [entityName]: {
+      ...state[entityName],
+      [id]: Object.keys(flattenedData).reduce((result, k) => {
+        return set(result, k, flattenedData[k]);
+      }, cloneDeep(state[entityName])),
+    },
+  };
+}
+
+
 function reducer(state, action) {
   switch (action.type) {
     case EntitiesActions.CREATE_ENTITY: {
       const { schema, data } = action.payload;
       const { entities, result } = data;
       const createdEntity = entities[schema.getKey()][result];
-      const mergedEntities = { ...state, ...entities };
-      return mapValues(mergedEntities, (currentEntities, name) => {
+      return mapValues(state, (currentEntities, name) => {
+        const mergedEntities = { ...currentEntities, ...entities[name] };
         if (name.startsWith('_') || ! schema.isRelatedTo(name)) {
-          return currentEntities;
+          return mergedEntities;
         }
         const { relatedPropName, relatedId } = schema.getRelation(createdEntity, name);
         // Only update related arrays?
         if ( ! relatedId) {
-          return currentEntities;
+          return mergedEntities;
         }
-        return pushIn(currentEntities, relatedId, relatedPropName, createdEntity.id);
+        return pushIn(mergedEntities, relatedId, relatedPropName, createdEntity.id);
       });
+    }
+    case EntitiesActions.UPDATE_ENTITY: {
+      const { schema, data, id, useDefault } = action.payload;
+      const newData = data.entities[schema.getKey()][id];
+      if (useDefault) {
+        return state;
+      }
+      return update(state, schema.getKey(), id, newData);
     }
     case EntitiesActions.DELETE_ENTITY: {
       const { schema, id } = action.payload;
