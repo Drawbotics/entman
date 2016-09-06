@@ -128,6 +128,7 @@ describe('@Schema', function () {
         related: 'Group',
         relatedPropName: 'users',
         relatedId: 1,
+        isArray: true,
       };
       const result = schemas.User.getRelation(userEntity, 'Group');
       expect(result).to.deep.equal(expected);

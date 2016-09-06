@@ -10,7 +10,6 @@ import {
   flatten,
   values,
   defaultsDeep,
-  setIn,
   update,
 } from './utils';
 
@@ -138,10 +137,6 @@ function reducer_old(state, action) {
 }
 
 
-function updateRelationsWhenCreating() {
-}
-
-
 function pushIn(entities, id, prop, value) {
   return {
     ...entities,
@@ -153,26 +148,65 @@ function pushIn(entities, id, prop, value) {
 }
 
 
+function deleteIn(entities, id, prop, value) {
+  return {
+    ...entities,
+    [id]: {
+      ...entities[id],
+      [prop]: entities[id][prop].filter(id => id !== value),
+    },
+  };
+}
+
+
+function setIn(entities, id, prop, value) {
+  return {
+    ...entities,
+    [id]: {
+      ...entities[id],
+      [prop]: value,
+    },
+  };
+}
+
+
 function reducer(state, action) {
   switch (action.type) {
     case EntitiesActions.CREATE_ENTITY: {
       const { schema, data } = action.payload;
       const { entities, result } = data;
       const createdEntity = entities[schema.getKey()][result];
-      return mapValues(state, (currentEntities, name) => {
-        if (name.startsWith('_')) {
+      const mergedEntities = { ...state, ...entities };
+      return mapValues(mergedEntities, (currentEntities, name) => {
+        if (name.startsWith('_') || ! schema.isRelatedTo(name)) {
           return currentEntities;
         }
-        const mergedEntities = { ...currentEntities, ...entities[name] };
-        if ( ! schema.isRelatedTo(name)) {
-          return mergedEntities;
-        }
-        const { related, relatedPropName, relatedId } = schema.getRelation(createdEntity, name);
+        const { relatedPropName, relatedId } = schema.getRelation(createdEntity, name);
         // Only update related arrays?
         if ( ! relatedId) {
-          return mergedEntities;
+          return currentEntities;
         }
-        return pushIn(mergedEntities, relatedId, relatedPropName, createdEntity.id);
+        return pushIn(currentEntities, relatedId, relatedPropName, createdEntity.id);
+      });
+    }
+    case EntitiesActions.DELETE_ENTITY: {
+      const { schema, id } = action.payload;
+      const entityToDelete = state[schema.getKey()][id];
+      const stateWithoutEntity = {
+        ...state,
+        [schema.getKey()]: omit(state[schema.getKey()], id),
+      };
+      return mapValues(stateWithoutEntity, (currentEntities, name) => {
+        if (name.startsWith('_') || ! schema.isRelatedTo(name)) {
+          return currentEntities;
+        }
+        const { relatedPropName, relatedId, isArray } = schema.getRelation(entityToDelete, name);
+        if (isArray) {
+          return deleteIn(currentEntities, relatedId, relatedPropName, entityToDelete.id);
+        }
+        else {
+          return setIn(currentEntities, relatedId, relatedPropName, null);
+        }
       });
     }
     default:

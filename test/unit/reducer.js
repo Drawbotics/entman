@@ -79,9 +79,8 @@ describe('@Reducer', function () {
         expect(finalState.Task[task.id].name).to.equal(task.name);
       });
       it('should update relationships', function () {
-        console.log(finalState.Group[group.id]);
         expect(finalState.Group[group.id].users).to.deep.equal([user.id]);
-        //expect(finalState.User[user.id].tasks).to.deep.equal([tasks.id]);
+        expect(finalState.User[user.id].tasks).to.deep.equal([task.id]);
       });
     });
     describe.skip('when `UPDATE_ENTITY` is received as action', function () {
@@ -96,10 +95,35 @@ describe('@Reducer', function () {
       it('should update relationships when `UPDATE_ENTITY_ID`', function () {
       });
     });
-    describe.skip('when `DELETE_ENTITY` is received as action', function () {
-      it('should delete an entity when `DELETE_ENTITY`', function () {
+    describe('when `DELETE_ENTITY` is received as action', function () {
+      let finalState;
+      const group = { name: 'Group 1', id: 1 };
+      const user = { name: 'Lars', group: 1, id: 1 };
+      const task = { title: 'Do something', user: 1, id: 1 };
+      beforeEach(function () {
+        const initialState = deepFreeze(reducer(undefined, {}));
+        const createGroup = createEntity(schemas.Group, group);
+        const createUser = createEntity(schemas.User, user);
+        const createTask = createEntity(schemas.Task, task);
+        finalState = deepFreeze(reducer(initialState, createGroup));
+        finalState = deepFreeze(reducer(finalState, createUser));
+        finalState = deepFreeze(reducer(finalState, createTask));
       });
-      it('should update relationships when `DELETE_ENTITY`', function () {
+      it('should delete the entity', function () {
+        const deleteTask = deleteEntity(schemas.Task, task);
+        finalState = deepFreeze(reducer(finalState, deleteTask));
+        expect(finalState.Task).to.not.have.property(task.id);
+      });
+      it('should update relationships', function () {
+        const deleteTask = deleteEntity(schemas.Task, task);
+        finalState = deepFreeze(reducer(finalState, deleteTask));
+        expect(finalState.User[user.id].tasks).to.not.contain(task.id);
+      });
+      it.skip('should cascade delete when parent entity is deleted', function () {
+        const deleteUser = deleteEntity(schemas.User, user);
+        finalState = deepFreeze(reducer(finalState, deleteUser));
+        expect(finalState.User[user.id]).to.not.exist;
+        expect(finalState.Task[task.id]).to.not.exist;
       });
     });
   });

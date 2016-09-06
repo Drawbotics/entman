@@ -1,5 +1,6 @@
 import { v4 } from 'node-uuid';
 import { normalize } from 'normalizr';
+import isPlainObject from 'lodash/isPlainObject';
 
 
 export const CREATE_ENTITY = 'CREATE_ENTITY';
@@ -73,10 +74,14 @@ export function updateEntityId(schema, oldId, newId) {
 export const DELETE_ENTITY = 'DELETE_ENTITY';
 
 export function deleteEntity(schema, id) {
+  if (isPlainObject(id) && id.hasOwnProperty('id')) {
+    id = id.id;
+  }
   return {
     type: DELETE_ENTITY,
     payload: {
       name: schema.getKey(),
+      schema: schema,
       id,
     },
     meta: {

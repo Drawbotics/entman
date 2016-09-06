@@ -61,6 +61,7 @@ function getRelation(schema, relatedEntities, bag) {
       related: relatedEntityName,
       relatedPropName,
       relatedId,
+      isArray: bag[relatedEntityName][relatedPropName].hasOwnProperty('_itemSchema'),
     };
   };
 }
