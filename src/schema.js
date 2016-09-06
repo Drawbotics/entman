@@ -30,6 +30,42 @@ export function hasMany(schema) {
 }
 
 
+function getRelatedThrough(entity1, entity2) {
+  return Object.keys(entity1).find(prop => {
+    if (prop.startsWith('_')) {
+      return false;
+    }
+    const relation = entity1[prop];
+    if (relation.getKey) {
+      return relation.getKey() === entity2.getKey();
+    }
+    else if (relation.getItemSchema) {
+      return relation.getItemSchema().getKey() === entity2.getKey();
+    }
+    return false;
+  });
+}
+
+
+function isRelatedTo(relatedEntities) {
+  return (entityName) => relatedEntities.map(e => e.entity).includes(entityName);
+}
+
+
+function getRelation(schema, relatedEntities, bag) {
+  return (entity, relatedEntityName) => {
+    const { prop } = relatedEntities.find(e => e.entity === relatedEntityName);
+    const relatedId = entity[prop];
+    const relatedPropName = getRelatedThrough(bag[relatedEntityName], schema);
+    return {
+      related: relatedEntityName,
+      relatedPropName,
+      relatedId,
+    };
+  };
+}
+
+
 function generateSchema(schema, bag) {
   const relatedEntities = [];
   const schemaDefinition = Object.keys(schema.attributes).reduce((result, a) => {
@@ -54,43 +90,11 @@ function generateSchema(schema, bag) {
   finalSchema.define(schemaDefinition);
   Object.defineProperty(finalSchema, 'isRelatedTo', {
     enumerable: false,
-    value(entityName) {
-      return relatedEntities.map(e => e.entity).includes(entityName);
-    },
-  });
-  Object.defineProperty(finalSchema, 'getRelatedThroughTo', {
-    enumerable: false,
-    value(relatedEntityName) {
-      return Object.keys(this).find(k => {
-        console.groupCollapsed(this.getKey())
-        console.log('this', this);
-        console.log('relatedTo', relatedEntityName);
-        console.groupEnd(this.getKey());
-        if (k.startsWith('_')) return false;
-        if (this[k].getKey) {
-          return this[k].getKey() === relatedEntityName;
-        }
-        else if (this[k].getItemSchema) {
-          return this[k].getItemSchema().getKey() === relatedEntityName;
-        }
-        return false;
-      });
-    }
+    value: isRelatedTo(relatedEntities),
   });
   Object.defineProperty(finalSchema, 'getRelation', {
     enumerable: false,
-    value(entity, relatedEntityName) {
-      console.log('entity', entity);
-      console.log('relatedEntityName', relatedEntityName);
-      const { prop } = relatedEntities.find(e => e.entity === relatedEntityName);
-      const relatedId = entity[prop];
-      const relatedPropName = bag[relatedEntityName].getRelatedThroughTo(this.getKey());
-      return {
-        related: relatedEntityName,
-        relatedPropName,
-        relatedId,
-      };
-    },
+    value: getRelation(finalSchema, relatedEntities, bag),
   });
   return finalSchema;
 }

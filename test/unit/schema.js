@@ -119,7 +119,9 @@ describe('@Schema', function () {
       const user = defineSchema('User', {
         group: 'Group',
       });
-      const group = defineSchema('Group');
+      const group = defineSchema('Group', {
+        users: hasMany('User'),
+      });
       const schemas = generateSchemas([user, group]);
       const userEntity = { id: 1, group: 1, name: 'Lars' };
       const expected = {
