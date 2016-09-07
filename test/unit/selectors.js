@@ -1,9 +1,10 @@
 import { expect } from 'chai';
-import deepFreeze from 'deep-freeze';
-import { Schema, arrayOf } from 'normalizr';
 
-import entities from 'reducer';
-import { inverseSchemas } from 'utils';
+import {
+  defineSchema,
+  generateSchemas,
+  hasMany,
+} from 'schema';
 import {
   getEntities,
   getEntitiesBy,
@@ -13,232 +14,91 @@ import {
 
 describe('@Selectors', function () {
   let state;
-  let reducer;
+  let schemas;
   before(function () {
-    const cart = new Schema('cart');
-    const estate = new Schema('estate');
-    const user = new Schema('user');
-    user.define({
-      carts: arrayOf(cart),
+    const group = defineSchema('Group', {
+      users: hasMany('User'),
     });
-    cart.define({
-      user,
-      estates: arrayOf(estate),
+    const user = defineSchema('User', {
+      group: 'Group',
+      tasks: hasMany('Task'),
     });
-    estate.define({
-      cart,
+    const task = defineSchema('Task', {
+      user: 'User',
+      //TODO: users: hasMany('User'),
     });
-    reducer = entities([cart, estate, user]);
-    state = deepFreeze({
-      ...reducer(undefined, {}),
-      user: {
-        1: { id: 1, name: 'Lars', carts: [] },
-        2: { id: 2, name: 'Stan', carts: [] },
+    schemas = generateSchemas([group, user, task]);
+    state = {
+      Group: {
+        1: { id: 1, name: 'Group 1' },
+        2: { id: 2, name: 'Group 2' },
       },
-      cart: {
-        1: { id: 1, estates: [1, 2] },
-        2: { id: 2, estates: [3] },
+      User: {
+        1: { id: 1, name: 'Lars', group: 1 },
+        2: { id: 2, name: 'Grishan', group: 1 },
+        3: { id: 3, name: 'Deathvoid', group: 2 },
       },
-      estate: {
-        1: { id: 1, cart: 1 },
-        2: { id: 2, cart: 1 },
-        3: { id: 3, cart: 2 },
+      Task: {
+        1: { id: 1, title: 'Do something', user: 1 },
+        2: { id: 2, title: 'Keep calm', user: 1 },
       },
-    });
+    };
   });
-  describe('getEntities(state, name)', function () {
-    it('should return all the entities of name = `name`', function () {
-      const result = getEntities(state, 'user');
-      const expected = [
-        { id: 1, name: 'Lars', carts: [] },
-        { id: 2, name: 'Stan', carts: [] },
-      ];
-      expect(result).to.deep.equal(expected);
+  describe('getEntities(state, schema)', function () {
+    let entities;
+    before(function () {
+      entities = getEntities(state, schemas.Group);
     });
-    it('should populate relationships one level deep', function () {
-      const result = getEntities(state, 'cart');
-      const expected = [
-        { id: 1 },
-        { id: 2 },
-      ];
-      expected[0].estates = [{
-        id: 1, cart: expected[0],
-      }, {
-        id: 2, cart: expected[0],
-      }];
-      expected[1].estates = [{
-        id: 3, cart: expected[1],
-      }];
-      const cart1 = result[0];
-      const cart2 = result[1];
-      const expectedCart1 = expected[0];
-      const expectedCart2 = expected[1];
-      // Entities
-      expect(result).to.have.lengthOf(2);
-      expect(cart1.id).to.equal(expectedCart1.id);
-      expect(cart2.id).to.equal(expectedCart2.id);
-      // Relationships
-      expect(cart1.estates).to.have.lengthOf(2);
-      expect(cart2.estates).to.have.lengthOf(1);
-      expect(cart1.estates[0].id).to.equal(expectedCart1.estates[0].id);
-      expect(cart1.estates[1].id).to.equal(expectedCart1.estates[1].id);
-      expect(cart2.estates[0].id).to.equal(expectedCart2.estates[0].id);
+    it('should return all the entities of schema = `schema`', function () {
+      expect(entities).to.have.length(2);
+      expect(entities).to.satisfy(entities => entities.some(e => e.id === 1));
+      expect(entities).to.satisfy(entities => entities.some(e => e.id === 2));
     });
     it('should populate all relationships', function () {
-      const state = deepFreeze({
-        ...reducer(undefined, {}),
-        user: {
-          1: { id: 1, name: 'Lars', carts: [1] },
-        },
-        cart: {
-          1: { id: 1, estates: [1] },
-        },
-        estate: {
-          1: { id: 1, cart: 1 },
-        },
-      });
-      const result = getEntities(state, 'user');
-      const expected = [
-        { id: 1 },
-      ];
-      expected[0].carts = [{
-        id: 1, user: expected[0],
-      }];
-      expected[0].carts[0].estates = [{
-        id: 1, cart: expected[0].carts[0],
-      }];
-      const user = result[0];
-      const expectedUser = expected[0];
-      // Entities
-      expect(result).to.have.lengthOf(1);
-      expect(user.id).to.equal(expectedUser.id);
-      // Relationships
-      expect(user.carts).to.have.lengthOf(1);
-      expect(user.carts[0].id).to.equal(expectedUser.carts[0].id);
-      expect(user.carts[0].estates[0].id).to.equal(expectedUser.carts[0].estates[0].id);
+      const group1 = entities.find(e => e.id === 1);
+      expect(group1.users).to.have.length(2);
+      expect(group1.users).to.satisfy(users => users.some(u => u.id === 1));
+      expect(group1.users).to.satisfy(users => users.some(u => u.id === 2));
     });
   });
-  describe('getEntitiesBy(state, name, by={})', function () {
-    it('should return all the entities of name = `name` that fulfil the condition `by`', function () {
-      const result = getEntitiesBy(state, 'user', { name: 'Lars' });
-      const expected = [
-        { id: 1, name: 'Lars', carts: [] },
-      ];
-      expect(result).to.deep.equal(expected);
+  describe('getEntitiesBy(state, schema, by={})', function () {
+    let entities;
+    before(function () {
+      entities = getEntitiesBy(state, schemas.Group, { name: 'Group 1' });
+    });
+    it('should return all the entities of schema = `schema` that fulfil the condition `by`', function () {
+      expect(entities).to.have.length(1);
+      expect(entities[0].id).to.equal(1);
     });
     it('should return an empty array when no entity fulfil the condition `by`', function () {
-      const result = getEntitiesBy(state, 'user', { name: 'Sandjiv' });
-      const expected = [];
-      expect(result).to.deep.equal(expected);
-    });
-    it('should populate relationships one level deep', function () {
-      const result = getEntitiesBy(state, 'cart', { id: 1 });
-      const expected = [
-        { id: 1 },
-      ];
-      expected[0].estates = [{
-        id: 1, cart: expected[0],
-      }, {
-        id: 2, cart: expected[0],
-      }];
-      const cart1 = result[0];
-      const expectedCart1 = expected[0];
-      // Entities
-      expect(result).to.have.lengthOf(1);
-      expect(cart1.id).to.equal(expectedCart1.id);
-      // Relationships
-      expect(cart1.estates).to.have.lengthOf(2);
-      expect(cart1.estates[0].id).to.equal(expectedCart1.estates[0].id);
-      expect(cart1.estates[1].id).to.equal(expectedCart1.estates[1].id);
+      const entities = getEntitiesBy(state, schemas.Group, { name: 'asdfa' });
+      expect(entities).to.be.an('array');
+      expect(entities).to.have.length(0);
     });
     it('should populate all relationships', function () {
-      const state = deepFreeze({
-        ...reducer(undefined, {}),
-        user: {
-          1: { id: 1, name: 'Lars', carts: [1] },
-        },
-        cart: {
-          1: { id: 1, estates: [1] },
-        },
-        estate: {
-          1: { id: 1, cart: 1 },
-        },
-      });
-      const result = getEntitiesBy(state, 'user', { id: 1 });
-      const expected = [
-        { id: 1 },
-      ];
-      expected[0].carts = [{
-        id: 1, user: expected[0],
-      }];
-      expected[0].carts[0].estates = [{
-        id: 1, cart: expected[0].carts[0],
-      }];
-      const user = result[0];
-      const expectedUser = expected[0];
-      // Entities
-      expect(result).to.have.lengthOf(1);
-      expect(user.id).to.equal(expectedUser.id);
-      // Relationships
-      expect(user.carts).to.have.lengthOf(1);
-      expect(user.carts[0].id).to.equal(expectedUser.carts[0].id);
-      expect(user.carts[0].estates[0].id).to.equal(expectedUser.carts[0].estates[0].id);
+      const group1 = entities.find(e => e.id === 1);
+      expect(group1.users).to.have.length(2);
+      expect(group1.users).to.satisfy(users => users.some(u => u.id === 1));
+      expect(group1.users).to.satisfy(users => users.some(u => u.id === 2));
     });
   });
-  describe('getEntity(state, name, id)', function () {
-    it('should return the entity of name = `name` with the specified `id`', function () {
-      const result = getEntity(state, 'user', 1);
-      const expected = { id: 1, name: 'Lars', carts: [] };
-      expect(result).to.deep.equal(expected);
-    });
-    it('should populate relationships one level deep', function () {
-      const result = getEntity(state, 'cart', 1);
-      const expected = { id: 1 };
-      expected.estates = [{
-        id: 1, cart: expected,
-      }, {
-        id: 2, cart: expected,
-      }];
-      // Entities
-      expect(result.id).to.equal(expected.id);
-      // Relationships
-      expect(result.estates).to.have.lengthOf(2);
-      expect(result.estates[0].id).to.equal(expected.estates[0].id);
-      expect(result.estates[1].id).to.equal(expected.estates[1].id);
-    });
-    it('should populate all relationships', function () {
-      const state = deepFreeze({
-        ...reducer(undefined, {}),
-        user: {
-          1: { id: 1, name: 'Lars', carts: [1] },
-        },
-        cart: {
-          1: { id: 1, estates: [1], user: 1 },
-        },
-        estate: {
-          1: { id: 1, cart: 1 },
-        },
-      });
-      const user = getEntity(state, 'user', 1);
-      const expectedUser = { id: 1 };
-      expectedUser.carts = [{
-        id: 1, user: expectedUser,
-      }];
-      expectedUser.carts[0].estates = [{
-        id: 1, cart: expectedUser.carts[0],
-      }];
-      // Entities
-      expect(user.id).to.equal(expectedUser.id);
-      // Relationships
-      expect(user.carts).to.have.lengthOf(1);
-      expect(user.carts[0].id).to.equal(expectedUser.carts[0].id);
-      expect(user.carts[0].estates[0].id).to.equal(expectedUser.carts[0].estates[0].id);
-      // Bidirectional relationships
-      expect(user.carts[0].user.id).to.equal(user.id);
+  describe('getEntity(state, schema, id)', function () {
+    let entity;
+    before(function () {
+      entity = getEntity(state, schemas.Group, 1);
     });
     it('should throw an error if no `id` is specified', function () {
-      const result = () => getEntity(state, 'cart');
-      expect(result).to.throw(Error);
+      const result = () => getEntity(state, schemas.Group);
+      expect(result).to.throw(/Required param/);
+    });
+    it('should return the entity of schema = `schema` with the specified `id`', function () {
+      expect(entity.id).to.equal(1);
+    });
+    it('should populate all relationships', function () {
+      const group1 = entity;
+      expect(group1.users).to.have.length(2);
+      expect(group1.users).to.satisfy(users => users.some(u => u.id === 1));
+      expect(group1.users).to.satisfy(users => users.some(u => u.id === 2));
     });
   });
 });
