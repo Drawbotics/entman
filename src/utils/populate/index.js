@@ -2,6 +2,8 @@ import isObject from 'lodash/isObject';
 import merge from 'lodash/merge';
 import get from 'lodash/get';
 import set from 'lodash/set';
+import values from 'lodash/values';
+import isEmpty from 'lodash/isEmpty';
 import IterableSchema from 'normalizr/lib/IterableSchema';
 import EntitySchema from 'normalizr/lib/EntitySchema';
 import UnionSchema from 'normalizr/lib/UnionSchema';
@@ -23,9 +25,26 @@ function resolveEntityOrId(schema, entityOrId, entities) {
 }
 
 
+function getRelatedAttribute(schema1, schema2) {
+  return Object.keys(schema1).find(k => {
+    if (schema1[k] instanceof IterableSchema) {
+      const relatedSchema = schema1[k].getItemSchema();
+      return relatedSchema.getKey() === schema2.getKey();
+    }
+    else if (schema1[k] instanceof EntitySchema) {
+      const relatedSchema = schema1[k];
+      return relatedSchema.getKey() === schema2.getKey();
+    }
+    else {
+      return false;
+    }
+  });
+}
+
+
 function populateIterable(schema, items, entities, bag) {
   const itemSchema = schema.getItemSchema();
-  return items.map(o => populate(o, entities, itemSchema, bag));
+  return items.map(o => populate(itemSchema, o, entities, bag));
 }
 
 
@@ -46,15 +65,27 @@ function populateObject(schema, obj, entities, bag) {
   Object.keys(schema)
     .filter(attribute => attribute.substring(0, 1) !== '_')
     .forEach(attribute => {
-      const item = get(obj, [attribute]);
-      const itemSchema = get(schema, [attribute]);
+      const relatedSchema = get(schema, [attribute]);
 
-      if (typeof get(obj, [attribute]) === 'undefined' &&
-          schema[attribute] instanceof IterableSchema) {
-        populated = set(populated, [attribute], []);
+      if (relatedSchema instanceof IterableSchema) {
+        const objId = obj[schema.getIdAttribute()];
+        const itemSchema = relatedSchema.getItemSchema();
+        const key = itemSchema.getKey();
+        const relatedAttribute = getRelatedAttribute(itemSchema, schema);
+        const items = values(entities[key])
+          .filter(e => e[relatedAttribute] === objId)
+          .map(e => e[itemSchema.getIdAttribute()]);
+        console.log('items', items);
+        if (isEmpty(items)) {
+          populated = set(populated, [attribute], []);
+        }
+        else {
+          populated = set(populated, [attribute], populate(relatedSchema, items, entities, bag));
+        }
       }
       else {
-        populated = set(populated, [attribute], populate(itemSchema, item, entities, bag));
+        const item = get(obj, [attribute]);
+        populated = set(populated, [attribute], populate(relatedSchema, item, entities, bag));
       }
     });
 

@@ -1,7 +1,6 @@
 import { expect } from 'chai';
 
 import { populate } from 'utils';
-import { denormalize } from 'denormalizr';
 import { defineSchema, hasMany, generateSchemas } from 'schema';
 
 
@@ -21,12 +20,13 @@ describe('@Populate', function () {
     });
     state = {
       Group: {
-        1: { id: 1, name: 'Group 1' },
+        1: { id: 1, name: 'Group 1', users: [1, 2] },
         2: { id: 2, name: 'Group 2' },
       },
       User: {
         1: { id: 1, name: 'Lars', group: 1 },
-        2: { id: 2, name: 'Grishan', group: 2 },
+        2: { id: 2, name: 'Grishan', group: 1 },
+        3: { id: 3, name: 'Grishan', group: 2 },
       },
       Task: {
         1: { id: 1, title: 'Do something', user: 1 },
@@ -38,9 +38,7 @@ describe('@Populate', function () {
     it('should populate the entity', function () {
       const entity = state.Group[1];
       const result = populate(schemas.Group, entity, state);
-      const result2 = denormalize(entity, state, schemas.Group);
       console.log('result', result);
-      console.log('result2', result2);
     });
   });
 });
