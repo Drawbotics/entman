@@ -60,7 +60,7 @@ function populateUnion(schema, entity, entities, bag) {
 
 
 function populateObject(schema, obj, entities, bag) {
-  let populated = cloneDeep(obj);
+  let populated = obj;
 
   Object.keys(schema)
     .filter(attribute => attribute.substring(0, 1) !== '_')
@@ -93,7 +93,7 @@ function populateObject(schema, obj, entities, bag) {
 
 function populateEntity(schema, entityOrId, entities, bag) {
   const key = schema.getKey();
-  const { entity, id } = resolveEntityOrId(schema, entityOrId, entities);
+  let { entity, id } = resolveEntityOrId(schema, entityOrId, entities);
 
   if( ! bag.hasOwnProperty(key)) {
     bag[key] = {};
@@ -102,6 +102,7 @@ function populateEntity(schema, entityOrId, entities, bag) {
   if( ! bag[key].hasOwnProperty(id)) {
     // Need to set this first so that if it is referenced within the call to
     // populateObject, it will already exist.
+    entity = cloneDeep(entity);
     bag[key][id] = entity;
     bag[key][id] = populateObject(schema, entity, entities, bag);
   }
@@ -129,6 +130,7 @@ export function populate(schema, entity, entities, bag={}) {
   } else if (schema instanceof UnionSchema) {
     return populateUnion(schema, entity, entities, bag);
   } else {
+    entity = cloneDeep(entity);
     return populateObject(schema, entity, entities, bag);
   }
 }

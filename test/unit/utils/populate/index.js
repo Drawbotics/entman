@@ -77,7 +77,6 @@ describe('@Populate', function () {
       const user1 = result.users.find(u => u.id === 1);
       expect(user1.tasks).to.have.length(1);
       const task1 = user1.tasks.find(t => t.id === 1);
-      console.log(task1.user.group);
       expect(task1.user.group.name).to.equal('Group 1');
     });
   });
