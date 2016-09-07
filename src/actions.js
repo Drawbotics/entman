@@ -18,7 +18,7 @@ export function createEntity(schema, data) {
   return {
     type: CREATE_ENTITY,
     payload: {
-      name: schema.getKey(),
+      key: schema.getKey(),
       schema: schema,
       data: normalize(data, schema),
       _rawData: data,
@@ -42,7 +42,7 @@ export function updateEntity(schema, id, data, useDefault) {
   return {
     type: UPDATE_ENTITY,
     payload: {
-      name: schema.getKey(),
+      key: schema.getKey(),
       schema: schema,
       id,
       data: normalize({ id, ...data }, schema),
@@ -61,7 +61,7 @@ export function updateEntityId(schema, oldId, newId) {
   return {
     type: UPDATE_ENTITY_ID,
     payload: {
-      name: schema.getKey(),
+      key: schema.getKey(),
       oldId,
       newId,
     },
@@ -81,7 +81,7 @@ export function deleteEntity(schema, id) {
   return {
     type: DELETE_ENTITY,
     payload: {
-      name: schema.getKey(),
+      key: schema.getKey(),
       schema: schema,
       id,
     },
