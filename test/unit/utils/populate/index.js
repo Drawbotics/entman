@@ -21,13 +21,12 @@ describe('@Populate', function () {
     });
     state = deepFreeze({
       Group: {
-        1: { id: 1, name: 'Group 1', users: [1, 2] },
+        1: { id: 1, name: 'Group 1' },
         2: { id: 2, name: 'Group 2' },
       },
       User: {
         1: { id: 1, name: 'Lars', group: 1 },
         2: { id: 2, name: 'Grishan', group: 1 },
-        3: { id: 3, name: 'Grishan', group: 2 },
       },
       Task: {
         1: { id: 1, title: 'Do something', user: 1 },
@@ -47,6 +46,39 @@ describe('@Populate', function () {
       const user2 = result.users.find(u => u.id === 2);
       expect(user1.name).to.equal('Lars');
       expect(user2.name).to.equal('Grishan');
+    });
+    it('should initialize empty relations as empty attributes', function () {
+      const entity = state.Group[2];
+      const result = populate(schemas.Group, entity, state);
+      expect(result.users).to.exist;
+      expect(result.users).to.have.length(0);
+    });
+    it('should keep a reference to the parent entity from the child entity', function () {
+      const result = populate(schemas.Group, entity, state);
+      const user1 = result.users.find(u => u.id === 1);
+      expect(user1.group.name).to.equal('Group 1');
+    });
+    it('should populate the grandchildren of the entity', function () {
+      const result = populate(schemas.Group, entity, state);
+      const user1 = result.users.find(u => u.id === 1);
+      expect(user1.tasks).to.have.length(1);
+      const task1 = user1.tasks.find(t => t.id === 1);
+      expect(task1.title).to.equal('Do something');
+    });
+    it('should keep a reference to the parent entity of the grandchild entity', function () {
+      const result = populate(schemas.Group, entity, state);
+      const user1 = result.users.find(u => u.id === 1);
+      expect(user1.tasks).to.have.length(1);
+      const task1 = user1.tasks.find(t => t.id === 1);
+      expect(task1.user.name).to.equal('Lars');
+    });
+    it('should keep a reference to the grandparent of the grandchild entity', function () {
+      const result = populate(schemas.Group, entity, state);
+      const user1 = result.users.find(u => u.id === 1);
+      expect(user1.tasks).to.have.length(1);
+      const task1 = user1.tasks.find(t => t.id === 1);
+      console.log(task1.user.group);
+      expect(task1.user.group.name).to.equal('Group 1');
     });
   });
 });
