@@ -104,3 +104,6 @@ export function mergeEntities(state={}, action, name) {
   const { result } = action.payload;
   return { ...state, ...result.entities[name] };
 }
+
+
+export * from './populate';
