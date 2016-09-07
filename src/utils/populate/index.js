@@ -1,9 +1,9 @@
 import isObject from 'lodash/isObject';
-import merge from 'lodash/merge';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import values from 'lodash/values';
 import isEmpty from 'lodash/isEmpty';
+import cloneDeep from 'lodash/cloneDeep';
 import IterableSchema from 'normalizr/lib/IterableSchema';
 import EntitySchema from 'normalizr/lib/EntitySchema';
 import UnionSchema from 'normalizr/lib/UnionSchema';
@@ -60,13 +60,12 @@ function populateUnion(schema, entity, entities, bag) {
 
 
 function populateObject(schema, obj, entities, bag) {
-  let populated = obj;
+  let populated = cloneDeep(obj);
 
   Object.keys(schema)
     .filter(attribute => attribute.substring(0, 1) !== '_')
     .forEach(attribute => {
       const relatedSchema = get(schema, [attribute]);
-
       if (relatedSchema instanceof IterableSchema) {
         const objId = obj[schema.getIdAttribute()];
         const itemSchema = relatedSchema.getItemSchema();
@@ -75,7 +74,6 @@ function populateObject(schema, obj, entities, bag) {
         const items = values(entities[key])
           .filter(e => e[relatedAttribute] === objId)
           .map(e => e[itemSchema.getIdAttribute()]);
-        console.log('items', items);
         if (isEmpty(items)) {
           populated = set(populated, [attribute], []);
         }
