@@ -1,14 +1,25 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
 
-const Groups = ({
-}) => {
-  return (
-    <div>
-      Hello
-    </div>
-  );
-};
+class Groups extends React.Component {
+  render() {
+    return (
+      <h1>Hello</h1>
+    );
+  }
+}
 
 
-export default Groups;
+const mapStateToProps = (state) => ({
+});
+
+
+const mapDispatchToProps = (dispatch) => ({
+});
+
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(Groups);
