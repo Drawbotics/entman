@@ -28,7 +28,7 @@ module.exports = {
     loaders: [{
       test: /\.jsx?$/,
       include: jsDirs,
-      loaders: [ 'babel?presets[]=es2015&presets[]=stage-0&plugins[]=transform-decorators' ],
+      loaders: [ 'babel?presets[]=es2015&presets[]=stage-0' ],
     }]
   },
 };
