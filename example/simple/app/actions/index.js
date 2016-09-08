@@ -1,6 +1,7 @@
 import {
   createEntity,
   updateEntity,
+  deleteEntity,
 } from '../../../../src/helpers';
 import {
   loadEntities,
@@ -44,6 +45,28 @@ export function uncheckTask(task) {
     type: CHECK_TASK,
     payload: {
       data: { done: false },
+    },
+  });
+}
+
+
+export const DELETE_TASK = 'DELETE_TASK';
+
+export function deleteTask(task) {
+  const id = task.id ? task.id : task;
+  return deleteEntity(schemas.Task, id, {
+    type: DELETE_TASK,
+  });
+}
+
+
+export const CREATE_TASK = 'CREATE_TASK';
+
+export function createTask(task) {
+  return createEntity(schemas.Task, 'payload.task', {
+    type: CREATE_TASK,
+    payload: {
+      task,
     },
   });
 }

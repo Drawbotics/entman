@@ -5,6 +5,8 @@ import {
   loadGroups,
   checkTask,
   uncheckTask,
+  deleteTask,
+  createTask,
 } from '../actions';
 import {
   getGroups,
@@ -24,6 +26,8 @@ class Groups extends React.Component {
       isLoading,
       checkTask,
       uncheckTask,
+      deleteTask,
+      createTask,
     } = this.props;
     return (
       <div>
@@ -43,11 +47,14 @@ class Groups extends React.Component {
                         <button type="button" onClick={() => task.done ? uncheckTask(task) : checkTask(task)}>
                           {task.done ? 'Uncheck' : 'Check'}
                         </button>
-                        <button>Delete</button>
+                        <button type="button" onClick={() => deleteTask(task)}>Delete</button>
                       </li>
                     ))}
                   </ol>
-                  <button>Add task</button>
+                  <button type="button" onClick={() => {
+                    const taskTitle = prompt('Task title');
+                    createTask({ title: taskTitle, user: user.id });
+                  }}>Add task</button>
                 </li>
               ))}
             </ul>
@@ -70,6 +77,8 @@ const mapDispatchToProps = {
   loadGroups,
   checkTask,
   uncheckTask,
+  deleteTask,
+  createTask,
 };
 
 
