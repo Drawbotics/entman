@@ -70,3 +70,15 @@ export function createTask(task) {
     },
   });
 }
+
+
+export const CREATE_USER = 'CREATE_USER';
+
+export function createUser(user) {
+  return createEntity(schemas.User, 'payload.user', {
+    type: CREATE_USER,
+    payload: {
+      user,
+    },
+  });
+}

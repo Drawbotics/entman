@@ -7,6 +7,7 @@ import {
   uncheckTask,
   deleteTask,
   createTask,
+  createUser,
 } from '../actions';
 import {
   getGroups,
@@ -28,6 +29,7 @@ class Groups extends React.Component {
       uncheckTask,
       deleteTask,
       createTask,
+      createUser,
     } = this.props;
     return (
       <div>
@@ -53,12 +55,22 @@ class Groups extends React.Component {
                   </ol>
                   <button type="button" onClick={() => {
                     const taskTitle = prompt('Task title');
-                    createTask({ title: taskTitle, user: user.id });
+                    if (taskTitle) {
+                      createTask({ title: taskTitle, user: user.id });
+                    }
                   }}>Add task</button>
+                  <button type="button">
+                    Save changes
+                  </button>
                 </li>
               ))}
             </ul>
-            <button>Add user</button>
+            <button type="button" onClick={() => {
+              const userName = prompt('User name');
+              if (userName) {
+                createUser({ name: userName, group: group.id });
+              }
+            }}>Add user</button>
           </div>
         ))}
       </div>
@@ -79,6 +91,7 @@ const mapDispatchToProps = {
   uncheckTask,
   deleteTask,
   createTask,
+  createUser,
 };
 
 
