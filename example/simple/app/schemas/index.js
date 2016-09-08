@@ -6,7 +6,7 @@ import {
 
 
 const group = defineSchema('Group', {
-  user: hasMany('User'),
+  users: hasMany('User'),
 });
 
 

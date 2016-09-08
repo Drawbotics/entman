@@ -20,6 +20,9 @@ describe('@Actions', function () {
     const cart = defineSchema('Cart');
     schemas = generateSchemas([cart]);
   });
+  describe('loadEntities(schema, data)', function () {
+    it('TODO');
+  });
   describe('createEntity(schema, data)', function () {
     it('should return an action object of type CREATE_ENTITY', function () {
       const { Cart } = schemas;
