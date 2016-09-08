@@ -15,7 +15,7 @@
     "no-unused-vars": 1,
     "jsx-quotes": 1,
     "quotes": [2, "single"],
-    "indent": [2, 2, { "SwitchCase": 2 }],
+    "indent": [2, 2, { "SwitchCase": 1 }],
     "semi": [2, "always"]
   },
   "ecmaFeatures": {

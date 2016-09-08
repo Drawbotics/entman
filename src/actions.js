@@ -62,6 +62,7 @@ export function updateEntityId(schema, oldId, newId) {
     type: UPDATE_ENTITY_ID,
     payload: {
       key: schema.getKey(),
+      schema,
       oldId,
       newId,
     },

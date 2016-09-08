@@ -1,22 +1,12 @@
 import omit from 'lodash/omit';
 import isEmpty from 'lodash/isEmpty';
 import mapValues from 'lodash/mapValues';
-import cloneDeep from 'lodash/cloneDeep';
-import set from 'lodash/set';
 
 import * as EntitiesActions from './actions';
 import {
-  flatten,
-  defaultsDeep,
+  update,
+  defaultTo,
 } from './utils';
-
-
-function update(entity, newData) {
-  const flattenedData = flatten(newData);
-  return Object.keys(flattenedData).reduce((result, k) => {
-    return set(result, k, flattenedData[k]);
-  }, cloneDeep(entity));
-}
 
 
 function reducer(state, action) {
@@ -29,19 +19,48 @@ function reducer(state, action) {
       }));
     }
     case EntitiesActions.UPDATE_ENTITY: {
-      const { data, id, key } = action.payload;
+      const { data, id, key, useDefault } = action.payload;
       const newData = data.entities[key][id];
       return {
         ...state,
         [key]: {
           ...state[key],
-          [id]: update(state[key][id], newData),
+          [id]: useDefault ? defaultTo(state[key][id], newData) : update(state[key][id], newData),
         },
       };
     }
     case EntitiesActions.UPDATE_ENTITY_ID: {
-      const { key, oldId, newId } = action.payload;
-      return state;
+      const { key, schema, oldId, newId } = action.payload;
+      const updatedEntity = { ...state[key][oldId], id: newId };
+      return mapValues(state, (currentEntities, key) => {
+        // The entities we need to update
+        if (key === schema.getKey()) {
+          return omit({
+            ...currentEntities,
+            [newId]: updatedEntity,
+          }, oldId);
+        }
+        // No related entities, so no need to perform any update
+        if ( ! schema.isRelatedTo(key)) {
+          return currentEntities;
+        }
+        // The entities are related
+        const { isParent, relatedPropName } = schema.getRelation(updatedEntity, key);
+        if (isParent) {
+          // TODO: The entity is a OneToOne relation
+          return currentEntities;
+        }
+        // The entities are the 'many' part in a OneToMany relation
+        return mapValues(currentEntities, (entity) => {
+          if (entity[relatedPropName] !== oldId) {
+            return entity;
+          }
+          return {
+            ...entity,
+            [relatedPropName]: newId,
+          };
+        });
+      });
     }
     case EntitiesActions.DELETE_ENTITY: {
       const { key, id } = action.payload;

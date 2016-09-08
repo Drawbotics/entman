@@ -1,49 +1,7 @@
-import map from 'lodash/map';
-import mapValues from 'lodash/mapValues';
 import cloneDeep from 'lodash/cloneDeep';
-import dD from 'lodash/defaultsDeep';
+import defaultsDeep from 'lodash/defaultsDeep';
 import set from 'lodash/set';
 import isPlainObject from 'lodash/isPlainObject';
-import IterableSchema from 'normalizr/lib/IterableSchema';
-import EntitySchema from 'normalizr/lib/EntitySchema';
-import UnionSchema from 'normalizr/lib/UnionSchema';
-
-
-const isRelationship = (prop) => (prop instanceof EntitySchema) ||
-  (prop instanceof IterableSchema) || (prop instanceof UnionSchema);
-
-
-export function inverseSchema(schema) {
-  const result = Object.keys(schema).reduce((result, key) => {
-    const prop = schema[key];
-    if ( ! isRelationship(prop)) return result;
-    const isArray = prop instanceof IterableSchema;
-    const entityName = isArray ? prop.getItemSchema().getKey() : prop.getKey();
-    return {
-      ...result,
-      relationships: {
-        ...result.relationships,
-        [entityName]: { isArray, key, entity: entityName }
-      }
-    };
-  }, { name: schema._key, relationships: {} });
-  if (Object.keys(result.relationships).length <= 0) delete result.relationships;
-  return result;
-}
-
-
-export function inverseSchemas(schemas) {
-  const inversedSchemas = map(schemas, inverseSchema);
-  return inversedSchemas.reduce((result, s) => {
-    result[s.name] = s;
-    return result;
-  }, {});
-}
-
-
-export function getEmptyEntities(inversedSchemas={}) {
-  return mapValues(inversedSchemas, () => ({}));
-}
 
 
 export function flatten(obj, parentPath) {
@@ -75,34 +33,16 @@ export function flatten(obj, parentPath) {
 }
 
 
-export function values(obj={}) {
-  return Object.values(obj);
+export function defaultTo(obj, defaults) {
+  return defaultsDeep(cloneDeep(obj), defaults);
 }
 
 
-export function defaultsDeep(obj, defaults) {
-  return dD(cloneDeep(obj), defaults);
-}
-
-
-export function setIn(obj, field, value) {
-  const result = cloneDeep(obj);
-  set(result, field, value);
-  return result;
-}
-
-
-export function update(obj, data) {
-  const flattenedData = flatten(data);
+export function update(obj, newData) {
+  const flattenedData = flatten(newData);
   return Object.keys(flattenedData).reduce((result, k) => {
-    return setIn(result, k, flattenedData[k]);
-  }, obj);
-}
-
-
-export function mergeEntities(state={}, action, name) {
-  const { result } = action.payload;
-  return { ...state, ...result.entities[name] };
+    return set(result, k, flattenedData[k]);
+  }, cloneDeep(obj));
 }
 
 

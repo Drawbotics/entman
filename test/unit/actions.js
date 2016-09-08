@@ -31,11 +31,11 @@ describe('@Actions', function () {
       const result = createEntity(Cart, {});
       expect(result.meta.isEntityAction).to.be.true;
     });
-    it('should include the name of the entity in the payload', function () {
+    it('should include the key of the entity in the payload', function () {
       const { Cart } = schemas;
       const data = { foo: 'bar' };
       const result = createEntity(Cart, data);
-      expect(result.payload.name).to.equal('Cart');
+      expect(result.payload.key).to.equal('Cart');
     });
     it('should include the data normalized in the payload', function () {
       const { Cart } = schemas;
@@ -68,10 +68,10 @@ describe('@Actions', function () {
       const result = updateEntity(Cart, 1231, {});
       expect(result.meta.isEntityAction).to.be.true;
     });
-    it('should include the id of the entity, the name of the entity and the data in the payload', function () {
+    it('should include the the key of the entity in the payload', function () {
       const { Cart } = schemas;
       const result = updateEntity(Cart, 123, { foo: 'bar' });
-      expect(result.payload.name).to.equal('Cart');
+      expect(result.payload.key).to.equal('Cart');
     });
     it('should include the id of the entity in the payload', function () {
       const { Cart } = schemas;
@@ -98,10 +98,10 @@ describe('@Actions', function () {
       const result = updateEntityId(Cart, 1, 2);
       expect(result.meta.isEntityAction).to.be.true;
     });
-    it('should include the name of the entity in the payload', function () {
+    it('should include the key of the entity in the payload', function () {
       const { Cart } = schemas;
       const result = updateEntityId(Cart, 1, 2);
-      expect(result.payload.name).to.equal('Cart');
+      expect(result.payload.key).to.equal('Cart');
     });
     it('should include the oldId of the entity in the payload', function () {
       const { Cart } = schemas;
@@ -127,10 +127,10 @@ describe('@Actions', function () {
       const result = deleteEntity(Cart, 1231);
       expect(result.meta.isEntityAction).to.be.true;
     });
-    it('should include the name of the entity in the payload', function () {
+    it('should include the key of the entity in the payload', function () {
       const { Cart } = schemas;
       const result = deleteEntity(Cart, 1);
-      expect(result.payload.name).to.equal('Cart');
+      expect(result.payload.key).to.equal('Cart');
     });
     it('should include the id of the entity in the payload', function () {
       const { Cart } = schemas;

@@ -126,20 +126,18 @@ describe('@Reducer', function () {
       const group2 = { name: 'Group 2', id: 2 };
       const user = { name: 'Lars', group: 1, id: 1 };
       const task = { title: 'Do something', user: 1, id: 1 };
-      const newName = 'Grishan';
-      const newGroup = 2;
       before(function () {
         const initialState = deepFreeze(reducer(undefined, {}));
         const createGroup = createEntity(schemas.Group, group);
         const createGroup2 = createEntity(schemas.Group, group2);
         const createUser = createEntity(schemas.User, user);
         const createTask = createEntity(schemas.Task, task);
-        const updateUser = updateEntityId(schemas.User, 1, 2);
+        const updateUserId = updateEntityId(schemas.User, 1, 2);
         finalState = deepFreeze(reducer(initialState, createGroup));
         finalState = deepFreeze(reducer(finalState, createGroup2));
         finalState = deepFreeze(reducer(finalState, createUser));
         finalState = deepFreeze(reducer(finalState, createTask));
-        finalState = deepFreeze(reducer(finalState, updateUser));
+        finalState = deepFreeze(reducer(finalState, updateUserId));
       });
       it('should update the id of the entity', function () {
         const expectedState = {
