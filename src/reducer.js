@@ -11,6 +11,7 @@ import {
 
 function reducer(state, action) {
   switch (action.type) {
+    case EntitiesActions.CREATE_ENTITIES:
     case EntitiesActions.CREATE_ENTITY: {
       const { entities } = action.payload.data;
       return mapValues(state, (currentEntities, key) => ({
@@ -80,5 +81,10 @@ export default function entities(schemas) {
     throw new Error('[INVALID SCHEMAS]');
   }
   const emptyEntities = mapValues(schemas, () => ({}));
-  return (state=emptyEntities, action) => reducer(state, action);
+  return (state=emptyEntities, action) => {
+    const isEntityAction = action.meta && (action.meta.isEntityAction || action.meta.entityAction);
+    if ( ! isEntityAction) return state;
+    action = action.meta.entityAction ? action.meta.entityAction : action;
+    return reducer(state, action);
+  };
 }

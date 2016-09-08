@@ -1,16 +1,38 @@
 import { v4 } from 'node-uuid';
-import { normalize } from 'normalizr';
+import { normalize, arrayOf } from 'normalizr';
 import isPlainObject from 'lodash/isPlainObject';
+
+
+export const CREATE_ENTITIES = 'CREATE_ENTITIES';
+
+export function createEntities(schema, data=[]) {
+  schema = arrayOf(schema);
+  data = data.map(e => {
+    if ( ! e.hasOwnProperty('id')) {
+      return {
+        ...e,
+        id: v4(),
+      };
+    }
+    return e;
+  });
+  return {
+    type: CREATE_ENTITIES,
+    payload: {
+      key: schema.getItemSchema().getKey(),
+      schema: schema,
+      data: normalize(data, schema),
+      _rawData: data,
+    },
+    meta: {
+      isEntityAction: true,
+    },
+  };
+}
 
 
 export const CREATE_ENTITY = 'CREATE_ENTITY';
 
-/**
- * Create would be better named as "add", because
- * we are not creating entities, we are just adding
- * them to the store. But the word "create" is kept
- * because resemblance with CRUD operations.
- */
 export function createEntity(schema, data) {
   if ( ! data.hasOwnProperty('id')) {
     data = { ...data, id: v4() };
@@ -28,12 +50,6 @@ export function createEntity(schema, data) {
     },
   };
 }
-
-
-/**
- * The "READ" operation from CRUD are
- * the selectors that read from the estate.
- */
 
 
 export const UPDATE_ENTITY = 'UPDATE_ENTITY';

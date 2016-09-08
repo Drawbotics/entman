@@ -2,7 +2,7 @@ import pickBy from 'lodash/pickBy';
 import isEmpty from 'lodash/isEmpty';
 import values from 'lodash/values';
 
-import { populate } from 'utils';
+import { populate } from './utils';
 
 
 export function getEntities(state, schema, ids) {
