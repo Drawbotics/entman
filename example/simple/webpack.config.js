@@ -16,7 +16,7 @@ module.exports = {
     loaders: [{
       test: /\.jsx?$/,
       include: path.resolve('./app'),
-      loaders: [ 'babel?presets[]=es2015&presets[]=stage-0' ],
+      loaders: [ 'babel?presets[]=es2015&presets[]=stage-0&presets[]=react' ],
     }]
   },
 };
