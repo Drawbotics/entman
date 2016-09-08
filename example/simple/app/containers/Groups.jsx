@@ -3,6 +3,8 @@ import { connect } from 'react-redux';
 
 import {
   loadGroups,
+  checkTask,
+  uncheckTask,
 } from '../actions';
 import {
   getGroups,
@@ -17,8 +19,12 @@ class Groups extends React.Component {
   }
 
   render() {
-    const { groups, isLoading } = this.props;
-    console.log('groups', groups);
+    const {
+      groups,
+      isLoading,
+      checkTask,
+      uncheckTask,
+    } = this.props;
     return (
       <div>
         <h1>Groups</h1>
@@ -34,7 +40,9 @@ class Groups extends React.Component {
                     {user.tasks.map((task, i) => (
                       <li key={i}>
                         <span style={{ textDecoration: task.done ? 'line-through' : 'none' }}>{task.title}</span>
-                        <button>{task.done ? 'Uncheck' : 'Check'}</button>
+                        <button type="button" onClick={() => task.done ? uncheckTask(task) : checkTask(task)}>
+                          {task.done ? 'Uncheck' : 'Check'}
+                        </button>
                         <button>Delete</button>
                       </li>
                     ))}
@@ -60,6 +68,8 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = {
   loadGroups,
+  checkTask,
+  uncheckTask,
 };
 
 
