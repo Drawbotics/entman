@@ -11,7 +11,6 @@ import {
 
 function reducer(state, action) {
   switch (action.type) {
-    case EntitiesActions.CREATE_ENTITIES:
     case EntitiesActions.CREATE_ENTITY: {
       const { entities } = action.payload.data;
       return mapValues(state, (currentEntities, key) => ({
@@ -32,7 +31,6 @@ function reducer(state, action) {
     }
     case EntitiesActions.UPDATE_ENTITY_ID: {
       const { key, schema, oldId, newId } = action.payload;
-      if (oldId === newId) return state;
       const updatedEntity = { ...state[key][oldId], id: newId };
       return mapValues(state, (currentEntities, key) => {
         // The entities we need to update
@@ -82,10 +80,5 @@ export default function entities(schemas) {
     throw new Error('[INVALID SCHEMAS]');
   }
   const emptyEntities = mapValues(schemas, () => ({}));
-  return (state=emptyEntities, action) => {
-    const isEntityAction = action.meta && (action.meta.isEntityAction || action.meta.entityAction);
-    if ( ! isEntityAction) return state;
-    action = action.meta.entityAction ? action.meta.entityAction : action;
-    return reducer(state, action);
-  };
+  return (state=emptyEntities, action) => reducer(state, action);
 }
