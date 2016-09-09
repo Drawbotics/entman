@@ -8,6 +8,7 @@ import {
   deleteTask,
   createTask,
   createUser,
+  saveUser,
 } from '../actions';
 import {
   getGroups,
@@ -30,6 +31,7 @@ class Groups extends React.Component {
       deleteTask,
       createTask,
       createUser,
+      saveUser,
     } = this.props;
     return (
       <div>
@@ -59,7 +61,8 @@ class Groups extends React.Component {
                       createTask({ title: taskTitle, user: user.id });
                     }
                   }}>Add task</button>
-                  <button type="button">
+                  <br />
+                  <button type="button" onClick={() => saveUser(user)}>
                     Save changes
                   </button>
                 </li>
@@ -92,6 +95,7 @@ const mapDispatchToProps = {
   deleteTask,
   createTask,
   createUser,
+  saveUser,
 };
 
 

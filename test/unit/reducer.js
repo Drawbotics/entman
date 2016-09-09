@@ -154,6 +154,23 @@ describe('@Reducer', function () {
         };
         expect(finalState).to.deep.equal(expectedState);
       });
+      it('should return the state unmodified if `newId === oldId`', function () {
+        const updateUserId = updateEntityId(schemas.User, 2, 2);
+        finalState = deepFreeze(reducer(finalState, updateUserId));
+        const expectedState = {
+          Group: {
+            1: { id: 1, name: 'Group 1' },
+            2: { id: 2, name: 'Group 2' },
+          },
+          User: {
+            2: { id: 2, name: 'Lars', group: 1 },
+          },
+          Task: {
+            1: { id: 1, title: 'Do something', user: 2 },
+          },
+        };
+        expect(finalState).to.deep.equal(expectedState);
+      });
     });
     describe('when `DELETE_ENTITY` is received as action', function () {
       let finalState;

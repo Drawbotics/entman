@@ -5,6 +5,7 @@ import {
 } from '../../../../src/helpers';
 import {
   loadEntities,
+  saveEntity,
 } from '../../../../src/middleware';
 import schemas from '../schemas';
 
@@ -80,5 +81,15 @@ export function createUser(user) {
     payload: {
       user,
     },
+  });
+}
+
+
+export const SAVE_USER = 'SAVE_USER';
+
+export function saveUser(user) {
+  const id = user.id ? user.id : user;
+  return saveEntity(schemas.User, id, {
+    type: SAVE_USER,
   });
 }
