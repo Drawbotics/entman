@@ -1,6 +1,9 @@
 # Entities Manager
 
 
+> [NOTE]: Still a work in progress, not even in alpha state.
+
+
 A library to help you manage your entities in a [redux](http://www.github.com/)
 store. **_InsertName_** manages everything for you. From the communication with
 the server to the access to the data in the store.
