@@ -67,26 +67,6 @@ export default combineReducers({
 })
 ```
 
-### store.js
-
-Connect the middleware to your store.
-
-```javascript
-import { createStore, applyMiddleware, compose } from 'redux';
-import { entitiesMiddleware } from '_InsertName_';
-import reducer from './reducer';
-
-export default createStore(
-  reducer,
-  compose(
-    applyMiddleware(
-      // Other middlewares,
-      entitiesMiddleware,
-    ),
-  ),
-);
-```
-
 ### selectors.js
 
 Create selectors for the entities. This way the entities access code is abstracted
@@ -105,40 +85,14 @@ export function getGroup(state, id) {
 
 ```javascript
 import {
-  loadEntity,
   createEntity,
-  saveEntity,
-  createAndSaveEntity,
 } from '_InsertName_';
 import schemas from './schemas';
-
-export const LOAD_GROUP = 'LOAD_GROUP';
-
-export function loadGroup(id) {
-  /**
-   * loadEntity() will generate automatically
-   * LOAD_${ENTITY}_SUCCESS and LOAD_${ENTITY}_FAIL
-   * to report about the result of the operation.
-   */
-  return loadEntity(schemas.Group, id);  // 'GET /groups/id'
-}
 
 export const CREATE_USER = 'CREATE_USER';
 
 export function createUser(user) {
   return createEntity(schemas.User, user);  // Add user to the store
-}
-
-export const SAVE_USER = 'SAVE_USER';
-
-export function saveUser(id) {
-  return saveEntity(schemas.User, id);  // 'POST /users'
-}
-
-export const CREATE_AND_SAVE_USER = 'CREATE_AND_SAVE_USER';
-
-export function createAndSaveUser(user) {
-  return createAndSaveEntity(schemas.User, user);
 }
 ```
 
@@ -215,7 +169,6 @@ const mapStateToProps = (state, ownProps) => ({
 
 const mapDispatchToProps = {
   loadGroup,
-  createAndSaveUser,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Group);
