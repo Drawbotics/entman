@@ -10,6 +10,8 @@ import {
 
 
 function reducer(state, action) {
+  if ( ! action.meta || ! action.meta.entityAction) return state;
+  action = action.meta.entityAction;
   switch (action.type) {
     case EntitiesActions.CREATE_ENTITY: {
       const { entities } = action.payload.data;
