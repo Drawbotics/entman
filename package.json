@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "A manager of entities for redux",
   "author": "Lorenzo Ruiz <lars.bs@hotmail.com>",
-  "main": "index.js",
+  "main": "lib/entman.js",
   "scripts": {
     "clean": "rimraf lib/",
     "build": "webpack --progress",

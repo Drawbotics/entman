@@ -17,7 +17,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'lib'),
     publicPath: '/',
-    filename: 'entities-manager.js',
+    filename: 'entman.js',
   },
   module: {
     preLoaders: [{
