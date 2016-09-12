@@ -6,7 +6,7 @@
   "main": "lib/entman.js",
   "scripts": {
     "clean": "rimraf lib/",
-    "build": "webpack --progress",
+    "build": "npm run clean && webpack --progress",
     "test-watch": "karma start",
     "test": "karma start --single-run --browsers PhantomJS",
     "start": "npm run clean && npm run build"
