@@ -18,6 +18,8 @@ module.exports = {
     path: path.resolve(__dirname, 'lib'),
     publicPath: '/',
     filename: 'entman.js',
+    library: 'entman',
+    libraryTarget: 'umd',
   },
   module: {
     preLoaders: [{
