@@ -5,5 +5,5 @@ if ( ! global._babelPolyfill) {
 
 export reducer from './reducer';
 export * from './selectors';
-export * from './utils';
 export * from './helpers';
+export * from './schema';
