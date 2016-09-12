@@ -13,8 +13,8 @@ module.exports = Object.assign({}, webpackBaseConfig, {
       'process.env': { NODE_ENV: JSON.stringify('production') }
     }),
     new webpack.optimize.DedupePlugin(),
-    new webpack.optimize.UglifyJsPlugin({
-      drop_console: true
-    }),
+    //new webpack.optimize.UglifyJsPlugin({
+      //drop_console: true
+    //}),
   ],
 });
