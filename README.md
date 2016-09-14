@@ -177,7 +177,7 @@ const mapDispatchToProps = {
 export default connect(mapStateToProps, mapDispatchToProps)(Group);
 ```
 
-More examples in the [examples]() folder.
+A more detailed example can be found in the [entman-example](https://github.com/Drawbotics/entman-example) repository.
 
 
 ## Documentation
