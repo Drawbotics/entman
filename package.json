@@ -12,8 +12,11 @@
     "start": "npm run clean && npm run build"
   },
   "keywords": [],
-  "license": "UNLICENSED",
-  "repository": "private",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Drawbotics/entman.git"
+  },
   "peerDependencies": {
     "normalizr": "^2.2.1",
     "redux": "^3.5.2"
