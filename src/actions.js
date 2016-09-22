@@ -1,5 +1,5 @@
 import { v4 } from 'node-uuid';
-import { normalize } from 'normalizr';
+import { normalize, arrayOf } from 'normalizr';
 import isPlainObject from 'lodash/isPlainObject';
 
 
@@ -27,6 +27,14 @@ export function createEntity(schema, data) {
       isEntityAction: true,
     },
   };
+}
+
+
+export const CREATE_ENTITIES = 'CREATE_ENTITIES';
+
+export function createEntities(schema, data) {
+  data = data.map(e => e.id ? e : { ...e, id: v4() });
+  return createEntity(arrayOf(schema), data);
 }
 
 
@@ -95,6 +103,7 @@ export function deleteEntity(schema, id) {
 
 export default {
   createEntity,
+  createEntities,
   updateEntity,
   deleteEntity,
   updateEntityId,
