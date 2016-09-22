@@ -34,7 +34,18 @@ export const CREATE_ENTITIES = 'CREATE_ENTITIES';
 
 export function createEntities(schema, data) {
   data = data.map(e => e.id ? e : { ...e, id: v4() });
-  return createEntity(arrayOf(schema), data);
+  return {
+    type: CREATE_ENTITIES,
+    payload: {
+      key: schema.getKey(),
+      schema: schema,
+      data: normalize(data, arrayOf(schema)),
+      _rawData: data,
+    },
+    meta: {
+      isEntityAction: true,
+    },
+  };
 }
 
 
