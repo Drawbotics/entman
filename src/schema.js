@@ -1,17 +1,18 @@
 import isEmpty from 'lodash/isEmpty';
+import omit from 'lodash/omit';
 import { Schema, arrayOf } from 'normalizr';
 
 
-export function defineSchema(name, attributes={}) {
+export function defineSchema(name, config={}) {
   if (isEmpty(name)) {
     throw new Error('[INVALID NAME]');
   }
-  if ((typeof attributes !== 'object') && attributes) {
-    throw new Error('[INVALID ATTRIBUTES]');
+  if ((typeof config !== 'object') && config) {
+    throw new Error('[INVALID CONFIG]');
   }
   return {
     name,
-    attributes,
+    config: { ...config, attributes: config.attributes ? config.attributes : {}},
   };
 }
 
@@ -69,8 +70,8 @@ function getRelation(schema, relatedEntities, bag) {
 
 function generateSchema(schema, bag) {
   const relatedEntities = [];
-  const schemaDefinition = Object.keys(schema.attributes).reduce((result, a) => {
-    const attribute = schema.attributes[a];
+  const schemaDefinition = Object.keys(schema.config.attributes).reduce((result, a) => {
+    const attribute = schema.config.attributes[a];
     if (typeof attribute === 'function') {
       // Treat it like a computed property
       return { ...result, _computed: { ...result._computed, [a]: attribute } };
@@ -88,7 +89,7 @@ function generateSchema(schema, bag) {
     return result;  // Shouldn't never come to here
   }, {});
   const finalSchema = bag[schema.name];
-  finalSchema.define(schemaDefinition);
+  finalSchema.define({ ...schemaDefinition, ...omit(schema.config, 'attributes') });
   Object.defineProperty(finalSchema, 'isRelatedTo', {
     enumerable: false,
     value: isRelatedTo(relatedEntities),

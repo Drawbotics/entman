@@ -3,6 +3,7 @@ import deepFreeze from 'deep-freeze';
 
 import {
   createEntity,
+  createEntities,
   updateEntity,
   updateEntityId,
   deleteEntity,
@@ -53,6 +54,36 @@ describe('@Reducer', function () {
       };
       const result = reducer(undefined, {});
       expect(result).to.deep.equal(expected);
+    });
+    describe('when `CREATE_ENTITIES` is received as action', function () {
+      let finalState;
+      const groups = [{ name: 'Group 1', id: 1 }, { name: 'Group 2', id: 2 }];
+      const user = { name: 'Lars', group: 1, id: 1 };
+      const task = { title: 'Do something', user: 1, id: 1 };
+      before(function () {
+        const initialState = deepFreeze(reducer(undefined, {}));
+        const createGroups = createEntities(schemas.Group, groups);
+        const createUser = createEntity(schemas.User, user);
+        const createTask = createEntity(schemas.Task, task);
+        finalState = deepFreeze(reducer(initialState, createGroups));
+        finalState = deepFreeze(reducer(finalState, createUser));
+        finalState = deepFreeze(reducer(finalState, createTask));
+      });
+      it('should add the new entities to the state', function () {
+        const expectedState = {
+          Group: {
+            1: { id: 1, name: 'Group 1' },
+            2: { id: 2, name: 'Group 2' },
+          },
+          User: {
+            1: { id: 1, name: 'Lars', group: 1 },
+          },
+          Task: {
+            1: { id: 1, title: 'Do something', user: 1 },
+          },
+        };
+        expect(finalState).to.deep.equal(expectedState);
+      });
     });
     describe('when `CREATE_ENTITY` is received as action', function () {
       let finalState;

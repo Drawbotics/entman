@@ -8,13 +8,13 @@ import {
 
 
 describe('@Schema', function () {
-  describe('defineSchema(name, attributes)', function () {
+  describe('defineSchema(name, config)', function () {
     it('should throw an error when `name` is empty', function () {
       expect(() => defineSchema()).to.throw(/INVALID NAME/);
     });
-    it('should throw an error when `attributes` is a function', function () {
-      expect(() => defineSchema('Test', () => {})).to.throw(/INVALID ATTRIBUTES/);
-      expect(() => defineSchema('Test', 123)).to.throw(/INVALID ATTRIBUTES/);
+    it('should throw an error when `config` is not an object', function () {
+      expect(() => defineSchema('Test', () => {})).to.throw(/INVALID CONFIG/);
+      expect(() => defineSchema('Test', 123)).to.throw(/INVALID CONFIG/);
     });
     it('should return an object', function () {
       const result = defineSchema('Test');
@@ -28,9 +28,9 @@ describe('@Schema', function () {
     it('the schema object should have a property with the attributes of the schema', function () {
       const name = 'Test';
       const attributes = { user: 'User' };
-      const result = defineSchema(name, attributes);
-      expect(result.attributes).to.deep.equal(attributes);
-      expect(defineSchema(name).attributes).to.be.an('object');
+      const result = defineSchema(name, { attributes });
+      expect(result.config.attributes).to.deep.equal(attributes);
+      expect(defineSchema(name).config.attributes).to.be.an('object');
     });
   });
   describe('hasMany(schema)', function () {
@@ -80,17 +80,40 @@ describe('@Schema', function () {
     });
     it('the resulted object should contain valid schemas', function () {
       const user = defineSchema('User', {
-        group: 'Group',
+        attributes: {
+          group: 'Group',
+        }
       });
       const group = defineSchema('Group', {
-        users: hasMany('User'),
-        getNumberOfUsers() {
-          return this.users.length;
+        attributes: {
+          users: hasMany('User'),
+          getNumberOfUsers() {
+            return this.users.length;
+          }
         }
       });
       const result = generateSchemas([user, group]);
       expect(result.Group.getKey()).to.equal('Group');
       expect(result.User.getKey()).to.equal('User');
+    });
+    it('the resulted schemas should contain the right attributes', function () {
+      const user = defineSchema('User', {
+        attributes: {
+          group: 'Group',
+        }
+      });
+      const group = defineSchema('Group', {
+        attributes: {
+          users: hasMany('User'),
+          getNumberOfUsers() {
+            return this.users.length;
+          }
+        }
+      });
+      const result = generateSchemas([user, group]);
+      expect(result.Group).to.contain.keys(['users', '_computed']);
+      expect(result.Group._computed).to.contain.keys(['getNumberOfUsers']);
+      expect(result.User).to.contain.keys(['group']);
     });
     it('should add a method called `isRelatedTo` to the generated schemas', function () {
       const user = defineSchema('User');
@@ -101,7 +124,9 @@ describe('@Schema', function () {
     });
     it('the method `isRelatedTo(entityName)` should return true when the entity is related to `entityName`', function () {
       const user = defineSchema('User', {
-        group: 'Group',
+        attributes: {
+          group: 'Group',
+        }
       });
       const group = defineSchema('Group');
       const result = generateSchemas([user, group]);
@@ -117,10 +142,14 @@ describe('@Schema', function () {
     });
     it('the method `getRelation(entity, name)` should return an object with the info for the relation between entities when single relation', function () {
       const user = defineSchema('User', {
-        group: 'Group',
+        attributes: {
+          group: 'Group',
+        },
       });
       const group = defineSchema('Group', {
-        users: hasMany('User'),
+        attributes: {
+          users: hasMany('User'),
+        },
       });
       const schemas = generateSchemas([user, group]);
       const userEntity = { id: 1, group: 1, name: 'Lars' };

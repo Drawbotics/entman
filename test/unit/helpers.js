@@ -3,6 +3,7 @@ import { expect } from 'chai';
 import { defineSchema, generateSchemas } from 'schema';
 import {
   createEntity,
+  createEntities,
   updateEntity,
   updateEntityId,
   deleteEntity,
@@ -68,6 +69,66 @@ describe('@Helpers', function () {
       const action = createUser({ name: 'Lars' });
       const result = action.meta.entityAction;
       expect(result.type).to.equal('CREATE_ENTITY');
+    });
+  });
+  describe('createEntities(schema, dataPath, action)', function () {
+    let schemas;
+    before(function () {
+      const user = defineSchema('User');
+      schemas = generateSchemas([user]);
+    });
+    it('should throw an error when `schema` is not a valid schema', function () {
+      expect(() => createEntities()).to.throw(/INVALID SCHEMA/);
+    });
+    it('should throw an error when `dataPath` is empty', function () {
+      const { User } = schemas;
+      expect(() => createEntities(User)).to.throw(/INVALID DATA PATH/);
+    });
+    it('should throw an error when invalid `action`', function () {
+      const { User } = schemas;
+      expect(() => createEntities(User, 'payload.data')).to.throw(/INVALID ACTION/);
+      expect(() => createEntities(User, 'payload.data', { asd: 'asdfa' })).to.throw(/INVALID ACTION/);
+    });
+    it('should return a valid action object', function () {
+      const { User } = schemas;
+      const type = 'TEST_ACTION';
+      const createUsers = (data) => createEntities(User, 'payload.data', {
+        type,
+        payload: { data },
+      });
+      const result = createUsers([{ name: 'Lars' }]);
+      expect(result).to.contain.key('type');
+    });
+    it('the type of the resulting action should be the specified in the wrapped action', function () {
+      const { User } = schemas;
+      const type = 'TEST_ACTION';
+      const createUsers = (data) => createEntities(User, 'payload.data', {
+        type,
+        payload: { data },
+      });
+      const result = createUsers([{ name: 'Lars' }]);
+      expect(result.type).to.equal(type);
+    });
+    it('should add a meta property called `entityAction` to the wrapped action', function () {
+      const { User } = schemas;
+      const type = 'TEST_ACTION';
+      const createUsers = (data) => createEntities(User, 'payload.data', {
+        type,
+        payload: { data },
+      });
+      const result = createUsers([{ name: 'Lars' }]);
+      expect(result.meta).to.contain.key('entityAction');
+    });
+    it('the `entityAction` should have the type `CREATE_ENTITIES`', function () {
+      const { User } = schemas;
+      const type = 'TEST_ACTION';
+      const createUsers = (data) => createEntities(User, 'payload.data', {
+        type,
+        payload: { data },
+      });
+      const action = createUsers([{ name: 'Lars' }]);
+      const result = action.meta.entityAction;
+      expect(result.type).to.equal('CREATE_ENTITIES');
     });
   });
   describe('updateEntity(schema, id, dataPath, action)', function () {

@@ -12,7 +12,7 @@ module.exports = Object.assign({}, webpackBaseConfig, {
   plugins: [
     ...plugins,
     new webpack.DefinePlugin({
-      'process.env': { TESTING: '"true"' }
+      'process.env': { NODE_ENV: '"test"' }
     }),
   ],
 });
