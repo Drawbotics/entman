@@ -37,15 +37,19 @@ We use schemas to define relationships between our entities.
 import { defineSchema, hasMany, generateSchemas } from 'entman';
 
 const Group = defineSchema('Group', {
-  users: hasMany('User'),  // Use the name of another model to define relationships
+  attributes: {
+    users: hasMany('User'),  // Use the name of another model to define relationships
 
-  getNumberOfUsers() {  // Define methods that interact with the entity instance
-    return this.users.length;
+    getNumberOfUsers() {  // Define methods that interact with the entity instance
+      return this.users.length;
+    }
   }
 });
 
 const User = defineSchema('User', {
-  group: 'Group',
+  attributes: {
+    group: 'Group',
+  }
 });
 
 // Generate and export the schemas. Schemas will be exported as an object
