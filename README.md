@@ -66,6 +66,7 @@ Connect the entities reducer to the state.
 
 ```javascript
 import { combineReducers } from 'redux';
+import { reducer as entities } from 'entman';
 import schemas from './schemas';
 
 export default combineReducers({
