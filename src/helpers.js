@@ -54,7 +54,7 @@ export function updateEntity(schema, id, dataPath, action, defaulting) {
   if ( ! schema || ! schema.getKey) {
     throw new Error(`[INVALID SCHEMA]: Entity schema expected instead of ${schema}`);
   }
-  if ( ! id || isNaN(id)) {
+  if ( ! id) {
     throw new Error('[INVALID ID]');
   }
   if (isEmpty(dataPath) || (typeof dataPath !== 'string')) {
@@ -80,10 +80,10 @@ export function updateEntityId(schema, oldId, newId, action) {
   if ( ! schema || ! schema.getKey) {
     throw new Error(`[INVALID SCHEMA]: Entity schema expected instead of ${schema}`);
   }
-  if ( ! oldId || isNaN(oldId)) {
+  if ( ! oldId) {
     throw new Error('[INVALID OLD ID]');
   }
-  if ( ! newId || isNaN(newId)) {
+  if ( ! newId) {
     throw new Error('[INVALID NEW ID]');
   }
   if (isEmpty(action) || ! action.hasOwnProperty('type')) {
@@ -103,7 +103,7 @@ export function deleteEntity(schema, id, action) {
   if ( ! schema || ! schema.getKey) {
     throw new Error(`[INVALID SCHEMA]: Entity schema expected instead of ${schema}`);
   }
-  if ( ! id || isNaN(id)) {
+  if ( ! id) {
     throw new Error('[INVALID ID]');
   }
   if (isEmpty(action) || ! action.hasOwnProperty('type')) {
