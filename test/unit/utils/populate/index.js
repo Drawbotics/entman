@@ -10,14 +10,20 @@ describe('@Populate', function () {
   let state;
   before(function () {
     const group = defineSchema('Group', {
-      users: hasMany('User'),
+      attributes: {
+        users: hasMany('User'),
+      },
     });
     const user = defineSchema('User', {
-      group: 'Group',
-      tasks: hasMany('Task'),
+      attributes: {
+        group: 'Group',
+        tasks: hasMany('Task'),
+      },
     });
     const task = defineSchema('Task', {
-      user: 'User',
+      attributes: {
+        user: 'User',
+      },
     });
     state = deepFreeze({
       Group: {

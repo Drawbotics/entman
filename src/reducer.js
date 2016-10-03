@@ -33,6 +33,19 @@ function reducer(state, action) {
         },
       };
     }
+    case EntitiesActions.UPDATE_ENTITIES: {
+      const { data, ids, key } = action.payload;
+      return ids.reduce((memo, id) => {
+        const newData = data.entities[key][id];
+        return {
+          ...memo,
+          [key]: {
+            ...memo[key],
+            [id]: update(memo[key][id], newData),
+          },
+        };
+      }, state);
+    }
     case EntitiesActions.UPDATE_ENTITY_ID: {
       const { key, schema, oldId, newId } = action.payload;
       const updatedEntity = { ...state[key][oldId], id: newId };

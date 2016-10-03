@@ -74,6 +74,25 @@ export function updateEntity(schema, id, data, useDefault) {
 }
 
 
+export const UPDATE_ENTITIES = 'UPDATE_ENTITIES';
+
+export function updateEntities(schema, ids, data) {
+  const dataAndIds = ids.map(id => ({ ...data, id }));
+  return {
+    type: UPDATE_ENTITIES,
+    payload: {
+      key: schema.getKey(),
+      schema: schema,
+      ids,
+      data: normalize(dataAndIds, arrayOf(schema)),
+    },
+    meta: {
+      isEntityAction: true,
+    },
+  };
+}
+
+
 export const UPDATE_ENTITY_ID = 'UPDATE_ENTITY_ID';
 
 export function updateEntityId(schema, oldId, newId) {
@@ -116,6 +135,7 @@ export default {
   createEntity,
   createEntities,
   updateEntity,
+  updateEntities,
   deleteEntity,
   updateEntityId,
 };

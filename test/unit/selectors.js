@@ -17,15 +17,21 @@ describe('@Selectors', function () {
   let schemas;
   before(function () {
     const group = defineSchema('Group', {
-      users: hasMany('User'),
+      attributes: {
+        users: hasMany('User'),
+      }
     });
     const user = defineSchema('User', {
-      group: 'Group',
-      tasks: hasMany('Task'),
+      attributes: {
+        group: 'Group',
+        tasks: hasMany('Task'),
+      }
     });
     const task = defineSchema('Task', {
-      user: 'User',
-      //TODO: users: hasMany('User'),
+      attributes: {
+        user: 'User',
+        //TODO: users: hasMany('User'),
+      }
     });
     schemas = generateSchemas([group, user, task]);
     state = {

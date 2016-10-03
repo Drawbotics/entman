@@ -5,6 +5,7 @@ import {
   createEntity,
   createEntities,
   updateEntity,
+  updateEntities,
   updateEntityId,
   deleteEntity,
 } from 'actions';
@@ -20,15 +21,21 @@ describe('@Reducer', function () {
   let schemas;
   before(function () {
     const group = defineSchema('Group', {
-      users: hasMany('User'),
+      attributes: {
+        users: hasMany('User'),
+      }
     });
     const user = defineSchema('User', {
-      group: 'Group',
-      tasks: hasMany('Task'),
+      attributes: {
+        group: 'Group',
+        tasks: hasMany('Task'),
+      }
     });
     const task = defineSchema('Task', {
-      user: 'User',
-      //TODO: users: hasMany('User'),
+      attributes: {
+        user: 'User',
+        //TODO: users: hasMany('User'),
+      }
     });
     schemas = generateSchemas([group, user, task]);
   });
@@ -143,6 +150,43 @@ describe('@Reducer', function () {
           },
           User: {
             1: { id: 1, name: newName, group: 2 },
+          },
+          Task: {
+            1: { id: 1, title: 'Do something', user: 1 },
+          },
+        };
+        expect(finalState).to.deep.equal(expectedState);
+      });
+    });
+    describe('when `UPDATE_ENTITIES` is received as action', function () {
+      let finalState;
+      const group = { name: 'Group 1', id: 1 };
+      const group2 = { name: 'Group 2', id: 2 };
+      const user = { name: 'Lars', group: 1, id: 1 };
+      const task = { title: 'Do something', user: 1, id: 1 };
+      const newName = 'Grishan';
+      const newGroup = 2;
+      before(function () {
+        const initialState = deepFreeze(reducer(undefined, {}));
+        const createGroup = createEntity(schemas.Group, group);
+        const createGroup2 = createEntity(schemas.Group, group2);
+        const createUser = createEntity(schemas.User, user);
+        const createTask = createEntity(schemas.Task, task);
+        const updateGroups = updateEntities(schemas.Group, [1, 2], { name: 'Group' });
+        finalState = deepFreeze(reducer(initialState, createGroup));
+        finalState = deepFreeze(reducer(finalState, createGroup2));
+        finalState = deepFreeze(reducer(finalState, createUser));
+        finalState = deepFreeze(reducer(finalState, createTask));
+        finalState = deepFreeze(reducer(finalState, updateGroups));
+      });
+      it('should update the entities', function () {
+        const expectedState = {
+          Group: {
+            1: { id: 1, name: 'Group' },
+            2: { id: 2, name: 'Group' },
+          },
+          User: {
+            1: { id: 1, name: 'Lars', group: 1 },
           },
           Task: {
             1: { id: 1, title: 'Do something', user: 1 },

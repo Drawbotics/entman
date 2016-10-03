@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { normalize } from 'normalizr';
+import { normalize, arrayOf } from 'normalizr';
 
 import { defineSchema, generateSchemas } from 'schema';
 import {
@@ -7,6 +7,8 @@ import {
   CREATE_ENTITY,
   updateEntity,
   UPDATE_ENTITY,
+  updateEntities,
+  UPDATE_ENTITIES,
   deleteEntity,
   DELETE_ENTITY,
   updateEntityId,
@@ -85,6 +87,36 @@ describe('@Actions', function () {
       const data = { foo: 'bar' };
       const result = updateEntity(Cart, id, data);
       expect(result.payload.data).to.deep.equal(normalize({ id, ...data }, Cart));
+    });
+  });
+  describe('updateEntities(schema, id, data)', function () {
+    it('should return an action object of type UPDATE_ENTITIES', function () {
+      const { Cart } = schemas;
+      const result = updateEntities(Cart, [ 1231 ], { foo: 'bar' });
+      expect(result.type).to.equal(UPDATE_ENTITIES);
+    });
+    it('should include a meta property with isEntityAction set to true', function () {
+      const { Cart } = schemas;
+      const result = updateEntities(Cart, [ 1231 ], {});
+      expect(result.meta.isEntityAction).to.be.true;
+    });
+    it('should include the the key of the entities in the payload', function () {
+      const { Cart } = schemas;
+      const result = updateEntities(Cart, [ 123 ], { foo: 'bar' });
+      expect(result.payload.key).to.equal('Cart');
+    });
+    it('should include the ids of the entities in the payload', function () {
+      const { Cart } = schemas;
+      const ids = [ 1231 ];
+      const result = updateEntities(Cart, ids, { foo: 'bar' });
+      expect(result.payload.ids).to.deep.equal(ids);
+    });
+    it('should include the data in the payload as an array', function () {
+      const { Cart } = schemas;
+      const ids = [ 123 ];
+      const data = { foo: 'bar' };
+      const result = updateEntities(Cart, ids, data);
+      expect(result.payload.data).to.deep.equal(normalize([{ id: 123, ...data }], arrayOf(Cart)));
     });
   });
   describe('updateEntityId(schema, newId, oldId)', function () {

@@ -5,6 +5,7 @@ import {
   createEntity,
   createEntities,
   updateEntity,
+  updateEntities,
   updateEntityId,
   deleteEntity,
 } from 'helpers';
@@ -193,6 +194,74 @@ describe('@Helpers', function () {
       const action = updateUser(1, { name: 'Lars' });
       const result = action.meta.entityAction;
       expect(result.type).to.equal('UPDATE_ENTITY');
+    });
+  });
+  describe('updateEntities(schema, ids, dataPath, action)', function () {
+    let schemas;
+    before(function () {
+      const user = defineSchema('User');
+      schemas = generateSchemas([user]);
+    });
+    it('should throw an error when `schema` is not a valid schema', function () {
+      expect(() => updateEntities()).to.throw(/INVALID SCHEMA/);
+    });
+    it('should throw an error when `ids` is empty', function () {
+      const { User } = schemas;
+      expect(() => updateEntities(User)).to.throw(/INVALID IDS/);
+    });
+    it('should throw an error when `ids` is not an array', function () {
+      const { User } = schemas;
+      expect(() => updateEntities(User, 1)).to.throw(/INVALID IDS/);
+    });
+    it('should throw an error when `dataPath` is empty', function () {
+      const { User } = schemas;
+      expect(() => updateEntities(User, [ 1 ])).to.throw(/INVALID DATA PATH/);
+    });
+    it('should throw an error when invalid `action`', function () {
+      const { User } = schemas;
+      expect(() => updateEntities(User, [ 1 ], 'payload.data')).to.throw(/INVALID ACTION/);
+      expect(() => updateEntities(User, [ 1 ], 'payload.data', { asd: 'asdfa' })).to.throw(/INVALID ACTION/);
+    });
+    it('should return a valid action object', function () {
+      const { User } = schemas;
+      const type = 'TEST_ACTION';
+      const updateUsers = (ids, data) => updateEntities(User, ids, 'payload.data', {
+        type,
+        payload: { data }
+      });
+      const result = updateUsers([ 1 ], { name: 'Lars' });
+      expect(result).to.contain.key('type');
+    });
+    it('the type of the resulting action should be the specified in the wrapped action', function () {
+      const { User } = schemas;
+      const type = 'TEST_ACTION';
+      const updateUsers = (ids, data) => updateEntities(User, ids, 'payload.data', {
+        type,
+        payload: { data }
+      });
+      const result = updateUsers([ 1 ], { name: 'Lars' });
+      expect(result.type).to.equal(type);
+    });
+    it('should add a meta property called `entityAction` to the wrapped action', function () {
+      const { User } = schemas;
+      const type = 'TEST_ACTION';
+      const updateUsers = (ids, data) => updateEntities(User, ids, 'payload.data', {
+        type,
+        payload: { data }
+      });
+      const result = updateUsers([ 1 ], { name: 'Lars' });
+      expect(result.meta).to.contain.key('entityAction');
+    });
+    it('the `entityAction` should have the type `UPDATE_ENTITIES`', function () {
+      const { User } = schemas;
+      const type = 'TEST_ACTION';
+      const updateUsers = (ids, data) => updateEntities(User, ids, 'payload.data', {
+        type,
+        payload: { data }
+      });
+      const action = updateUsers([ 1 ], { name: 'Lars' });
+      const result = action.meta.entityAction;
+      expect(result.type).to.equal('UPDATE_ENTITIES');
     });
   });
   describe('updateEntityId(schema, newId, oldId, action)', function () {
