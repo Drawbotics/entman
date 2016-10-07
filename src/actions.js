@@ -21,7 +21,7 @@ export function createEntity(schema, data, options={}) {
     payload: {
       key: schema.getKey(),
       schema: schema,
-      data: get(options, 'skipNormalization') ? data : normalize(data, schema),
+      data: options.skipNormalization ? data : normalize(data, schema),
       _rawData: data,
     },
     meta: {
@@ -34,13 +34,15 @@ export function createEntity(schema, data, options={}) {
 export const CREATE_ENTITIES = 'CREATE_ENTITIES';
 
 export function createEntities(schema, data, options={}) {
-  data = data.map(e => e.id ? e : { ...e, id: v4() });
+  if ( ! options.skipNormalization) {
+    data = data.map(e => e.id ? e : { ...e, id: v4() });
+  }
   return {
     type: CREATE_ENTITIES,
     payload: {
       key: schema.getKey(),
       schema: schema,
-      data: get(options, 'skipNormalization') ? data : normalize(data, arrayOf(schema)),
+      data: options.skipNormalization ? data : normalize(data, arrayOf(schema)),
       _rawData: data,
     },
     meta: {
