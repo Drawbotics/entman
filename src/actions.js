@@ -1,6 +1,7 @@
 import { v4 } from 'node-uuid';
 import { normalize, arrayOf } from 'normalizr';
 import isPlainObject from 'lodash/isPlainObject';
+import get from 'lodash/get';
 
 
 export const CREATE_ENTITY = 'CREATE_ENTITY';
@@ -11,7 +12,7 @@ export const CREATE_ENTITY = 'CREATE_ENTITY';
  * them to the store. But the word "create" is kept
  * because resemblance with CRUD operations.
  */
-export function createEntity(schema, data) {
+export function createEntity(schema, data, options={}) {
   if ( ! data.hasOwnProperty('id')) {
     data = { ...data, id: v4() };
   }
@@ -20,7 +21,7 @@ export function createEntity(schema, data) {
     payload: {
       key: schema.getKey(),
       schema: schema,
-      data: normalize(data, schema),
+      data: get(options, 'skipNormalization') ? data : normalize(data, schema),
       _rawData: data,
     },
     meta: {
@@ -32,14 +33,14 @@ export function createEntity(schema, data) {
 
 export const CREATE_ENTITIES = 'CREATE_ENTITIES';
 
-export function createEntities(schema, data) {
+export function createEntities(schema, data, options={}) {
   data = data.map(e => e.id ? e : { ...e, id: v4() });
   return {
     type: CREATE_ENTITIES,
     payload: {
       key: schema.getKey(),
       schema: schema,
-      data: normalize(data, arrayOf(schema)),
+      data: get(options, 'skipNormalization') ? data : normalize(data, arrayOf(schema)),
       _rawData: data,
     },
     meta: {

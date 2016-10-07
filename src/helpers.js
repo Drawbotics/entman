@@ -21,7 +21,9 @@ export function createEntity(schema, dataPath, action) {
     ...action,
     meta: {
       ...action.meta,
-      entityAction: actions.createEntity(schema, get(action, dataPath)),
+      entityAction: actions.createEntity(schema, get(action, dataPath), {
+        skipNormalization: get(action, 'meta.skipNormalization'),
+      }),
     },
   };
 }
@@ -44,7 +46,9 @@ export function createEntities(schema, dataPath, action) {
     ...action,
     meta: {
       ...action.meta,
-      entityAction: actions.createEntities(schema, get(action, dataPath)),
+      entityAction: actions.createEntities(schema, get(action, dataPath), {
+        skipNormalization: get(action, 'meta.skipNormalization'),
+      }),
     },
   };
 }
