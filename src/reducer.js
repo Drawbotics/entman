@@ -25,6 +25,7 @@ function reducer(state, action) {
     case EntitiesActions.UPDATE_ENTITY: {
       const { data, id, key, useDefault } = action.payload;
       const newData = data.entities[key][id];
+      delete newData.id;
       return {
         ...state,
         [key]: {
@@ -37,6 +38,7 @@ function reducer(state, action) {
       const { data, ids, key } = action.payload;
       return ids.reduce((memo, id) => {
         const newData = data.entities[key][id];
+        delete newData.id;
         return {
           ...memo,
           [key]: {
