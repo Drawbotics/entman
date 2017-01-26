@@ -10,15 +10,15 @@ export function flatten(obj, parentPath) {
     const currentPath = parentPath ? parentPath + '.' + k : k;
     const currentProp = obj[k];
 
-    if (Array.isArray(currentProp)) {
-      const arrayResult = currentProp.map((value, i) => {
-        const arrayPath = `${currentPath}[${i}]`;
-        if (isPlainObject(value)) return flatten(value, arrayPath);
-        return { [arrayPath] : value };
-      });
-      return Object.assign({}, result, ...arrayResult);
-    }
-    else if (isPlainObject(currentProp)) {
+    //if (Array.isArray(currentProp)) {
+      //const arrayResult = currentProp.map((value, i) => {
+        //const arrayPath = `${currentPath}[${i}]`;
+        //if (isPlainObject(value)) return flatten(value, arrayPath);
+        //return { [arrayPath] : value };
+      //});
+      //return Object.assign({}, result, ...arrayResult);
+    //}
+    if (isPlainObject(currentProp)) {
       return {
         ...result,
         ...flatten(currentProp, currentPath),
