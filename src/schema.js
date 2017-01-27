@@ -1,5 +1,6 @@
 import isEmpty from 'lodash/isEmpty';
 import omit from 'lodash/omit';
+import get from 'lodash/get';
 import { Schema, arrayOf } from 'normalizr';
 
 
@@ -62,7 +63,7 @@ function getRelation(schema, relatedEntities, bag) {
       related: relatedEntityName,
       relatedPropName,
       relatedId,
-      isArray: bag[relatedEntityName][relatedPropName].hasOwnProperty('_itemSchema'),
+      isArray: get(bag, [relatedEntityName, relatedPropName, '_itemSchema'], false),
     };
   };
 }
