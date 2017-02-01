@@ -102,7 +102,7 @@ function populateEntity(schema, entityOrId, entities, bag) {
   if( ! bag[key].hasOwnProperty(id)) {
     // Need to set this first so that if it is referenced within the call to
     // populateObject, it will already exist.
-    entity = cloneDeep(entity);
+    entity = cloneDeep(entity || { id });
     bag[key][id] = entity;
     bag[key][id] = populateObject(schema, entity, entities, bag);
   }
