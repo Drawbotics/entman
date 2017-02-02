@@ -10,9 +10,8 @@ import {
 
 
 function reducer(state, action) {
-  const testing = process.env.NODE_ENV === 'test';
-  if ( ! testing && (! action.meta || ! action.meta.entityAction)) return state;
-  action = testing ? action : action.meta.entityAction;
+  if ( ! action.meta || ! action.meta.entityAction) return state;
+  action = action.meta.entityAction;
   switch (action.type) {
     case EntitiesActions.CREATE_ENTITIES:
     case EntitiesActions.CREATE_ENTITY: {

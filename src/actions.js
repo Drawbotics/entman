@@ -35,7 +35,7 @@ export const CREATE_ENTITIES = 'CREATE_ENTITIES';
 
 export function createEntities(schema, data, options={}) {
   if ( ! options.skipNormalization) {
-    data = data.map(e => e.id ? e : { ...e, id: v4() });
+    data = Array.isArray(data) ? data.map(e => e.id ? e : { ...e, id: v4() }) : { ...data, id: v4() };
   }
   return {
     type: CREATE_ENTITIES,
