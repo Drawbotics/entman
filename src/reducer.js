@@ -11,10 +11,10 @@ import {
 
 
 function createEntities(state, action) {
-  const { data, key } = action.payload;
+  const { entities, key } = action.payload;
   return {
     ...state,
-    [key]: { ...state[key], ...data },
+    [key]: { ...state[key], ...entities },
   };
 }
 

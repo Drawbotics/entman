@@ -20,33 +20,6 @@ function normalizeData(schema, data, options) {
 }
 
 
-export function createEntity(schema, dataPath, action) {
-  console.error('Method createEntity() is deprecated. You should start using createEntities() instead.');
-  throw new Error('Dont use createEntity()');
-  if ( ! schema || ! schema.getKey) {
-    throw new Error(`[INVALID SCHEMA]: Entity schema expected instead of ${schema}`);
-  }
-  if (isEmpty(dataPath) || (typeof dataPath !== 'string')) {
-    throw new Error(`[INVALID DATA PATH]: Expected data path instead of ${dataPath}`);
-  }
-  if (isEmpty(action) || ! action.hasOwnProperty('type')) {
-    throw new Error('[INVALID ACTION]');
-  }
-  if ( ! get(action, dataPath)) {
-    console.warn(`No data found in action at ${dataPath}`);
-  }
-  return {
-    ...action,
-    meta: {
-      ...action.meta,
-      entityAction: actions.createEntity(schema, get(action, dataPath), {
-        skipNormalization: get(action, 'meta.skipNormalization'),
-      }),
-    },
-  };
-}
-
-
 export function createEntities(schema, dataPath, action) {
   if ( ! schema || ! schema.getKey) {
     throw new Error(`[INVALID SCHEMA]: Entity schema expected instead of ${schema}`);
@@ -67,38 +40,10 @@ export function createEntities(schema, dataPath, action) {
     // Create an action for every entity and dispatch it
     const actions = Object.keys(data.entities).map((key) => ({
       type: `@@entman/CREATE_ENTITIES_${key.toUpperCase()}`,
-      payload: { data: data.entities[key], key },
+      payload: { entities: data.entities[key], key },
       meta: { entmanAction: true, type: 'CREATE_ENTITIES' },
     }));
     actions.forEach(dispatch);
-  };
-}
-
-
-export function updateEntity(schema, id, dataPath, action, defaulting) {
-  if ( ! schema || ! schema.getKey) {
-    throw new Error(`[INVALID SCHEMA]: Entity schema expected instead of ${schema}`);
-  }
-  if ( ! id) {
-    throw new Error('[INVALID ID]');
-  }
-  if (isEmpty(dataPath) || (typeof dataPath !== 'string')) {
-    throw new Error(`[INVALID DATA PATH]: Expected data path instead of ${dataPath}`);
-  }
-  if (isEmpty(action) || ! action.hasOwnProperty('type')) {
-    throw new Error('[INVALID ACTION]');
-  }
-  if ( ! get(action, dataPath)) {
-    console.warn(`No data found in action at ${dataPath}`);
-  }
-  return (dispatch) => {
-  };
-  return {
-    ...action,
-    meta: {
-      ...action.meta,
-      entityAction: actions.updateEntity(schema, id, get(action, dataPath), defaulting),
-    },
   };
 }
 
@@ -119,12 +64,10 @@ export function updateEntities(schema, ids, dataPath, action) {
   if ( ! get(action, dataPath)) {
     console.warn(`No data found in action at ${dataPath}`);
   }
-  return {
-    ...action,
-    meta: {
-      ...action.meta,
-      entityAction: actions.updateEntities(schema, ids, get(action, dataPath)),
-    },
+  return (dispatch, getState) => {
+    dispatch(action);
+    const dataWithIds = ids.map((id) => ({ ...get(action, dataPath), id }));
+    console.log(dataWithIds);
   };
 }
 
