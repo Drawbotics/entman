@@ -1,5 +1,6 @@
 import omit from 'lodash/omit';
 import isEmpty from 'lodash/isEmpty';
+import get from 'lodash/get';
 import mapValues from 'lodash/mapValues';
 
 import * as EntitiesActions from './actions';
@@ -9,10 +10,34 @@ import {
 } from './utils';
 
 
+function createEntities(state, action) {
+  const { data, key } = action.payload;
+  return {
+    ...state,
+    [key]: { ...state[key], ...data },
+  };
+}
+
+
+function updateEntities(state, action) {
+  const { data, ids, key } = action.payload;
+  return ids.reduce((memo, id) => {
+    const newData = data.entities[key][id];
+    delete newData.id;
+    return {
+      ...memo,
+      [key]: {
+        ...memo[key],
+        [id]: update(memo[key][id], newData),
+      },
+    };
+  }, state);
+}
+
+
 function reducer(state, action) {
-  if ( ! action.meta || ! action.meta.entityAction) return state;
-  action = action.meta.entityAction;
-  switch (action.type) {
+  if ( ! get(action, 'meta.entmanAction', false)) return state;
+  switch (action.meta.type) {
     case EntitiesActions.CREATE_ENTITIES:
     case EntitiesActions.CREATE_ENTITY: {
       const { entities } = action.payload.data;
@@ -93,10 +118,23 @@ function reducer(state, action) {
 }
 
 
+function createReducer(entities) {
+  const reactions = Object.keys(entities).reduce((memo, k) => ({
+    ...memo,
+    [`@@entman/CREATE_ENTITIES_${k.toUpperCase()}`]: createEntities,
+    //[`@@entman/UPDATE_ENTITIES_${k}`]: updateEntities,
+  }), {});
+  return (state, action) => {
+    const reaction = reactions[action.type];
+    return (typeof reaction === 'function') ? reaction(state, action) : state;
+  };
+}
+
+
 export default function entities(schemas) {
   if (isEmpty(schemas)) {
     throw new Error('[INVALID SCHEMAS]');
   }
   const emptyEntities = mapValues(schemas, () => ({}));
-  return (state=emptyEntities, action) => reducer(state, action);
+  return (state=emptyEntities, action) => createReducer(emptyEntities)(state, action);
 }

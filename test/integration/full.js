@@ -1,6 +1,7 @@
 import { expect } from 'chai';
-import { createStore } from 'redux';
+import { createStore, applyMiddleware, compose } from 'redux';
 import { v4 } from 'node-uuid';
+import reduxThunk from 'redux-thunk';
 
 import {
   defineSchema,
@@ -83,7 +84,13 @@ const updateTask = (id, data) => updateEntity(schemas.Task, id, 'payload.data', 
 
 describe('FULL EXAMPLE', function () {
 
-  const store = createStore(reducer);
+  const store = createStore(
+    reducer,
+    compose(
+      applyMiddleware(reduxThunk),
+      window.devToolsExtension ? window.devToolsExtension() : f => f,
+    ),
+  );
 
 
   before(function () {

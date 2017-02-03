@@ -1,10 +1,28 @@
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
+import { normalize, arrayOf } from 'normalizr';
+import { v4 } from 'node-uuid';
 
 import actions from './actions';
 
 
+function normalizeData(schema, data, options) {
+  let normalizedData = data;
+  if (Array.isArray(data)) {
+    data = data.map((e) => e.id ? e : { ...e, id: v4() });
+    normalizedData = normalize(data, arrayOf(schema));
+  }
+  else {
+    data = data.id ? data : { ...data, id: v4() };
+    normalizedData = normalize(data, schema);
+  }
+  return normalizedData;
+}
+
+
 export function createEntity(schema, dataPath, action) {
+  console.error('Method createEntity() is deprecated. You should start using createEntities() instead.');
+  throw new Error('Dont use createEntity()');
   if ( ! schema || ! schema.getKey) {
     throw new Error(`[INVALID SCHEMA]: Entity schema expected instead of ${schema}`);
   }
@@ -42,14 +60,17 @@ export function createEntities(schema, dataPath, action) {
   if ( ! get(action, dataPath)) {
     console.warn(`No data found in action at ${dataPath}`);
   }
-  return {
-    ...action,
-    meta: {
-      ...action.meta,
-      entityAction: actions.createEntities(schema, get(action, dataPath), {
-        skipNormalization: get(action, 'meta.skipNormalization'),
-      }),
-    },
+  return (dispatch) => {
+    dispatch(action);
+    const skipNormalization = get(action, 'meta.skipNormalization');
+    const data = skipNormalization ? get(action, dataPath) : normalizeData(schema, get(action, dataPath));
+    // Create an action for every entity and dispatch it
+    const actions = Object.keys(data.entities).map((key) => ({
+      type: `@@entman/CREATE_ENTITIES_${key.toUpperCase()}`,
+      payload: { data: data.entities[key], key },
+      meta: { entmanAction: true, type: 'CREATE_ENTITIES' },
+    }));
+    actions.forEach(dispatch);
   };
 }
 
@@ -70,6 +91,8 @@ export function updateEntity(schema, id, dataPath, action, defaulting) {
   if ( ! get(action, dataPath)) {
     console.warn(`No data found in action at ${dataPath}`);
   }
+  return (dispatch) => {
+  };
   return {
     ...action,
     meta: {
