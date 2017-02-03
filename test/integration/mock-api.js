@@ -15,13 +15,13 @@ users = () => [
     tasks: [3],
   },
   {
-    id: 1,
+    id: 3,
     name: 'Lars',
     group: 2,
     tasks: [4],
   },
   {
-    id: 2,
+    id: 4,
     name: 'Grishan',
     group: 2,
     tasks: [5],
@@ -33,8 +33,13 @@ groups = () => [
   {
     id: 1,
     name: 'Test Group',
-    users: [ users()[1], users()[2] ],
-  }
+    users: [ users()[0], users()[1] ],
+  },
+  {
+    id: 2,
+    name: 'Test Group 2',
+    users: [ users()[2], users()[3] ],
+  },
 ];
 
 

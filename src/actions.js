@@ -34,15 +34,23 @@ export function createEntity(schema, data, options={}) {
 export const CREATE_ENTITIES = 'CREATE_ENTITIES';
 
 export function createEntities(schema, data, options={}) {
+  let normalizedData;
   if ( ! options.skipNormalization) {
-    data = Array.isArray(data) ? data.map(e => e.id ? e : { ...e, id: v4() }) : { ...data, id: v4() };
+    if (Array.isArray(data)) {
+      data = data.map((e) => e.id ? e : { ...e, id: v4() });
+      normalizedData = normalize(data, arrayOf(schema));
+    }
+    else {
+      data = data.id ? data : { ...data, id: v4() };
+      normalizedData = normalize(data, schema);
+    }
   }
   return {
     type: CREATE_ENTITIES,
     payload: {
       key: schema.getKey(),
       schema: schema,
-      data: options.skipNormalization ? data : normalize(data, arrayOf(schema)),
+      data: options.skipNormalization ? data : normalizedData,
       _rawData: data,
     },
     meta: {

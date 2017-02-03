@@ -1,4 +1,6 @@
 import { expect } from 'chai';
+import { createStore } from 'redux';
+import { v4 } from 'node-uuid';
 
 import {
   defineSchema,
@@ -81,26 +83,59 @@ const updateTask = (id, data) => updateEntity(schemas.Task, id, 'payload.data', 
 
 describe('FULL EXAMPLE', function () {
 
+  const store = createStore(reducer);
+
+
+  before(function () {
+  });
+
   describe('after initialization', function () {
-    it('the reducer should return an empty state with empty entities', function () {
-      const initialState = reducer(undefined, {});
-      expect(initialState).to.contain.keys(['Group', 'User', 'Task']);
-      expect(initialState.Group).to.be.empty;
-      expect(initialState.User).to.be.empty;
-      expect(initialState.Task).to.be.empty;
+    it('the store should contain an state with empty entities', function () {
+      const state = store.getState();
+      expect(state).to.contain.keys(['Group', 'User', 'Task']);
+      expect(state.Group).to.be.empty;
+      expect(state.User).to.be.empty;
+      expect(state.Task).to.be.empty;
     });
   });
 
   describe('when adding groups to the estate', function () {
-    it('the reducer should return the new state with the entities on it', function () {
-      const initialState = reducer(undefined, {});
+    let state;
+    before(function () {
       const groups = api.groups.findAll();
       const action = receiveGroups(groups);
-      const finalState = reducer(initialState, action);
+      store.dispatch(action);
+      state = store.getState();
+    });
+    it('the reducer should return the new state with the groups on it', function () {
+      expect(state.Group[1]).to.exist;
+      expect(state.Group[2]).to.exist;
+    });
+    it('the new state should contain also related entities', function () {
+      expect(state.User[1]).to.exist;
+      expect(state.User[2]).to.exist;
+      expect(state.User[3]).to.exist;
+      expect(state.User[4]).to.exist;
     });
   });
 
   describe('when adding a new user', function () {
+    let state;
+    before(function () {
+      const newUser = {
+        id: 123,
+        name: 'Fienhard',
+        group: 1,
+      };
+      const action = createUser(newUser);
+      store.dispatch(action);
+      state = store.getState();
+    });
+    it('the new state should contain the new user', function () {
+      expect(state.User[123]).to.exist;
+    });
+    it('if the new user contained an embedded entity, the state should also contain it', function () {
+    });
   });
 
 });
