@@ -11,27 +11,28 @@ import {
 
 
 function createEntities(state, action) {
-  const { entities, key } = action.payload;
+  const { entities } = action.payload;
   return {
     ...state,
-    [key]: { ...state[key], ...entities },
+    ...entities,
   };
 }
 
 
 function updateEntities(state, action) {
-  const { data, ids, key } = action.payload;
-  return ids.reduce((memo, id) => {
-    const newData = data.entities[key][id];
-    delete newData.id;
-    return {
-      ...memo,
-      [key]: {
-        ...memo[key],
-        [id]: update(memo[key][id], newData),
-      },
-    };
-  }, state);
+  const { entities } = action.payload;
+  return Object.keys(entities).reduce((memo, id) => ({
+    ...memo,
+    [id]: update(memo[id], omit(entities[id], 'id')),
+  }), state);
+}
+
+
+function updateEntitiesIds(state, action) {
+}
+
+
+function deleteEntities(state, action) {
 }
 
 
@@ -121,8 +122,12 @@ function reducer(state, action) {
 function createReducer(entities) {
   const reactions = Object.keys(entities).reduce((memo, k) => ({
     ...memo,
-    [`@@entman/CREATE_ENTITIES_${k.toUpperCase()}`]: createEntities,
-    //[`@@entman/UPDATE_ENTITIES_${k}`]: updateEntities,
+    [`@@entman/CREATE_ENTITIES_${k.toUpperCase()}`]: (state, action) => ({
+      ...state, [k]: { ...state[k], ...createEntities(state[k], action) },
+    }),
+    [`@@entman/UPDATE_ENTITIES_${k.toUpperCase()}`]: (state, action) => ({
+      ...state, [k]: { ...state[k], ...updateEntities(state[k], action) },
+    }),
   }), {});
   return (state, action) => {
     const reaction = reactions[action.type];

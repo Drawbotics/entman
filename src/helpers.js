@@ -52,8 +52,8 @@ export function updateEntities(schema, ids, dataPath, action) {
   if ( ! schema || ! schema.getKey) {
     throw new Error(`[INVALID SCHEMA]: Entity schema expected instead of ${schema}`);
   }
-  if ( ! ids || ! Array.isArray(ids)) {
-    throw new Error('[INVALID IDS]');
+  if ( ! Array.isArray(ids)) {
+    ids = [ids];
   }
   if (isEmpty(dataPath) || (typeof dataPath !== 'string')) {
     throw new Error(`[INVALID DATA PATH]: Expected data path instead of ${dataPath}`);
@@ -67,7 +67,13 @@ export function updateEntities(schema, ids, dataPath, action) {
   return (dispatch, getState) => {
     dispatch(action);
     const dataWithIds = ids.map((id) => ({ ...get(action, dataPath), id }));
-    console.log(dataWithIds);
+    const data = normalizeData(schema, dataWithIds);
+    const actions = Object.keys(data.entities).map((key) => ({
+      type: `@@entman/UPDATE_ENTITIES_${key.toUpperCase()}`,
+      payload: { entities: data.entities[key], key },
+      meta: { entmanAction: true, type: 'UPDATE_ENTITIES' },
+    }));
+    actions.forEach(dispatch);
   };
 }
 

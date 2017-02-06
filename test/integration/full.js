@@ -65,7 +65,7 @@ const createTask = (task) => createEntities(schemas.Task, 'payload.task', {
   payload: { task },
 });
 
-const updateGroup = (id, data) => updateEntity(schemas.Group, id, 'payload.data', {
+const updateGroup = (id, data) => updateEntities(schemas.Group, id, 'payload.data', {
   type: 'UPDATE_GROUP',
   payload: { data },
 });
@@ -132,7 +132,7 @@ describe('FULL EXAMPLE', function () {
       const newUser = {
         id: 123,
         name: 'Fienhard',
-        group: 1,
+        group: 1,  // should we dispatch two actions? createUser() and addUserToGroup()?
       };
       const action = createUser(newUser);
       store.dispatch(action);
@@ -141,11 +141,22 @@ describe('FULL EXAMPLE', function () {
     it('the new state should contain the new user', function () {
       expect(state.User[123]).to.exist;
     });
-    it('if the new user contained an embedded entity, the state should also contain it', function () {
+    it.skip('if the new user contained an embedded entity, what should we do?', function () {
     });
   });
 
-  describe('when updating an entity', function () {
+  describe('when updating a group', function () {
+    let state;
+    describe('if we\'re updating a single property (no array, no relation)', function () {
+      before(function () {
+        const action = updateGroup(1, { name: 'New Test Group' });
+        store.dispatch(action);
+        state = store.getState();
+      });
+      it('the property of the group should be updated in the state', function () {
+        expect(state.Group[1].name).to.equal('New Test Group');
+      });
+    })
   });
 
 });
