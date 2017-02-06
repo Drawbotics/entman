@@ -50,6 +50,9 @@ function reducer(state, action) {
     }
     case EntitiesActions.UPDATE_ENTITY_ID: {
       const { key, schema, oldId, newId } = action.payload;
+      if (oldId === newId) {
+        return state;
+      }
       const updatedEntity = { ...state[key][oldId], id: newId };
       return mapValues(state, (currentEntities, key) => {
         // The entities we need to update
