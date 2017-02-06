@@ -14,6 +14,7 @@ import {
   updateEntities,
   updateEntityId,
   deleteEntity,
+  deleteEntities,
 } from 'index';
 import api from './mock-api';
 
@@ -78,6 +79,10 @@ const updateUser = (id, data) => updateEntity(schemas.User, id, 'payload.data', 
 const updateTask = (id, data) => updateEntity(schemas.Task, id, 'payload.data', {
   type: 'UPDATE_TASK',
   payload: { data },
+});
+
+const deleteGroup = (id) => deleteEntities(schemas.Group, id, {
+  type: 'DELETE_GROUP',
 });
 // ACTIONS --}}
 
@@ -157,6 +162,19 @@ describe('FULL EXAMPLE', function () {
         expect(state.Group[1].name).to.equal('New Test Group');
       });
     })
+  });
+
+  describe('when deleting a group', function () {
+    let state;
+    before(function () {
+      const action = deleteGroup(1);
+      store.dispatch(action);
+      state = store.getState();
+    });
+    it('the entity should be removed from the state', function () {
+    });
+    it('do we cascade related entities as well?', function () {
+    });
   });
 
 });

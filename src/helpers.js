@@ -119,3 +119,28 @@ export function deleteEntity(schema, id, action) {
     },
   };
 }
+
+
+export function deleteEntities(schema, ids, action) {
+  if ( ! schema || ! schema.getKey) {
+    throw new Error(`[INVALID SCHEMA]: Entity schema expected instead of ${schema}`);
+  }
+  if ( ! ids) {
+    throw new Error('[INVALID ID]');
+  }
+  if ( ! Array.isArray(ids)) {
+    ids = [ids];
+  }
+  if (isEmpty(action) || ! action.hasOwnProperty('type')) {
+    throw new Error('[INVALID ACTION]');
+  }
+  return (dispatch) => {
+    dispatch(action);
+    // Do we cascade delete?
+    dispatch({
+      type: `@@entman/DELETE_ENTITIES_${schema.getKey().toUpperCase()}`,
+      payload: { ids, key: schema.getKey() },
+      meta: { entmanAction: true, type: 'DELETE_ENTITIES' },
+    });
+  };
+}

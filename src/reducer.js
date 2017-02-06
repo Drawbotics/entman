@@ -33,6 +33,9 @@ function updateEntitiesIds(state, action) {
 
 
 function deleteEntities(state, action) {
+  const { ids } = action.payload;
+  console.log(omit(state, ids));
+  return omit(state, ids);
 }
 
 
@@ -123,10 +126,13 @@ function createReducer(entities) {
   const reactions = Object.keys(entities).reduce((memo, k) => ({
     ...memo,
     [`@@entman/CREATE_ENTITIES_${k.toUpperCase()}`]: (state, action) => ({
-      ...state, [k]: { ...state[k], ...createEntities(state[k], action) },
+      ...state, [k]: createEntities(state[k], action),
     }),
     [`@@entman/UPDATE_ENTITIES_${k.toUpperCase()}`]: (state, action) => ({
-      ...state, [k]: { ...state[k], ...updateEntities(state[k], action) },
+      ...state, [k]: updateEntities(state[k], action),
+    }),
+    [`@@entman/DELETE_ENTITIES_${k.toUpperCase()}`]: (state, action) => ({
+      ...state, [k]: deleteEntities(state[k], action),
     }),
   }), {});
   return (state, action) => {
