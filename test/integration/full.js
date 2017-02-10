@@ -15,6 +15,7 @@ import {
   updateEntityId,
   deleteEntity,
   deleteEntities,
+  getEntitiesSlice,
 } from 'index';
 import api from './mock-api';
 
@@ -71,12 +72,12 @@ const updateGroup = (id, data) => updateEntities(schemas.Group, id, 'payload.dat
   payload: { data },
 });
 
-const updateUser = (id, data) => updateEntity(schemas.User, id, 'payload.data', {
+const updateUser = (id, data) => updateEntities(schemas.User, id, 'payload.data', {
   type: 'UPDATE_USER',
   payload: { data },
 });
 
-const updateTask = (id, data) => updateEntity(schemas.Task, id, 'payload.data', {
+const updateTask = (id, data) => updateEntities(schemas.Task, id, 'payload.data', {
   type: 'UPDATE_TASK',
   payload: { data },
 });
@@ -107,7 +108,7 @@ describe('FULL EXAMPLE', function () {
 
   describe('after initialization', function () {
     it('the store should contain an state with empty entities', function () {
-      const state = store.getState();
+      const state = getEntitiesSlice(store.getState());
       expect(state).to.contain.keys(['Group', 'User', 'Task']);
       expect(state.Group).to.be.empty;
       expect(state.User).to.be.empty;
@@ -121,7 +122,7 @@ describe('FULL EXAMPLE', function () {
       const groups = api.groups.findAll();
       const action = receiveGroups(groups);
       store.dispatch(action);
-      state = store.getState();
+      state = getEntitiesSlice(store.getState());
     });
     it('the reducer should return the new state with the groups on it', function () {
       expect(state.Group[1]).to.exist;
@@ -145,10 +146,13 @@ describe('FULL EXAMPLE', function () {
       };
       const action = createUser(newUser);
       store.dispatch(action);
-      state = store.getState();
+      state = getEntitiesSlice(store.getState());
     });
     it('the new state should contain the new user', function () {
       expect(state.User[123]).to.exist;
+    });
+    it('the group should be updated with the new user', function () {
+      expect(state.Group[1].users).to.include('123');
     });
     it.skip('if the new user contained an embedded entity, what should we do?', function () {
     });
@@ -160,7 +164,7 @@ describe('FULL EXAMPLE', function () {
       before(function () {
         const action = updateGroup(1, { name: 'New Test Group' });
         store.dispatch(action);
-        state = store.getState();
+        state = getEntitiesSlice(store.getState());
       });
       it('the property of the group should be updated in the state', function () {
         expect(state.Group[1].name).to.equal('New Test Group');
@@ -168,17 +172,30 @@ describe('FULL EXAMPLE', function () {
     })
   });
 
+  describe('when updating an user', function () {
+    let state;
+    before(function () {
+      const action = updateUser(1, { name: 'New User Name', group: 2 });
+      store.dispatch(action);
+      state = getEntitiesSlice(store.getState());
+    });
+    it('the entity should have its properties updated', function () {
+      expect(state.User[1].name).to.equal('New User Name');
+    });
+  });
+
   describe('when deleting an user', function () {
     let state;
     before(function () {
       const action = deleteUser(123);
       store.dispatch(action);
-      state = store.getState();
+      state = getEntitiesSlice(store.getState());
     });
     it('the entity should be removed from the state', function () {
       expect(state.User[123]).to.not.exist;
     });
     it('the related group should be updated to remove the reference to the user', function () {
+      expect(state.Group[1].users).to.not.include('123');
     })
   });
 
@@ -187,11 +204,11 @@ describe('FULL EXAMPLE', function () {
     before(function () {
       const action = deleteGroup(1);
       store.dispatch(action);
-      state = store.getState();
+      state = getEntitiesSlice(store.getState());
     });
     it('the entity should be removed from the state', function () {
     });
-    it('do we cascade related entities as well?', function () {
+    it.skip('do we cascade related entities as well?', function () {
     });
   });
 

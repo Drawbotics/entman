@@ -21,12 +21,12 @@ function createEntity(state, action) {
 }
 
 
-function updateEntities(state, action) {
-  const { entities } = action.payload;
-  return Object.keys(entities).reduce((memo, id) => ({
-    ...memo,
-    [id]: update(memo[id], omit(entities[id], 'id')),
-  }), state);
+function updateEntity(state, action) {
+  const { entity } = action.payload;
+  return {
+    ...state,
+    [entity.id]: update(state[entity.id], omit(entity, 'id')),
+  };
 }
 
 
@@ -153,8 +153,8 @@ function createEntityReducer(entitySchema) {
       case `@@entman/CREATE_ENTITY_${entityName.toUpperCase()}`: {
         return createEntity(state, action);
       }
-      case `@@entman/UPDATE_ENTITIES_${entityName.toUpperCase()}`: {
-        return updateEntities(state, action);
+      case `@@entman/UPDATE_ENTITY_${entityName.toUpperCase()}`: {
+        return updateEntity(state, action);
       }
       case `@@entman/DELETE_ENTITY_${entityName.toUpperCase()}`: {
         return deleteEntity(state, action);

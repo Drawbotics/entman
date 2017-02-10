@@ -86,11 +86,17 @@ export function updateEntities(schema, ids, dataPath, action) {
     dispatch(action);
     const dataWithIds = ids.map((id) => ({ ...get(action, dataPath), id }));
     const data = normalizeData(schema, dataWithIds);
-    const actions = Object.keys(data.entities).map((key) => ({
-      type: `@@entman/UPDATE_ENTITIES_${key.toUpperCase()}`,
-      payload: { entities: data.entities[key], key },
-      meta: { entmanAction: true, type: 'UPDATE_ENTITIES' },
-    }));
+    const actions = Object.keys(data.entities)
+      .map((key) => ({ entities: data.entities[key], key }))
+      .reduce((memo, entitiesAndKey) => [
+        ...memo,
+        ...extractEntities(entitiesAndKey),
+      ], [])
+      .map((entity) => ({
+        type: `@@entman/UPDATE_ENTITY_${entity.key.toUpperCase()}`,
+        payload: entity,
+        meta: { entmanAction: true, type: 'UPDATE_ENTITY' },
+      }));
     actions.forEach(dispatch);
   };
 }
