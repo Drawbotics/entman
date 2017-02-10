@@ -97,19 +97,10 @@ function addToManyProperty(state, action, relation) {
 // }}}
 
 
-// FAKE RELATIONS
-let relations = [
-  {
-    to: 'User',
-    through: 'users',
-    foreign: 'group',
-    isMany: true,
-  },
-];
-
 
 function createOneRelationReactions(relation) {
   return {
+    // This would only be useful in OneToOne relationships, for now, it's not supported (or not necessary)
   };
 }
 
@@ -137,9 +128,7 @@ function createRelationReactions(relation) {
 
 function createEntityReducer(entitySchema) {
   const entityName = entitySchema.getKey();
-  //const relations = entitySchema.getRelations();
-  // FAKE REACTIONS FOR GROUP ENTITY
-  relations = entityName === 'Group' ? relations : [];
+  const relations = entitySchema.getRelations();
   const reactionsToRelations = relations
     .map(createRelationReactions)
     .reduce((memo, reactions) => ({ ...memo, ...reactions }), {});
