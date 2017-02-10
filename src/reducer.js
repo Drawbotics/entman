@@ -107,6 +107,31 @@ function deleteFromManyProperty(state, action, relation) {
     },
   };
 }
+
+function updateRelation(state, action, relation) {
+  const { entity: foreignEntity, oldEntity: oldForeignEntity } = action.payload;
+  const { through, foreign } = relation;
+  if (get(foreignEntity, foreign) === get(oldForeignEntity, foreign)) {
+    console.log('no need to update');
+    return state;  // No need to update
+  }
+  const newParentEntity = get(state, get(foreignEntity, foreign));
+  const oldParentEntity = get(state, get(oldForeignEntity, foreign));
+  return {
+    ...state,
+    [newParentEntity.id]: {
+      ...newParentEntity,
+      [through]: [
+        ...newParentEntity[through],
+        foreignEntity.id,
+      ],
+    },
+    [oldParentEntity.id]: {
+      ...oldParentEntity,
+      [through]: oldParentEntity[through].filter((id) => id != foreignEntity.id)
+    },
+  };
+}
 // }}}
 
 
@@ -126,6 +151,9 @@ function createManyRelationReactions(relation) {
     },
     [`@@entman/DELETE_ENTITY_${to.toUpperCase()}`]: (state, action) => {
       return deleteFromManyProperty(state, action, relation);
+    },
+    [`@@entman/UPDATE_ENTITY_${to.toUpperCase()}`]: (state, action) => {
+      return updateRelation(state, action, relation);
     },
   };
 }

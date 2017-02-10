@@ -32,6 +32,11 @@ function extractEntities(entitiesAndKey) {
 }
 
 
+function getFromState(state, key, id) {
+  return get(getEntitiesSlice(state), [key, id]);
+}
+
+
 export function createEntities(schema, dataPath, action) {
   if ( ! schema || ! schema.getKey) {
     throw new Error(`[INVALID SCHEMA]: Entity schema expected instead of ${schema}`);
@@ -92,9 +97,10 @@ export function updateEntities(schema, ids, dataPath, action) {
         ...memo,
         ...extractEntities(entitiesAndKey),
       ], [])
-      .map((entity) => ({
-        type: `@@entman/UPDATE_ENTITY_${entity.key.toUpperCase()}`,
-        payload: entity,
+      .map((entity) => ({ ...entity, oldEntity: getFromState(getState(), entity.key, entity.entity.id) }))
+      .map((payload) => ({
+        type: `@@entman/UPDATE_ENTITY_${payload.key.toUpperCase()}`,
+        payload: payload,
         meta: { entmanAction: true, type: 'UPDATE_ENTITY' },
       }));
     actions.forEach(dispatch);
@@ -143,7 +149,7 @@ export function deleteEntities(schema, ids, action) {
     // Do we cascade delete?
     const actions = ids
       .map((id) => ({ id, key: schema.getKey() }))
-      .map((info) => ({ entity: get(getEntitiesSlice(getState()), [info.key, info.id]), key: info.key }))
+      .map((info) => ({ entity: getFromState(getState(), info.key, info.id), key: info.key }))
       .map((payload) => ({
         type: `@@entman/DELETE_ENTITY_${schema.getKey().toUpperCase()}`,
         payload,

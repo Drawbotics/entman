@@ -179,8 +179,16 @@ describe('FULL EXAMPLE', function () {
       store.dispatch(action);
       state = getEntitiesSlice(store.getState());
     });
-    it('the entity should have its properties updated', function () {
+    it('the user should have its properties updated', function () {
       expect(state.User[1].name).to.equal('New User Name');
+    });
+    describe('if updating the group of the user', function () {
+      it('the original group should not contain the user in the users list', function () {
+        expect(state.Group[1].users).to.not.include('1');
+      });
+      it('the new group should contain the user in the users list', function () {
+        expect(state.Group[2].users).to.include('1');
+      });
     });
   });
 
@@ -195,7 +203,7 @@ describe('FULL EXAMPLE', function () {
       expect(state.User[123]).to.not.exist;
     });
     it('the related group should be updated to remove the reference to the user', function () {
-      expect(state.Group[1].users).to.not.include('123');
+      expect(state.Group[2].users).to.not.include('123');
     })
   });
 
