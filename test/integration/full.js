@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { createStore, applyMiddleware, compose } from 'redux';
+import { createStore, applyMiddleware, compose, combineReducers } from 'redux';
 import { v4 } from 'node-uuid';
 import reduxThunk from 'redux-thunk';
 
@@ -42,7 +42,7 @@ const Task = defineSchema('Task', {
 const schemas = generateSchemas([ Group, User, Task ]);
 
 
-const reducer = entities(schemas);
+const reducer = combineReducers({ entities: entities(schemas) });
 
 
 // {{-- ACTIONS
@@ -83,6 +83,10 @@ const updateTask = (id, data) => updateEntity(schemas.Task, id, 'payload.data', 
 
 const deleteGroup = (id) => deleteEntities(schemas.Group, id, {
   type: 'DELETE_GROUP',
+});
+
+const deleteUser = (id) => deleteEntities(schemas.User, id, {
+  type: 'DELETE_USER',
 });
 // ACTIONS --}}
 
@@ -161,6 +165,20 @@ describe('FULL EXAMPLE', function () {
       it('the property of the group should be updated in the state', function () {
         expect(state.Group[1].name).to.equal('New Test Group');
       });
+    })
+  });
+
+  describe('when deleting an user', function () {
+    let state;
+    before(function () {
+      const action = deleteUser(123);
+      store.dispatch(action);
+      state = store.getState();
+    });
+    it('the entity should be removed from the state', function () {
+      expect(state.User[123]).to.not.exist;
+    });
+    it('the related group should be updated to remove the reference to the user', function () {
     })
   });
 

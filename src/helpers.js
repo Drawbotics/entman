@@ -4,6 +4,7 @@ import { normalize, arrayOf } from 'normalizr';
 import { v4 } from 'node-uuid';
 
 import actions from './actions';
+import { getEntitiesSlice } from './selectors';
 
 
 function normalizeData(schema, data, options) {
@@ -118,26 +119,6 @@ export function updateEntityId(schema, oldId, newId, action) {
 }
 
 
-export function deleteEntity(schema, id, action) {
-  if ( ! schema || ! schema.getKey) {
-    throw new Error(`[INVALID SCHEMA]: Entity schema expected instead of ${schema}`);
-  }
-  if ( ! id) {
-    throw new Error('[INVALID ID]');
-  }
-  if (isEmpty(action) || ! action.hasOwnProperty('type')) {
-    throw new Error('[INVALID ACTION]');
-  }
-  return {
-    ...action,
-    meta: {
-      ...action.meta,
-      entityAction: actions.deleteEntity(schema, id),
-    },
-  };
-}
-
-
 export function deleteEntities(schema, ids, action) {
   if ( ! schema || ! schema.getKey) {
     throw new Error(`[INVALID SCHEMA]: Entity schema expected instead of ${schema}`);
@@ -151,13 +132,17 @@ export function deleteEntities(schema, ids, action) {
   if (isEmpty(action) || ! action.hasOwnProperty('type')) {
     throw new Error('[INVALID ACTION]');
   }
-  return (dispatch) => {
+  return (dispatch, getState) => {
     dispatch(action);
     // Do we cascade delete?
-    dispatch({
-      type: `@@entman/DELETE_ENTITIES_${schema.getKey().toUpperCase()}`,
-      payload: { ids, key: schema.getKey() },
-      meta: { entmanAction: true, type: 'DELETE_ENTITIES' },
-    });
+    const actions = ids
+      .map((id) => ({ id, key: schema.getKey() }))
+      .map((info) => ({ entity: get(getEntitiesSlice(getState()), [info.key, info.id]), key: info.key }))
+      .map((payload) => ({
+        type: `@@entman/DELETE_ENTITY_${schema.getKey().toUpperCase()}`,
+        payload,
+        meta: { entmanAction: true, type: 'DELETE_ENTITY' },
+      }));
+    actions.forEach(dispatch);
   };
 }

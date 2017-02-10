@@ -68,9 +68,9 @@ function updateEntitiesIds(state, action) {
 }
 
 
-function deleteEntities(state, action) {
-  const { ids } = action.payload;
-  return omit(state, ids);
+function deleteEntity(state, action) {
+  const { entity } = action.payload;
+  return omit(state, entity.id);
 }
 // }}}
 
@@ -94,6 +94,19 @@ function addToManyProperty(state, action, relation) {
     },
   };
 }
+
+function deleteFromManyProperty(state, action, relation) {
+  const { entity: foreignEntity } = action.payload;
+  const { to, through, foreign } = relation;
+  const entityToUpdate = state[foreignEntity[foreign]];
+  return {
+    ...state,
+    [entityToUpdate.id]: {
+      ...entityToUpdate,
+      [through]: entityToUpdate[through].filter((id) => id != foreignEntity.id)
+    },
+  };
+}
 // }}}
 
 
@@ -110,6 +123,9 @@ function createManyRelationReactions(relation) {
   return {
     [`@@entman/CREATE_ENTITY_${to.toUpperCase()}`]: (state, action) => {
       return addToManyProperty(state, action, relation);
+    },
+    [`@@entman/DELETE_ENTITY_${to.toUpperCase()}`]: (state, action) => {
+      return deleteFromManyProperty(state, action, relation);
     },
   };
 }
@@ -140,8 +156,8 @@ function createEntityReducer(entitySchema) {
       case `@@entman/UPDATE_ENTITIES_${entityName.toUpperCase()}`: {
         return updateEntities(state, action);
       }
-      case `@@entman/DELETE_ENTITIES_${entityName.toUpperCase()}`: {
-        return deleteEntities(state, action);
+      case `@@entman/DELETE_ENTITY_${entityName.toUpperCase()}`: {
+        return deleteEntity(state, action);
       }
       case `@@entman/UPDATE_ENTITIES_IDS_${entityName.toUpperCase()}`: {
         return updateEntitiesIds(state, action);
