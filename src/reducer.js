@@ -11,11 +11,12 @@ import {
 } from './utils';
 
 
-function createEntities(state, action) {
-  const { entities } = action.payload;
+// MAIN REDUCER FUNCTIONS {{{
+function createEntity(state, action) {
+  const { entity } = action.payload;
   return {
     ...state,
-    ...entities,
+    [entity.id]: entity,
   };
 }
 
@@ -71,14 +72,81 @@ function deleteEntities(state, action) {
   const { ids } = action.payload;
   return omit(state, ids);
 }
+// }}}
+
+
+// RELATED ENTITIES REDUCER FUNCTIONS {{{
+function addToManyProperty(state, action, relation) {
+  const { entity: foreignEntity } = action.payload;
+  const { to, through, foreign } = relation;
+  const entityToUpdate = state[foreignEntity[foreign]];
+  if (entityToUpdate[through].find((id) => id == foreignEntity.id)) {
+    return state;  // Don't do anything if the entity is already on the state
+  }
+  return {
+    ...state,
+    [entityToUpdate.id]: {
+      ...entityToUpdate,
+      [through]: [
+        ...entityToUpdate[through],
+        foreignEntity.id,
+      ],
+    },
+  };
+}
+// }}}
+
+
+// FAKE RELATIONS
+let relations = [
+  {
+    to: 'User',
+    through: 'users',
+    foreign: 'group',
+    isMany: true,
+  },
+];
+
+
+function createOneRelationReactions(relation) {
+  return {
+  };
+}
+
+
+function createManyRelationReactions(relation) {
+  const { to, through, foreign } = relation;
+  return {
+    [`@@entman/CREATE_ENTITY_${to.toUpperCase()}`]: (state, action) => {
+      return addToManyProperty(state, action, relation);
+    },
+  };
+}
+
+
+// The entity in state reacts to the entity in relation
+function createRelationReactions(relation) {
+  if (relation.isMany) {
+    return createManyRelationReactions(relation);
+  }
+  else {
+    return createOneRelationReactions(relation);
+  }
+}
 
 
 function createEntityReducer(entitySchema) {
   const entityName = entitySchema.getKey();
+  //const relations = entitySchema.getRelations();
+  // FAKE REACTIONS FOR GROUP ENTITY
+  relations = entityName === 'Group' ? relations : [];
+  const reactionsToRelations = relations
+    .map(createRelationReactions)
+    .reduce((memo, reactions) => ({ ...memo, ...reactions }), {});
   return (state={}, action) => {
     switch (action.type) {
-      case `@@entman/CREATE_ENTITIES_${entityName.toUpperCase()}`: {
-        return createEntities(state, action);
+      case `@@entman/CREATE_ENTITY_${entityName.toUpperCase()}`: {
+        return createEntity(state, action);
       }
       case `@@entman/UPDATE_ENTITIES_${entityName.toUpperCase()}`: {
         return updateEntities(state, action);
@@ -90,7 +158,8 @@ function createEntityReducer(entitySchema) {
         return updateEntitiesIds(state, action);
       }
       default:
-        return state;
+        const reaction = reactionsToRelations[action.type];
+        return (typeof reaction === 'function') ? reaction(state, action) : state;
     }
   }
 }

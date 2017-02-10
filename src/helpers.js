@@ -20,6 +20,17 @@ function normalizeData(schema, data, options) {
 }
 
 
+function extractEntities(entitiesAndKey) {
+  return Object.keys(entitiesAndKey.entities).map((id) => ({
+    entity: {
+      ...entitiesAndKey.entities[id],
+      id,
+    },
+    key: entitiesAndKey.key,
+  }));
+}
+
+
 export function createEntities(schema, dataPath, action) {
   if ( ! schema || ! schema.getKey) {
     throw new Error(`[INVALID SCHEMA]: Entity schema expected instead of ${schema}`);
@@ -38,11 +49,17 @@ export function createEntities(schema, dataPath, action) {
     const skipNormalization = get(action, 'meta.skipNormalization');
     const data = skipNormalization ? get(action, dataPath) : normalizeData(schema, get(action, dataPath));
     // Create an action for every entity and dispatch it
-    const actions = Object.keys(data.entities).map((key) => ({
-      type: `@@entman/CREATE_ENTITIES_${key.toUpperCase()}`,
-      payload: { entities: data.entities[key], key },
-      meta: { entmanAction: true, type: 'CREATE_ENTITIES' },
-    }));
+    const actions = Object.keys(data.entities)
+      .map((key) => ({ entities: data.entities[key], key }))
+      .reduce((memo, entitiesAndKey) => [
+        ...memo,
+        ...extractEntities(entitiesAndKey),
+      ], [])
+      .map((entity) => ({
+        type: `@@entman/CREATE_ENTITY_${entity.key.toUpperCase()}`,
+        payload: entity,
+        meta: { entmanAction: true, type: 'CREATE_ENTITY' },
+      }));
     actions.forEach(dispatch);
   };
 }
