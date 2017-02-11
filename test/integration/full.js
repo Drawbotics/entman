@@ -1,6 +1,5 @@
 import { expect } from 'chai';
 import { createStore, applyMiddleware, compose, combineReducers } from 'redux';
-import { v4 } from 'node-uuid';
 import reduxThunk from 'redux-thunk';
 
 import {
@@ -8,12 +7,9 @@ import {
   hasMany,
   generateSchemas,
   reducer as entities,
-  createEntity,
   createEntities,
-  updateEntity,
   updateEntities,
   updateEntityId,
-  deleteEntity,
   deleteEntities,
   getEntitiesSlice,
   getEntity,
@@ -41,7 +37,9 @@ const User = defineSchema('User', {
 
 
 const Task = defineSchema('Task', {
-  // user: 'User'  // Leave it out to test asymmetric relations
+  attributes: {
+    users: hasMany('User'),
+  },
 });
 
 
@@ -187,7 +185,7 @@ describe('FULL EXAMPLE', function () {
       it('the property of the group should be updated in the state', function () {
         expect(state.Group[1].name).to.equal('New Test Group');
       });
-    })
+    });
   });
 
   describe('when updating an user', function () {
@@ -210,6 +208,26 @@ describe('FULL EXAMPLE', function () {
     });
   });
 
+  describe('when updating the tasks of an user', function () {
+    let state;
+    before(function () {
+      // add user to task 3
+      const action = updateUser(1, { tasks: [2, 3] });  // we need to keep the old tasks as well
+      store.dispatch(action);
+      state = getEntitiesSlice(store.getState());
+    });
+    it('the user should have its tasks updated', function () {
+      expect(state.User[1].tasks).to.not.include(1);
+      expect(state.User[1].tasks).to.include(2);
+      expect(state.User[1].tasks).to.include(3);
+    });
+    it('the tasks should have its respective users updated', function () {
+      expect(state.Task[1].users).to.not.include(1);
+      expect(state.Task[2].users).to.include(1);
+      expect(state.Task[3].users).to.include('1');
+    });
+  });
+
   describe('when deleting an user', function () {
     let state;
     before(function () {
@@ -222,7 +240,7 @@ describe('FULL EXAMPLE', function () {
     });
     it('the related group should be updated to remove the reference to the user', function () {
       expect(state.Group[2].users).to.not.include('123');
-    })
+    });
   });
 
   describe('when deleting a group', function () {
@@ -280,8 +298,6 @@ describe('FULL EXAMPLE', function () {
   describe('when using selectors to retrieve a group', function () {
     it('the group should have users populated', function () {
       const group = getGroup(store.getState(), 456);
-      console.log('group result', group);
-      console.log(group.getNumberOfUsers());
     });
   });
 

@@ -1,6 +1,5 @@
 import isEmpty from 'lodash/isEmpty';
 import omit from 'lodash/omit';
-import get from 'lodash/get';
 import { schema } from 'normalizr';
 
 

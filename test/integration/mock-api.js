@@ -6,25 +6,25 @@ users = () => [
     id: 1,
     name: 'Lars',
     group: 1,
-    tasks: [1, 2],
+    tasks: [ tasks()[0], tasks()[1] ],
   },
   {
     id: 2,
     name: 'Grishan',
     group: 1,
-    tasks: [3],
+    tasks: [ tasks()[2] ],
   },
   {
     id: 3,
     name: 'Lars',
     group: 2,
-    tasks: [4],
+    tasks: [ tasks()[3] ],
   },
   {
     id: 4,
     name: 'Grishan',
     group: 2,
-    tasks: [5],
+    tasks: [ tasks()[4] ],
   },
 ];
 
@@ -47,22 +47,27 @@ tasks = () => [
   {
     id: 1,
     name: 'Task 1',
+    users: [ 1 ],
   },
   {
     id: 2,
     name: 'Task 2',
+    users: [ 1 ],
   },
   {
     id: 3,
     name: 'Task 3',
+    users: [ 2 ],
   },
   {
     id: 4,
     name: 'Task 4',
+    users: [ 3 ],
   },
   {
     id: 5,
     name: 'Task 5',
+    users: [ 4 ],
   },
 ];
 
