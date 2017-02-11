@@ -1,6 +1,5 @@
 import { expect } from 'chai';
 import { createStore, applyMiddleware, compose, combineReducers } from 'redux';
-import { v4 } from 'node-uuid';
 import reduxThunk from 'redux-thunk';
 
 import {
@@ -8,12 +7,9 @@ import {
   hasMany,
   generateSchemas,
   reducer as entities,
-  createEntity,
   createEntities,
-  updateEntity,
   updateEntities,
   updateEntityId,
-  deleteEntity,
   deleteEntities,
   getEntitiesSlice,
   getEntity,
@@ -189,7 +185,7 @@ describe('FULL EXAMPLE', function () {
       it('the property of the group should be updated in the state', function () {
         expect(state.Group[1].name).to.equal('New Test Group');
       });
-    })
+    });
   });
 
   describe('when updating an user', function () {
@@ -244,7 +240,7 @@ describe('FULL EXAMPLE', function () {
     });
     it('the related group should be updated to remove the reference to the user', function () {
       expect(state.Group[2].users).to.not.include('123');
-    })
+    });
   });
 
   describe('when deleting a group', function () {

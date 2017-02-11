@@ -7,7 +7,6 @@ import mapValues from 'lodash/mapValues';
 
 import {
   update,
-  defaultTo,
   arrayFrom,
 } from './utils';
 
@@ -50,7 +49,7 @@ function deleteEntity(state, action) {
 // RELATED ENTITIES REDUCER FUNCTIONS {{{
 function addToManyProperty(state, action, relation) {
   const { entity: foreignEntity } = action.payload;
-  const { to, through, foreign } = relation;
+  const { through, foreign } = relation;
   const entityToUpdate = get(state, get(foreignEntity, foreign));
   if ( ! entityToUpdate) {
     // Don't do anything if the parent entity doesn't exist
@@ -73,7 +72,7 @@ function addToManyProperty(state, action, relation) {
 
 function deleteFromManyProperty(state, action, relation) {
   const { entity: foreignEntity } = action.payload;
-  const { to, through, foreign } = relation;
+  const { through, foreign } = relation;
   const entityToUpdate = get(state, get(foreignEntity, foreign));
   if ( ! entityToUpdate) {
     // Don't do anything if the parent entity doesn't exist
@@ -135,7 +134,7 @@ function updateRelatedId(state, action, relation) {
 
 function deleteOneProperty(state, action, relation) {
   const { entity: foreignEntity } = action.payload;
-  const { through, foreign } = relation;
+  const { through } = relation;
   return mapValues(state, (entity) => ({
     ...entity,
     [through]: get(entity, through) == foreignEntity.id ? null : get(entity, through),
@@ -207,11 +206,12 @@ function createEntityReducer(entitySchema) {
       case `@@entman/UPDATE_ENTITY_ID_${entityName.toUpperCase()}`: {
         return updateEntityId(state, action);
       }
-      default:
+      default: {
         const reaction = reactionsToRelations[action.type];
         return (typeof reaction === 'function') ? reaction(state, action) : state;
+      }
     }
-  }
+  };
 }
 
 

@@ -4,10 +4,9 @@ import { normalize } from 'normalizr';
 import { v4 } from 'node-uuid';
 
 import { getEntitiesSlice } from './selectors';
-import { log } from './utils';
 
 
-function normalizeData(schema, data, options) {
+function normalizeData(schema, data) {
   let normalizedData = data;
   if (Array.isArray(data)) {
     data = data.map((e) => e.id ? e : { ...e, id: v4() });
@@ -48,7 +47,7 @@ function sortMainFirst(main) {
       return 1;
     }
     return 0;
-  }
+  };
 }
 
 
