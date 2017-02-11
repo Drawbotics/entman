@@ -1,17 +1,18 @@
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
-import { normalize, arrayOf } from 'normalizr';
+import { normalize } from 'normalizr';
 import { v4 } from 'node-uuid';
 
 import actions from './actions';
 import { getEntitiesSlice } from './selectors';
+import { log } from './utils';
 
 
 function normalizeData(schema, data, options) {
   let normalizedData = data;
   if (Array.isArray(data)) {
     data = data.map((e) => e.id ? e : { ...e, id: v4() });
-    normalizedData = normalize(data, arrayOf(schema));
+    normalizedData = normalize(data, [ schema ]);
   }
   else {
     data = data.id ? data : { ...data, id: v4() };
@@ -37,8 +38,23 @@ function getFromState(state, key, id) {
 }
 
 
+// We try to dispatch the actions of the orignal entities
+// (the ones which schema was passed) first
+function sortMainFirst(main) {
+  return (entity1, entity2) => {
+    if (entity1.key === main.key) {
+      return -1;
+    }
+    else if (entity2.key === main.key) {
+      return 1;
+    }
+    return 0;
+  }
+}
+
+
 export function createEntities(schema, dataPath, action) {
-  if ( ! schema || ! schema.getKey) {
+  if ( ! schema || ! schema.key) {
     throw new Error(`[INVALID SCHEMA]: Entity schema expected instead of ${schema}`);
   }
   if (isEmpty(dataPath) || (typeof dataPath !== 'string')) {
@@ -61,6 +77,7 @@ export function createEntities(schema, dataPath, action) {
         ...memo,
         ...extractEntities(entitiesAndKey),
       ], [])
+      .sort(sortMainFirst(schema))
       .map((entity) => ({
         type: `@@entman/CREATE_ENTITY_${entity.key.toUpperCase()}`,
         payload: entity,
@@ -72,7 +89,7 @@ export function createEntities(schema, dataPath, action) {
 
 
 export function updateEntities(schema, ids, dataPath, action) {
-  if ( ! schema || ! schema.getKey) {
+  if ( ! schema || ! schema.key) {
     throw new Error(`[INVALID SCHEMA]: Entity schema expected instead of ${schema}`);
   }
   if ( ! Array.isArray(ids)) {
@@ -109,7 +126,7 @@ export function updateEntities(schema, ids, dataPath, action) {
 
 
 export function updateEntityId(schema, oldId, newId, action) {
-  if ( ! schema || ! schema.getKey) {
+  if ( ! schema || ! schema.key) {
     throw new Error(`[INVALID SCHEMA]: Entity schema expected instead of ${schema}`);
   }
   if ( ! oldId) {
@@ -124,8 +141,8 @@ export function updateEntityId(schema, oldId, newId, action) {
   return (dispatch, getState) => {
     dispatch(action);
     dispatch({
-      type: `@@entman/UPDATE_ENTITY_ID_${schema.getKey().toUpperCase()}`,
-      payload: { oldId, newId, oldEntity: getFromState(getState(), schema.getKey(), oldId) },
+      type: `@@entman/UPDATE_ENTITY_ID_${schema.key.toUpperCase()}`,
+      payload: { oldId, newId, oldEntity: getFromState(getState(), schema.key, oldId) },
       meta: { entmanAction: true, type: 'UPDATE_ENTITY_ID' },
     });
   };
@@ -133,7 +150,7 @@ export function updateEntityId(schema, oldId, newId, action) {
 
 
 export function deleteEntities(schema, ids, action) {
-  if ( ! schema || ! schema.getKey) {
+  if ( ! schema || ! schema.key) {
     throw new Error(`[INVALID SCHEMA]: Entity schema expected instead of ${schema}`);
   }
   if ( ! ids) {
@@ -149,10 +166,10 @@ export function deleteEntities(schema, ids, action) {
     dispatch(action);
     // Do we cascade delete?
     const actions = ids
-      .map((id) => ({ id, key: schema.getKey() }))
+      .map((id) => ({ id, key: schema.key }))
       .map((info) => ({ entity: getFromState(getState(), info.key, info.id), key: info.key }))
       .map((payload) => ({
-        type: `@@entman/DELETE_ENTITY_${schema.getKey().toUpperCase()}`,
+        type: `@@entman/DELETE_ENTITY_${schema.key.toUpperCase()}`,
         payload,
         meta: { entmanAction: true, type: 'DELETE_ENTITY' },
       }));

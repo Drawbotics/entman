@@ -1290,12 +1290,6 @@ delegates@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/delegates/-/delegates-1.0.0.tgz#84c6e159b81904fdca59a0ef44cd870d31250f9a"
 
-"denormalizr@git://github.com/larsbs/denormalizr":
-  version "0.3.2"
-  resolved "git://github.com/larsbs/denormalizr#30f989938929946bda89d60c6ae1db65227c67f2"
-  dependencies:
-    lodash "^4.0.0"
-
 depd@~1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/depd/-/depd-1.1.0.tgz#e1bd82c6aab6ced965b97b88b17ed3e528ca18c3"
@@ -2721,11 +2715,9 @@ normalize-path@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/normalize-path/-/normalize-path-2.0.1.tgz#47886ac1662760d4261b7d979d241709d3ce3f7a"
 
-normalizr@^2.2.1:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/normalizr/-/normalizr-2.3.1.tgz#ac12d771ce1fe6a43094c3d828caada4ed9a4540"
-  dependencies:
-    lodash "^4.17.2"
+normalizr@^3.2.1:
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/normalizr/-/normalizr-3.2.1.tgz#85a2d3d0ffb9c3b08f4131cb8d8fbfb7e9211b35"
 
 npmlog@^4.0.1:
   version "4.0.2"
