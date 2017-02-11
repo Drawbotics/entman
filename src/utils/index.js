@@ -4,9 +4,6 @@ import set from 'lodash/set';
 import isPlainObject from 'lodash/isPlainObject';
 
 
-export * from './populate';
-
-
 export function flatten(obj, parentPath) {
   return Object.keys(obj || {}).reduce((result, k) => {
     if ( ! obj.hasOwnProperty(k)) return result;
