@@ -51,14 +51,14 @@ function deleteEntity(state, action) {
 function addToManyProperty(state, action, relation) {
   const { entity: foreignEntity } = action.payload;
   const { to, through, foreign } = relation;
-  const entityToUpdate = state[foreignEntity[foreign]];
+  const entityToUpdate = get(state, get(foreignEntity, foreign));
   if ( ! entityToUpdate) {
-    // Don't do anything if the parent entity doesn't exist
-    // This shouldn't happen since we dispatch main entities first
-    console.warn('Trying to update a many property in an entity that doesn\'t exist');
+    // Don't do anything if the parent entity doesn't exist or the prop is not available
+    //console.warn(`Trying to update a many property (${through}) because of ${action.type} in an entity that doesn\'t exist`);
+    //console.log('[ENTMAN] Offending relation', relation);
     return state;
   }
-  if (entityToUpdate[through].find((id) => id == foreignEntity.id)) {
+  if (get(entityToUpdate, through, []).find((id) => id == foreignEntity.id)) {
     return state;  // Don't do anything if the entity is already on the state
   }
   return {
@@ -66,7 +66,7 @@ function addToManyProperty(state, action, relation) {
     [entityToUpdate.id]: {
       ...entityToUpdate,
       [through]: [
-        ...entityToUpdate[through],
+        ...get(entityToUpdate, through, []),
         foreignEntity.id,
       ],
     },
