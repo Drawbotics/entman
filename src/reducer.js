@@ -2,6 +2,7 @@ import { combineReducers } from 'redux';
 import omit from 'lodash/omit';
 import isEmpty from 'lodash/isEmpty';
 import get from 'lodash/get';
+import isEqual from 'lodash/isEqual';
 import mapValues from 'lodash/mapValues';
 
 import * as EntitiesActions from './actions';
@@ -53,9 +54,7 @@ function addToManyProperty(state, action, relation) {
   const { to, through, foreign } = relation;
   const entityToUpdate = get(state, get(foreignEntity, foreign));
   if ( ! entityToUpdate) {
-    // Don't do anything if the parent entity doesn't exist or the prop is not available
-    //console.warn(`Trying to update a many property (${through}) because of ${action.type} in an entity that doesn\'t exist`);
-    //console.log('[ENTMAN] Offending relation', relation);
+    // Don't do anything if the parent entity doesn't exist
     return state;
   }
   if (get(entityToUpdate, through, []).find((id) => id == foreignEntity.id)) {
@@ -87,29 +86,31 @@ function deleteFromManyProperty(state, action, relation) {
 }
 
 function updateRelation(state, action, relation) {
-  // This is gonna break when manyToMany asociations. Because here, we're expecting just a
-  // value (e.g. author: 1) and not a colection of values that can change (e.g. authors: [1, 2, 3])
   const { entity: foreignEntity, oldEntity: oldForeignEntity } = action.payload;
   const { through, foreign } = relation;
-  if (get(foreignEntity, foreign) === get(oldForeignEntity, foreign)) {
-    return state;  // No need to update
+  if (get(foreignEntity, foreign) === undefined || isEqual(get(foreignEntity, foreign), get(oldForeignEntity, foreign))) {
+    return state;  // No need to update because the prop has not been updated
   }
-  const newParentEntity = get(state, get(foreignEntity, foreign));
-  const oldParentEntity = get(state, get(oldForeignEntity, foreign));
-  return {
-    ...state,
-    [newParentEntity.id]: {
-      ...newParentEntity,
-      [through]: [
-        ...newParentEntity[through],
-        foreignEntity.id,
-      ],
-    },
-    [oldParentEntity.id]: {
-      ...oldParentEntity,
-      [through]: oldParentEntity[through].filter((id) => id != foreignEntity.id)
-    },
-  };
+  const newParentEntitiesIds = arrayFrom(get(foreignEntity, foreign)).map(String);
+  const oldParentEntitiesIds = arrayFrom(get(oldForeignEntity, foreign)).map(String);
+  return mapValues(state, (entity) => {
+    if (newParentEntitiesIds.includes(entity.id) && get(entity, through).find((id) => id == foreignEntity.id) === undefined) {
+      return {
+        ...entity,
+        [through]: [
+          ...get(entity, through, []),
+          foreignEntity.id,
+        ],
+      };
+    }
+    if (oldParentEntitiesIds.includes(entity.id) && ! newParentEntitiesIds.includes(entity.id)) {
+      return {
+        ...entity,
+        [through]: get(entity, through, []).filter((id) => id != foreignEntity.id)
+      };
+    }
+    return entity;
+  });
 }
 
 function updateRelatedId(state, action, relation) {

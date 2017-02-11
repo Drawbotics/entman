@@ -212,6 +212,26 @@ describe('FULL EXAMPLE', function () {
     //});
   //});
 
+  describe('when updating the tasks of an user', function () {
+    let state;
+    before(function () {
+      // add user to task 3
+      const action = updateUser(1, { tasks: [2, 3] });  // we need to keep the old tasks as well
+      store.dispatch(action);
+      state = getEntitiesSlice(store.getState());
+    });
+    it('the user should have its tasks updated', function () {
+      expect(state.User[1].tasks).to.not.include(1);
+      expect(state.User[1].tasks).to.include(2);
+      expect(state.User[1].tasks).to.include(3);
+    });
+    it('the tasks should have its respective users updated', function () {
+      expect(state.Task[1].users).to.not.include(1);
+      expect(state.Task[2].users).to.include(1);
+      expect(state.Task[3].users).to.include('1');
+    });
+  });
+
   //describe('when deleting an user', function () {
     //let state;
     //before(function () {

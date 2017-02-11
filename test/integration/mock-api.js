@@ -47,22 +47,27 @@ tasks = () => [
   {
     id: 1,
     name: 'Task 1',
+    users: [ 1 ],
   },
   {
     id: 2,
     name: 'Task 2',
+    users: [ 1 ],
   },
   {
     id: 3,
     name: 'Task 3',
+    users: [ 2 ],
   },
   {
     id: 4,
     name: 'Task 4',
+    users: [ 3 ],
   },
   {
     id: 5,
     name: 'Task 5',
+    users: [ 4 ],
   },
 ];
 
