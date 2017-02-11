@@ -75,12 +75,16 @@ function addToManyProperty(state, action, relation) {
 function deleteFromManyProperty(state, action, relation) {
   const { entity: foreignEntity } = action.payload;
   const { to, through, foreign } = relation;
-  const entityToUpdate = state[foreignEntity[foreign]];
+  const entityToUpdate = get(state, get(foreignEntity, foreign));
+  if ( ! entityToUpdate) {
+    // Don't do anything if the parent entity doesn't exist
+    return state;
+  }
   return {
     ...state,
     [entityToUpdate.id]: {
       ...entityToUpdate,
-      [through]: entityToUpdate[through].filter((id) => id != foreignEntity.id)
+      [through]: get(entityToUpdate, through, []).filter((id) => id != foreignEntity.id)
     },
   };
 }
