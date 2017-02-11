@@ -1,14 +1,29 @@
+/**
+ * Code highly inspired by https://github.com/gpbl/denormalizr
+ */
+
 import isObject from 'lodash/isObject';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import values from 'lodash/values';
 import isEmpty from 'lodash/isEmpty';
 import cloneDeep from 'lodash/cloneDeep';
-import IterableSchema from 'normalizr/lib/IterableSchema';
-import EntitySchema from 'normalizr/lib/EntitySchema';
-import UnionSchema from 'normalizr/lib/UnionSchema';
+import { schema } from 'normalizr';
 
 
+const IterableSchema = schema.Array;
+const EntitySchema = schema.Values;
+const UnionSchema = schema.Union;
+
+
+/**
+ * Take either an entity or id and derive the other.
+ *
+ * @param   {object|Immutable.Map|number|string} entityOrId
+ * @param   {object|Immutable.Map} entities
+ * @param   {schema.Entity} schema
+ * @returns {object}
+ */
 function resolveEntityOrId(schema, entityOrId, entities) {
   const key = schema.getKey();
 
@@ -17,6 +32,7 @@ function resolveEntityOrId(schema, entityOrId, entities) {
 
   if (isObject(entityOrId)) {
     id = get(entity, [schema.getIdAttribute()]);
+    id = schema.getId(entity);
   } else {
     entity = get(entities, [key, id]);
   }

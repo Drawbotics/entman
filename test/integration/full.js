@@ -16,6 +16,7 @@ import {
   deleteEntity,
   deleteEntities,
   getEntitiesSlice,
+  getEntity,
 } from 'index';
 import api from './mock-api';
 
@@ -46,7 +47,7 @@ const schemas = generateSchemas([ Group, User, Task ]);
 const reducer = combineReducers({ entities: entities(schemas) });
 
 
-// {{-- ACTIONS
+// ACTIONS {{{
 const receiveGroups = (groups) => createEntities(schemas.Group, 'payload.groups', {
   type: 'RECEIVE_GROUPS',
   payload: { groups },
@@ -97,7 +98,12 @@ const updateUserId = (oldId, newId) => updateEntityId(schemas.User, oldId, newId
 const updateGroupId = (oldId, newId) => updateEntityId(schemas.Group, oldId, newId, {
   type: 'UPDATE_GROUP_ID',
 });
-// ACTIONS --}}
+// }}}
+
+
+// SELECTORS {{{
+const getGroup = (id) => getEntity(state, schemas.Group, id);
+// }}}
 
 
 describe('FULL EXAMPLE', function () {
@@ -264,6 +270,13 @@ describe('FULL EXAMPLE', function () {
       expect(state.User[3].group).to.equal(456);
       expect(state.User[4].group).to.equal(456);
       expect(state.User[145].group).to.equal(456);
+    });
+  });
+
+  describe('when using selectors to retrieve a group', function () {
+    it('the group should have users populated', function () {
+      //const group = getGroup(456);
+      //console.log(group);
     });
   });
 

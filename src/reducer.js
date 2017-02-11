@@ -52,6 +52,12 @@ function addToManyProperty(state, action, relation) {
   const { entity: foreignEntity } = action.payload;
   const { to, through, foreign } = relation;
   const entityToUpdate = state[foreignEntity[foreign]];
+  if ( ! entityToUpdate) {
+    // Don't do anything if the parent entity doesn't exist
+    // This shouldn't happen since we dispatch main entities first
+    console.warn('Trying to update a many property in an entity that doesn\'t exist');
+    return state;
+  }
   if (entityToUpdate[through].find((id) => id == foreignEntity.id)) {
     return state;  // Don't do anything if the entity is already on the state
   }
@@ -178,7 +184,7 @@ function createRelationReactions(relation) {
 
 
 function createEntityReducer(entitySchema) {
-  const entityName = entitySchema.getKey();
+  const entityName = entitySchema.key;
   const relations = entitySchema.getRelations();
   const reactionsToRelations = relations
     .map(createRelationReactions)

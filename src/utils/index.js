@@ -52,3 +52,9 @@ export function update(obj, newData) {
 export function arrayFrom(value) {
   return Array.isArray(value) ? value : [value];
 }
+
+
+export function log(value) {
+  console.log(value);
+  return value;
+}

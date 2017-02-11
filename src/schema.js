@@ -1,23 +1,26 @@
 import isEmpty from 'lodash/isEmpty';
 import omit from 'lodash/omit';
 import get from 'lodash/get';
-import { Schema, arrayOf } from 'normalizr';
+import { schema } from 'normalizr';
 
 
 function getRelatedThrough(entity1, entity2) {
-  return Object.keys(entity1).find(prop => {
+  const entity1Schema = entity1.schema;
+  const entity2Schema = entity2;
+  const t = Object.keys(entity1Schema).find((prop) => {
     if (prop.startsWith('_')) {
       return false;
     }
-    const relation = entity1[prop];
-    if (relation.getKey) {
-      return relation.getKey() === entity2.getKey();
+    const relation = entity1Schema[prop];
+    if (relation.key) {
+      return relation.key === entity2Schema.key;
     }
-    else if (relation.getItemSchema) {
-      return relation.getItemSchema().getKey() === entity2.getKey();
+    else if (Array.isArray(relation)) {
+      return relation[0].key === entity2Schema.key;
     }
     return false;
   });
+  return t;
 }
 
 
@@ -31,7 +34,7 @@ function createSchemaDefinition(config, bag) {
       return { ...memo, [a]: bag[attribute] };
     }
     else if (attribute.isArray) { // Array reference to another schema
-      return { ...memo, [a]: arrayOf(bag[attribute.relatedSchema]) };
+      return { ...memo, [a]: [ bag[attribute.relatedSchema] ] };
     }
     return memo;  // Should never come to here
   }, {});
@@ -114,10 +117,11 @@ export function generateSchemas(schemas) {
   }
   const schemasBag = schemas.reduce((bag, s) => ({
     ...bag,
-    [s.name]: new Schema(s.name),
+    [s.name]: new schema.Entity(s.name),
   }), {});
-  return schemas.reduce((result, s) => ({
+  const t = schemas.reduce((result, s) => ({
     ...result,
     [s.name]: generateSchema(s, schemasBag),
   }), {});
+  return t;
 }
