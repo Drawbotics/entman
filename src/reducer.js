@@ -5,7 +5,6 @@ import get from 'lodash/get';
 import isEqual from 'lodash/isEqual';
 import mapValues from 'lodash/mapValues';
 
-import * as EntitiesActions from './actions';
 import {
   update,
   defaultTo,

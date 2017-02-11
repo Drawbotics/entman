@@ -3,7 +3,6 @@ import isEmpty from 'lodash/isEmpty';
 import { normalize } from 'normalizr';
 import { v4 } from 'node-uuid';
 
-import actions from './actions';
 import { getEntitiesSlice } from './selectors';
 import { log } from './utils';
 
