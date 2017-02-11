@@ -8,24 +8,19 @@ import set from 'lodash/set';
 import values from 'lodash/values';
 import isEmpty from 'lodash/isEmpty';
 import cloneDeep from 'lodash/cloneDeep';
-import { schema } from 'normalizr';
+import { schema as Schema } from 'normalizr';
 
-
-const IterableSchema = schema.Array;
-const EntitySchema = schema.Values;
-const UnionSchema = schema.Union;
+const IterableSchema = Schema.Array;
+const ValuesSchema = Schema.Values;
+const EntitySchema = Schema.Values;
+const UnionSchema = Schema.Union;
 
 
 /**
  * Take either an entity or id and derive the other.
- *
- * @param   {object|Immutable.Map|number|string} entityOrId
- * @param   {object|Immutable.Map} entities
- * @param   {schema.Entity} schema
- * @returns {object}
  */
 function resolveEntityOrId(schema, entityOrId, entities) {
-  const key = schema.getKey();
+  const key = schema.key;
 
   let entity = entityOrId;
   let id = entityOrId;
@@ -78,38 +73,30 @@ function populateUnion(schema, entity, entities, bag) {
 function populateObject(schema, obj, entities, bag) {
   let populated = obj;
 
+  const schemaDefinition = typeof schema.inferSchema === 'function' ?
+    schema.inferSchema(obj) : (schema.schema || schema);
+
   Object.keys(schema)
-    .filter(attribute => attribute.substring(0, 1) !== '_')
+    //.filter(attribute => attribute.substring(0, 1) !== '_')
+    .filter((attribute) => typeof get(obj, attribute) !== undefined)
     .forEach(attribute => {
-      const relatedSchema = get(schema, [attribute]);
-      if (relatedSchema instanceof IterableSchema) {
-        const objId = obj[schema.getIdAttribute()];
-        const itemSchema = relatedSchema.getItemSchema();
-        const key = itemSchema.getKey();
-        const relatedAttribute = getRelatedAttribute(itemSchema, schema);
-        const items = values(entities[key])
-          .filter(e => e[relatedAttribute] === objId)
-          .map(e => e[itemSchema.getIdAttribute()]);
-        if (isEmpty(items)) {
-          populated = set(populated, [attribute], []);
-        }
-        else {
-          populated = set(populated, [attribute], populate(relatedSchema, items, entities, bag));
-        }
-      }
-      else {
-        const item = get(obj, [attribute]);
-        populated = set(populated, [attribute], populate(relatedSchema, item, entities, bag));
-      }
+      const item = get(obj, attribute);
+      const itemSchema = get(schemaDefinition, attribute);
+
+      populated = set(populated, attribute, populate(itemSchema, item, entities, bag));
     });
 
   return populated;
 }
 
 
+/**
+ * Takes an entity, saves a reference to it in the 'bag' and then denormalizes
+ * it. Saving the reference is necessary for circular dependencies.
+ */
 function populateEntity(schema, entityOrId, entities, bag) {
-  const key = schema.getKey();
-  let { entity, id } = resolveEntityOrId(schema, entityOrId, entities);
+  const key = schema.key;
+  const { entity, id } = resolveEntityOrId(schema, entityOrId, entities);
 
   if( ! bag.hasOwnProperty(key)) {
     bag[key] = {};
@@ -118,9 +105,9 @@ function populateEntity(schema, entityOrId, entities, bag) {
   if( ! bag[key].hasOwnProperty(id)) {
     // Need to set this first so that if it is referenced within the call to
     // populateObject, it will already exist.
-    entity = cloneDeep(entity || { id });
-    bag[key][id] = entity;
-    bag[key][id] = populateObject(schema, entity, entities, bag);
+    const cloned = cloneDeep(entity || { id });
+    bag[key][id] = cloned;
+    bag[key][id] = populateObject(schema, cloned, entities, bag);
   }
 
   // If schema has a property called `computed` add it to the
@@ -134,6 +121,14 @@ function populateEntity(schema, entityOrId, entities, bag) {
 }
 
 
+/**
+ * Takes an object, array, or id and returns a denormalized copy of it. For
+ * an object or array, the same data type is returned. For an id, an object
+ * will be returned.
+ *
+ * If the passed object is null or undefined or if no schema is provided, the
+ * passed object will be returned.
+ */
 export function populate(schema, entity, entities, bag={}) {
   if (entity === null || typeof entity === 'undefined' || !isObject(schema)) {
     return entity;
@@ -141,7 +136,7 @@ export function populate(schema, entity, entities, bag={}) {
 
   if (schema instanceof EntitySchema) {
     return populateEntity(schema, entity, entities, bag);
-  } else if (schema instanceof IterableSchema) {
+  } else if (schema instanceof IterableSchema || schema instanceof ValuesSchema || Array.isArray(schema)) {
     return populateIterable(schema, entity, entities, bag);
   } else if (schema instanceof UnionSchema) {
     return populateUnion(schema, entity, entities, bag);

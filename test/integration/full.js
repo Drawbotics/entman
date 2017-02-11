@@ -24,6 +24,10 @@ import api from './mock-api';
 const Group = defineSchema('Group', {
   attributes: {
     users: hasMany('User'),
+
+    getNumberOfUsers() {
+      return this.users.length;
+    },
   },
 });
 
@@ -102,7 +106,7 @@ const updateGroupId = (oldId, newId) => updateEntityId(schemas.Group, oldId, new
 
 
 // SELECTORS {{{
-const getGroup = (id) => getEntity(state, schemas.Group, id);
+const getGroup = (state, id) => getEntity(state, schemas.Group, id);
 // }}}
 
 
@@ -275,8 +279,9 @@ describe('FULL EXAMPLE', function () {
 
   describe('when using selectors to retrieve a group', function () {
     it('the group should have users populated', function () {
-      //const group = getGroup(456);
-      //console.log(group);
+      const group = getGroup(store.getState(), 456);
+      console.log('group result', group);
+      console.log(group.getNumberOfUsers());
     });
   });
 
