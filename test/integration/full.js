@@ -225,7 +225,10 @@ describe('FULL EXAMPLE', function () {
     it('the entity should be removed from the state', function () {
       expect(state.Group[1]).to.not.exist;
     });
-    it.skip('do we cascade related entities as well?', function () {
+    it('the associated entities should set the related property to null', function () {
+      expect(state.User[2].group).to.be.null;
+    });
+    it.skip('or do we cascade related entities?', function () {
     });
   });
 

@@ -8,6 +8,7 @@ import * as EntitiesActions from './actions';
 import {
   update,
   defaultTo,
+  arrayFrom,
 } from './utils';
 
 
@@ -114,9 +115,20 @@ function updateRelatedId(state, action, relation) {
       [through]: get(entity, through).map((id) => id == oldId ? newId : id),
     }));
   }
+  else {
+    return mapValues(state, (entity) => ({
+      ...entity,
+      [through]: get(entity, through) == oldId ? newId : get(entity, through),
+    }));
+  }
+}
+
+function deleteOneProperty(state, action, relation) {
+  const { entity: foreignEntity } = action.payload;
+  const { through, foreign } = relation;
   return mapValues(state, (entity) => ({
     ...entity,
-    [through]: get(entity, through) == oldId ? newId : get(entity, through),
+    [through]: get(entity, through) == foreignEntity.id ? null : get(entity, through),
   }));
 }
 // }}}
@@ -125,6 +137,9 @@ function updateRelatedId(state, action, relation) {
 function createOneRelationReactions(relation) {
   const { to } = relation;
   return {
+    [`@@entman/DELETE_ENTITY_${to.toUpperCase()}`]: (state, action) => {
+      return deleteOneProperty(state, action, relation);
+    },
     [`@@entman/UPDATE_ENTITY_ID_${to.toUpperCase()}`]: (state, action) => {
       return updateRelatedId(state, action, relation);
     },

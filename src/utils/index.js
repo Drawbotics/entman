@@ -47,3 +47,8 @@ export function update(obj, newData) {
     return set(result, k, flattenedData[k]);
   }, cloneDeep(obj));
 }
+
+
+export function arrayFrom(value) {
+  return Array.isArray(value) ? value : [value];
+}
