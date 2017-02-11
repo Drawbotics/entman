@@ -5,6 +5,11 @@ import values from 'lodash/values';
 import { populate } from 'utils';
 
 
+export function getEntitiesSlice(state) {
+  return state.entities;
+}
+
+
 export function getEntities(state, schema, ids) {
   const key = schema.getKey();
   const entities = ids ?

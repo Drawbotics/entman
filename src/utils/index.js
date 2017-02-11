@@ -4,6 +4,9 @@ import set from 'lodash/set';
 import isPlainObject from 'lodash/isPlainObject';
 
 
+export * from './populate';
+
+
 export function flatten(obj, parentPath) {
   return Object.keys(obj || {}).reduce((result, k) => {
     if ( ! obj.hasOwnProperty(k)) return result;
@@ -46,4 +49,6 @@ export function update(obj, newData) {
 }
 
 
-export * from './populate';
+export function arrayFrom(value) {
+  return Array.isArray(value) ? value : [value];
+}
