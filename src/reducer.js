@@ -30,41 +30,12 @@ function updateEntity(state, action) {
 }
 
 
-function updateEntitiesIds(state, action) {
-  const { ids } = action.payload;
-  /*
-    const { key, schema, oldId, newId } = action.payload;
-    const updatedEntity = { ...state[key][oldId], id: newId };
-    return mapValues(state, (currentEntities, key) => {
-      // The entities we need to update
-      if (key === schema.getKey()) {
-        return omit({
-          ...currentEntities,
-          [newId]: updatedEntity,
-        }, oldId);
-      }
-      // No related entities, so no need to perform any update
-      if ( ! schema.isRelatedTo(key)) {
-        return currentEntities;
-      }
-      // The entities are related
-      const { isParent, relatedPropName } = schema.getRelation(updatedEntity, key);
-      if (isParent) {
-        // TODO: The entity is a OneToOne relation
-        return currentEntities;
-      }
-      // The entities are the 'many' part in a OneToMany relation
-      return mapValues(currentEntities, (entity) => {
-        if (entity[relatedPropName] !== oldId) {
-          return entity;
-        }
-        return {
-          ...entity,
-          [relatedPropName]: newId,
-        };
-      });
-    });
-  */
+function updateEntityId(state, action) {
+  const { oldId, newId } = action.payload;
+  return {
+    ...omit(state, oldId),
+    [newId]: { ...state[oldId], id: newId },
+  };
 }
 
 
@@ -109,10 +80,11 @@ function deleteFromManyProperty(state, action, relation) {
 }
 
 function updateRelation(state, action, relation) {
+  // This is gonna break when manyToMany asociations. Because here, we're expecting just a
+  // value (e.g. author: 1) and not a colection of values that can change (e.g. authors: [1, 2, 3])
   const { entity: foreignEntity, oldEntity: oldForeignEntity } = action.payload;
   const { through, foreign } = relation;
   if (get(foreignEntity, foreign) === get(oldForeignEntity, foreign)) {
-    console.log('no need to update');
     return state;  // No need to update
   }
   const newParentEntity = get(state, get(foreignEntity, foreign));
@@ -132,19 +104,36 @@ function updateRelation(state, action, relation) {
     },
   };
 }
+
+function updateRelatedId(state, action, relation) {
+  const { newId, oldId } = action.payload;
+  const { isMany, through } = relation;
+  if (isMany) {
+    return mapValues(state, (entity) => ({
+      ...entity,
+      [through]: get(entity, through).map((id) => id == oldId ? newId : id),
+    }));
+  }
+  return mapValues(state, (entity) => ({
+    ...entity,
+    [through]: get(entity, through) == oldId ? newId : get(entity, through),
+  }));
+}
 // }}}
 
 
-
 function createOneRelationReactions(relation) {
+  const { to } = relation;
   return {
-    // This would only be useful in OneToOne relationships, for now, it's not supported (or not necessary)
+    [`@@entman/UPDATE_ENTITY_ID_${to.toUpperCase()}`]: (state, action) => {
+      return updateRelatedId(state, action, relation);
+    },
   };
 }
 
 
 function createManyRelationReactions(relation) {
-  const { to, through, foreign } = relation;
+  const { to } = relation;
   return {
     [`@@entman/CREATE_ENTITY_${to.toUpperCase()}`]: (state, action) => {
       return addToManyProperty(state, action, relation);
@@ -155,13 +144,16 @@ function createManyRelationReactions(relation) {
     [`@@entman/UPDATE_ENTITY_${to.toUpperCase()}`]: (state, action) => {
       return updateRelation(state, action, relation);
     },
+    [`@@entman/UPDATE_ENTITY_ID_${to.toUpperCase()}`]: (state, action) => {
+      return updateRelatedId(state, action, relation);
+    }
   };
 }
 
 
 // The entity in state reacts to the entity in relation
 function createRelationReactions(relation) {
-  if (relation.isMany) {
+  if (relation.isMany) {  // relation is going to be an array (e.g. users)
     return createManyRelationReactions(relation);
   }
   else {
@@ -187,8 +179,8 @@ function createEntityReducer(entitySchema) {
       case `@@entman/DELETE_ENTITY_${entityName.toUpperCase()}`: {
         return deleteEntity(state, action);
       }
-      case `@@entman/UPDATE_ENTITIES_IDS_${entityName.toUpperCase()}`: {
-        return updateEntitiesIds(state, action);
+      case `@@entman/UPDATE_ENTITY_ID_${entityName.toUpperCase()}`: {
+        return updateEntityId(state, action);
       }
       default:
         const reaction = reactionsToRelations[action.type];

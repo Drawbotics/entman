@@ -121,12 +121,13 @@ export function updateEntityId(schema, oldId, newId, action) {
   if (isEmpty(action) || ! action.hasOwnProperty('type')) {
     throw new Error('[INVALID ACTION]');
   }
-  return {
-    ...action,
-    meta: {
-      ...action.meta,
-      entityAction: actions.updateEntityId(schema, oldId, newId),
-    },
+  return (dispatch, getState) => {
+    dispatch(action);
+    dispatch({
+      type: `@@entman/UPDATE_ENTITY_ID_${schema.getKey().toUpperCase()}`,
+      payload: { oldId, newId, oldEntity: getFromState(getState(), schema.getKey(), oldId) },
+      meta: { entmanAction: true, type: 'UPDATE_ENTITY_ID' },
+    });
   };
 }
 

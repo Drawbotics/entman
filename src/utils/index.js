@@ -4,6 +4,9 @@ import set from 'lodash/set';
 import isPlainObject from 'lodash/isPlainObject';
 
 
+export * from './populate';
+
+
 export function flatten(obj, parentPath) {
   return Object.keys(obj || {}).reduce((result, k) => {
     if ( ! obj.hasOwnProperty(k)) return result;
@@ -44,6 +47,3 @@ export function update(obj, newData) {
     return set(result, k, flattenedData[k]);
   }, cloneDeep(obj));
 }
-
-
-export * from './populate';

@@ -89,6 +89,14 @@ const deleteGroup = (id) => deleteEntities(schemas.Group, id, {
 const deleteUser = (id) => deleteEntities(schemas.User, id, {
   type: 'DELETE_USER',
 });
+
+const updateUserId = (oldId, newId) => updateEntityId(schemas.User, oldId, newId, {
+  type: 'UPDATE_USER_ID',
+});
+
+const updateGroupId = (oldId, newId) => updateEntityId(schemas.Group, oldId, newId, {
+  type: 'UPDATE_GROUP_ID',
+});
 // ACTIONS --}}
 
 
@@ -215,8 +223,44 @@ describe('FULL EXAMPLE', function () {
       state = getEntitiesSlice(store.getState());
     });
     it('the entity should be removed from the state', function () {
+      expect(state.Group[1]).to.not.exist;
     });
     it.skip('do we cascade related entities as well?', function () {
+    });
+  });
+
+  describe('when updating the id of an user', function () {
+    let state;
+    before(function () {
+      const action = updateUserId(1, 145);
+      store.dispatch(action);
+      state = getEntitiesSlice(store.getState());
+    });
+    it('the id of the user in the store should have changed', function () {
+      expect(state.User[1]).to.not.exist;
+      expect(state.User[145]).to.exist;
+    });
+    it('the related group should also change the id in the users array', function () {
+      expect(state.Group[2].users).to.not.contain('1');
+      expect(state.Group[2].users).to.contain(145);
+    });
+  });
+
+  describe('when updating the id of a group', function () {
+    let state;
+    before(function () {
+      const action = updateGroupId(2, 456);
+      store.dispatch(action);
+      state = getEntitiesSlice(store.getState());
+    });
+    it('the id of the group in the store should have changed', function () {
+      expect(state.Group[2]).to.not.exist;
+      expect(state.Group[456]).to.exist;
+    });
+    it('the related users should also update the id of the group', function () {
+      expect(state.User[3].group).to.equal(456);
+      expect(state.User[4].group).to.equal(456);
+      expect(state.User[145].group).to.equal(456);
     });
   });
 
