@@ -96,7 +96,8 @@ function updateRelation(state, action, relation) {
   const newParentEntitiesIds = arrayFrom(get(foreignEntity, foreign)).map(String);
   const oldParentEntitiesIds = arrayFrom(get(oldForeignEntity, foreign)).map(String);
   return mapValues(state, (entity) => {
-    if (newParentEntitiesIds.includes(entity.id) && get(entity, through).find((id) => id == foreignEntity.id) === undefined) {
+    const id = String(entity.id);  //TODO Track down where ids are switching types instead of forcing Strings
+    if (newParentEntitiesIds.includes(id) && get(entity, through).find((id) => id == foreignEntity.id) === undefined) {
       return {
         ...entity,
         [through]: [
@@ -105,7 +106,7 @@ function updateRelation(state, action, relation) {
         ],
       };
     }
-    if (oldParentEntitiesIds.includes(entity.id) && ! newParentEntitiesIds.includes(entity.id)) {
+    if (oldParentEntitiesIds.includes(id) && ! newParentEntitiesIds.includes(entity.id)) {
       return {
         ...entity,
         [through]: get(entity, through, []).filter((id) => id != foreignEntity.id)

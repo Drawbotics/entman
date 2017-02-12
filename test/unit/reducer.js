@@ -2,14 +2,6 @@ import { expect } from 'chai';
 import deepFreeze from 'deep-freeze';
 
 import {
-  createEntity,
-  createEntities,
-  updateEntity,
-  updateEntities,
-  updateEntityId,
-  deleteEntity,
-} from 'actions';
-import {
   defineSchema,
   generateSchemas,
   hasMany,
@@ -33,8 +25,7 @@ describe('@Reducer', function () {
     });
     const task = defineSchema('Task', {
       attributes: {
-        user: 'User',
-        //TODO: users: hasMany('User'),
+        users: hasMany('User'),
       }
     });
     schemas = generateSchemas([group, user, task]);
@@ -62,140 +53,106 @@ describe('@Reducer', function () {
       const result = reducer(undefined, {});
       expect(result).to.deep.equal(expected);
     });
-    describe('when `CREATE_ENTITIES` is received as action', function () {
-      let finalState;
-      const groups = [{ name: 'Group 1', id: 1 }, { name: 'Group 2', id: 2 }];
-      const user = { name: 'Lars', group: 1, id: 1 };
-      const task = { title: 'Do something', user: 1, id: 1 };
-      before(function () {
-        const initialState = deepFreeze(reducer(undefined, {}));
-        const createGroups = createEntities(schemas.Group, groups);
-        const createUser = createEntity(schemas.User, user);
-        const createTask = createEntity(schemas.Task, task);
-        finalState = deepFreeze(reducer(initialState, createGroups));
-        finalState = deepFreeze(reducer(finalState, createUser));
-        finalState = deepFreeze(reducer(finalState, createTask));
-      });
-      it('should add the new entities to the state', function () {
-        const expectedState = {
-          Group: {
-            1: { id: 1, name: 'Group 1' },
-            2: { id: 2, name: 'Group 2' },
-          },
-          User: {
-            1: { id: 1, name: 'Lars', group: 1 },
-          },
-          Task: {
-            1: { id: 1, title: 'Do something', user: 1 },
-          },
-        };
-        expect(finalState).to.deep.equal(expectedState);
-      });
-    });
-    describe('when `CREATE_ENTITY` is received as action', function () {
+    describe('when `CREATE_ENTITY_{ENTITY_NAME}` is received as an action', function () {
       let finalState;
       const group = { name: 'Group 1', id: 1 };
       const user = { name: 'Lars', group: 1, id: 1 };
       const task = { title: 'Do something', user: 1, id: 1 };
       before(function () {
         const initialState = deepFreeze(reducer(undefined, {}));
-        const createGroup = createEntity(schemas.Group, group);
-        const createUser = createEntity(schemas.User, user);
-        const createTask = createEntity(schemas.Task, task);
+        const createGroup = {
+          type: '@@entman/CREATE_ENTITY_GROUP',
+          payload: {
+            entity: group,
+            key: 'Group',
+          },
+        };
+        const createUser = {
+          type: '@@entman/CREATE_ENTITY_USER',
+          payload: {
+            entity: user,
+            key: 'User',
+          },
+        };
+        const createTask = {
+          type: '@@entman/CREATE_ENTITY_TASK',
+          payload: {
+            entity: task,
+            key: 'Task',
+          },
+        };
         finalState = deepFreeze(reducer(initialState, createGroup));
         finalState = deepFreeze(reducer(finalState, createUser));
         finalState = deepFreeze(reducer(finalState, createTask));
       });
       it('should add the new entity to the state', function () {
-        const expectedState = {
-          Group: {
-            1: { id: 1, name: 'Group 1' },
-          },
-          User: {
-            1: { id: 1, name: 'Lars', group: 1 },
-          },
-          Task: {
-            1: { id: 1, title: 'Do something', user: 1 },
-          },
-        };
-        expect(finalState).to.deep.equal(expectedState);
+        expect(finalState.Group[1]).to.exist;
+        expect(finalState.User[1]).to.exist;
+        expect(finalState.Task[1]).to.exist;
       });
     });
-    describe('when `UPDATE_ENTITY` is received as action', function () {
+    describe('when `UPDATE_ENTITY_{ENTITY_NAME}` is received as an action', function () {
       let finalState;
       const group = { name: 'Group 1', id: 1 };
-      const group2 = { name: 'Group 2', id: 2 };
       const user = { name: 'Lars', group: 1, id: 1 };
       const task = { title: 'Do something', user: 1, id: 1 };
       const newName = 'Grishan';
       const newGroup = 2;
       before(function () {
-        const initialState = deepFreeze(reducer(undefined, {}));
-        const createGroup = createEntity(schemas.Group, group);
-        const createGroup2 = createEntity(schemas.Group, group2);
-        const createUser = createEntity(schemas.User, user);
-        const createTask = createEntity(schemas.Task, task);
-        const updateUser = updateEntity(schemas.User, 1, { name: newName, group: newGroup });
-        finalState = deepFreeze(reducer(initialState, createGroup));
-        finalState = deepFreeze(reducer(finalState, createGroup2));
-        finalState = deepFreeze(reducer(finalState, createUser));
-        finalState = deepFreeze(reducer(finalState, createTask));
+        const initialState = deepFreeze({
+          Group: {
+            1: { id: 1, name: 'Group 1', users: [ 1 ] },
+            2: { id: 2, name: 'Group 2', users: [ 2 ] },
+          },
+          User: {
+            1: { id: 1, name: 'Lars', group: 1, tasks: [ 1 ] },
+            2: { id: 2, name: 'Deathvoid', group: 2, tasks: [] },
+          },
+          Task: {
+            1: { id: 1, name: 'Task 1', users: [ 1 ] },
+          },
+        });
+        const updateGroup = {
+          type: '@@entman/UPDATE_ENTITY_GROUP',
+          payload: {
+            entity: { id: 1, name: 'New Group 1' },
+            oldEntity: initialState.Group[1],
+            key: 'Group',
+          },
+        };
+        const updateUser = {
+          type: '@@entman/UPDATE_ENTITY_USER',
+          payload: {
+            entity: { id: 1, group: 2 },
+            oldEntity: initialState.User[1],
+            key: 'User',
+          },
+        };
+        const updateTask = {
+          type: '@@entman/UPDATE_ENTITY_TASK',
+          payload: {
+            entity: { id: 1, users: [ 1, 2 ] },
+            oldEntity: initialState.Task[1],
+            key: 'Task',
+          },
+        };
+        finalState = deepFreeze(reducer(initialState, updateGroup));
         finalState = deepFreeze(reducer(finalState, updateUser));
+        finalState = deepFreeze(reducer(finalState, updateTask));
       });
-      it('should update the entity', function () {
-        const expectedState = {
-          Group: {
-            1: { id: 1, name: 'Group 1' },
-            2: { id: 2, name: 'Group 2' },
-          },
-          User: {
-            1: { id: 1, name: newName, group: 2 },
-          },
-          Task: {
-            1: { id: 1, title: 'Do something', user: 1 },
-          },
-        };
-        expect(finalState).to.deep.equal(expectedState);
+      it('should update single properties of the entity correctly', function () {
+        expect(finalState.Group[1].name).to.equal('New Group 1');
+      });
+      it('should update oneToMany relations correctly', function () {
+        expect(finalState.User[1].group).to.equal(2);
+        expect(finalState.Group[2].users).to.include(1);
+      });
+      it('should update manyToMany relations correctly', function () {
+        expect(finalState.User[2].tasks).to.include(1);
+        expect(finalState.Task[1].users).to.include(2);
       });
     });
-    describe('when `UPDATE_ENTITIES` is received as action', function () {
-      let finalState;
-      const group = { name: 'Group 1', id: 1 };
-      const group2 = { name: 'Group 2', id: 2 };
-      const user = { name: 'Lars', group: 1, id: 1 };
-      const task = { title: 'Do something', user: 1, id: 1 };
-      const newName = 'Grishan';
-      const newGroup = 2;
-      before(function () {
-        const initialState = deepFreeze(reducer(undefined, {}));
-        const createGroup = createEntity(schemas.Group, group);
-        const createGroup2 = createEntity(schemas.Group, group2);
-        const createUser = createEntity(schemas.User, user);
-        const createTask = createEntity(schemas.Task, task);
-        const updateGroups = updateEntities(schemas.Group, [1, 2], { name: 'Group' });
-        finalState = deepFreeze(reducer(initialState, createGroup));
-        finalState = deepFreeze(reducer(finalState, createGroup2));
-        finalState = deepFreeze(reducer(finalState, createUser));
-        finalState = deepFreeze(reducer(finalState, createTask));
-        finalState = deepFreeze(reducer(finalState, updateGroups));
-      });
-      it('should update the entities', function () {
-        const expectedState = {
-          Group: {
-            1: { id: 1, name: 'Group' },
-            2: { id: 2, name: 'Group' },
-          },
-          User: {
-            1: { id: 1, name: 'Lars', group: 1 },
-          },
-          Task: {
-            1: { id: 1, title: 'Do something', user: 1 },
-          },
-        };
-        expect(finalState).to.deep.equal(expectedState);
-      });
-    });
-    describe('when `UPDATE_ENTITY_ID` is received as action', function () {
+    describe.skip('when `UPDATE_ENTITY_ID` is received as action', function () {
       let finalState;
       const group = { name: 'Group 1', id: 1 };
       const group2 = { name: 'Group 2', id: 2 };
@@ -232,31 +189,58 @@ describe('@Reducer', function () {
     });
     describe('when `DELETE_ENTITY` is received as action', function () {
       let finalState;
-      const group = { name: 'Group 1', id: 1 };
-      const user = { name: 'Lars', group: 1, id: 1 };
-      const task = { title: 'Do something', user: 1, id: 1 };
       beforeEach(function () {
-        const initialState = deepFreeze(reducer(undefined, {}));
-        const createGroup = createEntity(schemas.Group, group);
-        const createUser = createEntity(schemas.User, user);
-        const createTask = createEntity(schemas.Task, task);
-        const deleteTask = deleteEntity(schemas.Task, task);
-        finalState = deepFreeze(reducer(initialState, createGroup));
-        finalState = deepFreeze(reducer(finalState, createUser));
-        finalState = deepFreeze(reducer(finalState, createTask));
+        const initialState = deepFreeze({
+          Group: {
+            1: { name: 'Group 1', id: 1, users: [ 1 ] },
+            2: { name: 'Group 2', id: 2, users: [ 2 ] },
+          },
+          User: {
+            1: { name: 'Lars', group: 1, id: 1, tasks: [ 1 ] },
+            2: { name: 'Deathvoid', group: 2, id: 2, tasks: [ 2 ] },
+          },
+          Task: {
+            1: { title: 'Do something', users: [ 1 ], id: 1 },
+            2: { title: 'Do something again', users: [ 2 ], id: 2 },
+          },
+        });
+        const deleteGroup = {
+          type: '@@entman/DELETE_ENTITY_GROUP',
+          payload: {
+            entity: initialState.Group[2],
+            key: 'Group',
+          },
+        };
+        const deleteUser = {
+          type: '@@entman/DELETE_ENTITY_USER',
+          payload: {
+            entity: initialState.User[1],
+            key: 'User',
+          },
+        };
+        const deleteTask = {
+          type: '@@entman/DELETE_ENTITY_TASK',
+          payload: {
+            entity: initialState.Task[2],
+            key: 'Task',
+          },
+        };
+        finalState = deepFreeze(reducer(initialState, deleteGroup));
+        finalState = deepFreeze(reducer(finalState, deleteUser));
         finalState = deepFreeze(reducer(finalState, deleteTask));
       });
       it('should delete the entity', function () {
-        const expectedState = {
-          Group: {
-            1: { id: 1, name: 'Group 1' },
-          },
-          User: {
-            1: { id: 1, name: 'Lars', group: 1 },
-          },
-          Task: {},
-        };
-        expect(finalState).to.deep.equal(expectedState);
+        expect(finalState.Group[2]).to.not.exist;
+        expect(finalState.User[1]).to.not.exist;
+        expect(finalState.Task[2]).to.not.exist;
+      });
+      it('should update oneToMany relations', function () {
+        expect(finalState.Group[1].users).to.not.contain(1);
+        expect(finalState.User[2].group).to.be.null;
+      });
+      it('should update manyToMany relations', function () {
+        expect(finalState.Task[1].users).to.not.include(1);
+        expect(finalState.User[2].tasks).to.not.include(2);
       });
     });
   });
