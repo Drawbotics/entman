@@ -93,11 +93,6 @@ describe('@Reducer', function () {
     });
     describe('when `UPDATE_ENTITY_{ENTITY_NAME}` is received as an action', function () {
       let finalState;
-      const group = { name: 'Group 1', id: 1 };
-      const user = { name: 'Lars', group: 1, id: 1 };
-      const task = { title: 'Do something', user: 1, id: 1 };
-      const newName = 'Grishan';
-      const newGroup = 2;
       before(function () {
         const initialState = deepFreeze({
           Group: {
@@ -152,39 +147,68 @@ describe('@Reducer', function () {
         expect(finalState.Task[1].users).to.include(2);
       });
     });
-    describe.skip('when `UPDATE_ENTITY_ID` is received as action', function () {
+    describe('when `UPDATE_ENTITY_ID` is received as action', function () {
       let finalState;
-      const group = { name: 'Group 1', id: 1 };
-      const group2 = { name: 'Group 2', id: 2 };
-      const user = { name: 'Lars', group: 1, id: 1 };
-      const task = { title: 'Do something', user: 1, id: 1 };
       before(function () {
-        const initialState = deepFreeze(reducer(undefined, {}));
-        const createGroup = createEntity(schemas.Group, group);
-        const createGroup2 = createEntity(schemas.Group, group2);
-        const createUser = createEntity(schemas.User, user);
-        const createTask = createEntity(schemas.Task, task);
-        const updateUserId = updateEntityId(schemas.User, 1, 2);
-        finalState = deepFreeze(reducer(initialState, createGroup));
-        finalState = deepFreeze(reducer(finalState, createGroup2));
-        finalState = deepFreeze(reducer(finalState, createUser));
-        finalState = deepFreeze(reducer(finalState, createTask));
-        finalState = deepFreeze(reducer(finalState, updateUserId));
-      });
-      it('should update the id of the entity', function () {
-        const expectedState = {
+        const initialState = deepFreeze({
           Group: {
-            1: { id: 1, name: 'Group 1' },
-            2: { id: 2, name: 'Group 2' },
+            1: { id: 1, name: 'Group 1', users: [ 1 ] },
+            2: { id: 2, name: 'Group 2', users: [ 2 ] },
           },
           User: {
-            2: { id: 2, name: 'Lars', group: 1 },
+            1: { id: 1, name: 'Lars', group: 1, tasks: [ 1 ] },
+            2: { id: 2, name: 'Deathvoid', group: 2, tasks: [] },
           },
           Task: {
-            1: { id: 1, title: 'Do something', user: 2 },
+            1: { id: 1, name: 'Task 1', users: [ 1 ] },
+          },
+        });
+        const updateGroupId = {
+          type: '@@entman/UPDATE_ENTITY_ID_GROUP',
+          payload: {
+            oldId: 1,
+            newId: 123,
+            oldEntity: initialState.Group[1],
+            key: 'Group',
           },
         };
-        expect(finalState).to.deep.equal(expectedState);
+        const updateUserId = {
+          type: '@@entman/UPDATE_ENTITY_ID_USER',
+          payload: {
+            oldId: 1,
+            newId: 123,
+            oldEntity: initialState.User[1],
+            key: 'User',
+          },
+        };
+        const updateTaskId = {
+          type: '@@entman/UPDATE_ENTITY_ID_TASK',
+          payload: {
+            oldId: 1,
+            newId: 123,
+            oldEntity: initialState.Task[1],
+            key: 'Task',
+          },
+        };
+        finalState = deepFreeze(reducer(initialState, updateGroupId));
+        finalState = deepFreeze(reducer(finalState, updateUserId));
+        finalState = deepFreeze(reducer(finalState, updateTaskId));
+      });
+      it('should update the id of the entity', function () {
+        expect(finalState.Group[1]).to.not.exist;
+        expect(finalState.Group[123]).to.exist;
+        expect(finalState.User[1]).to.not.exist;
+        expect(finalState.User[123]).to.exist;
+        expect(finalState.Task[1]).to.not.exist;
+        expect(finalState.Task[123]).to.exist;
+      });
+      it('should update oneToMany relations', function () {
+        expect(finalState.User[123].group).to.equal(123);
+        expect(finalState.Group[123].users).to.contain(123);
+      });
+      it('should update manyToMany relations', function () {
+        expect(finalState.User[123].tasks).to.contain(123);
+        expect(finalState.Task[123].users).to.contain(123);
       });
     });
     describe('when `DELETE_ENTITY` is received as action', function () {
