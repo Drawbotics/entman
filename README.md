@@ -135,6 +135,23 @@ export function createUser(user) {
 }
 ```
 
+Or if you're using decorators, you can use the decorator syntax:
+
+```javascript
+import { createEntities } from 'entman/decorators';
+import schemas from './schemas';
+
+export const CREATE_USER = 'CREATE_USER';
+
+@createEntities(schemas.User, 'payload.user')
+export function createUser(user) {
+  return {
+    type: CREATE_USER,
+    payload: { user },
+  };
+}
+```
+
 
 ### Group.jsx
 
