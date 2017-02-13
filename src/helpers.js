@@ -32,6 +32,9 @@ export function updateEntities(schema, ids, dataPath, action) {
   if ( ! schema || ! schema.key) {
     throw new Error(`[INVALID SCHEMA]: Entity schema expected instead of ${schema}`);
   }
+  if ( ! ids) {
+    throw new Error('[INVALID IDS]');
+  }
   if ( ! Array.isArray(ids)) {
     ids = [ids];
   }
@@ -90,7 +93,7 @@ export function deleteEntities(schema, ids, action) {
     throw new Error(`[INVALID SCHEMA]: Entity schema expected instead of ${schema}`);
   }
   if ( ! ids) {
-    throw new Error('[INVALID ID]');
+    throw new Error('[INVALID IDS]');
   }
   if ( ! Array.isArray(ids)) {
     ids = [ids];
