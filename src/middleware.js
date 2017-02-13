@@ -3,7 +3,7 @@ import v4 from 'uuid/v4';
 import { normalize } from 'normalizr';
 
 import { getEntitiesSlice } from './selectors';
-import { arrayFrom, log } from './utils';
+import { arrayFrom } from './utils';
 
 
 // UTILS {{{
@@ -55,7 +55,6 @@ function createCreateEntityActions(action) {
     .map((key) => ({ entities: data.entities[key], key }))
     .reduce((memo, entitiesAndKey) => [ ...memo, ...extractEntities(entitiesAndKey) ], [])
     .sort(sortMainFirst(schema))
-    .map(log)
     .map((payload) => ({
       type: `@@entman/CREATE_ENTITY_${payload.key.toUpperCase()}`,
       payload,

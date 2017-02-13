@@ -93,10 +93,10 @@ function updateRelation(state, action, relation) {
   if (get(foreignEntity, foreign) === undefined || isEqual(get(foreignEntity, foreign), get(oldForeignEntity, foreign))) {
     return state;  // No need to update because the prop has not been updated
   }
-  const newParentEntitiesIds = arrayFrom(get(foreignEntity, foreign)).map(String);
-  const oldParentEntitiesIds = arrayFrom(get(oldForeignEntity, foreign)).map(String);
+  const newParentEntitiesIds = arrayFrom(get(foreignEntity, foreign));
+  const oldParentEntitiesIds = arrayFrom(get(oldForeignEntity, foreign));
   return mapValues(state, (entity) => {
-    const id = String(entity.id);  //TODO Track down where ids are switching types instead of forcing Strings
+    const id = entity.id;
     if (newParentEntitiesIds.includes(id) && get(entity, through).find((id) => id == foreignEntity.id) === undefined) {
       return {
         ...entity,
