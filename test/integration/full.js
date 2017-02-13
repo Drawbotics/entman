@@ -178,7 +178,7 @@ describe('FULL EXAMPLE', function () {
     });
   });
 
-  describe.skip('when updating the id of an user', function () {
+  describe('when updating the id of an user', function () {
     let state;
     before(function () {
       const action = updateUserId(1, 145);
@@ -195,7 +195,7 @@ describe('FULL EXAMPLE', function () {
     });
   });
 
-  describe.skip('when updating the id of a group', function () {
+  describe('when updating the id of a group', function () {
     let state;
     before(function () {
       const action = updateGroupId(2, 456);

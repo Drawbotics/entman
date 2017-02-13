@@ -81,6 +81,18 @@ function createUpdateEntityActions(action, getState) {
 }
 
 
+function createUpdateEntityIdActions(action, getState) {
+  const schema = get(action, 'meta.schema');
+  const oldId = get(action, 'meta.oldId');
+  const newId = get(action, 'meta.newId');
+  return [{
+    type: `@@entman/UPDATE_ENTITY_ID_${schema.key.toUpperCase()}`,
+    payload: { oldId, newId, oldEntity: getFromState(getState(), schema.key, oldId) },
+    meta: { entmanAction: true, type: 'UPDATE_ENTITY_ID' },
+  }];
+}
+
+
 function processEntmanAction(store, next, action) {
   switch (action.meta.type) {
     case 'CREATE_ENTITIES': {
@@ -88,6 +100,9 @@ function processEntmanAction(store, next, action) {
     }
     case 'UPDATE_ENTITIES': {
       return createUpdateEntityActions(action, store.getState).forEach(next);
+    }
+    case 'UPDATE_ENTITY_ID': {
+      return createUpdateEntityIdActions(action, store.getState).forEach(next);
     }
     default: {
       console.warn(`[ENTMAN] Unknown action type found ${action.meta.type}`);
