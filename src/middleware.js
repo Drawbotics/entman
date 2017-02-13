@@ -8,7 +8,6 @@ import { arrayFrom } from './utils';
 
 // UTILS {{{
 function normalizeData(schema, data) {
-  let normalizedData = data;
   const dataWithIds = arrayFrom(data).map((e) => e.id ? e : { ...e, id: v4() });
   return normalize(dataWithIds, [ schema ]);
 }
@@ -66,7 +65,6 @@ function createCreateEntityActions(action) {
 function createUpdateEntityActions(action, getState) {
   const dataPath = get(action, 'meta.dataPath');
   const schema = get(action, 'meta.schema');
-  const skipNormalization = get(action, 'meta.skipNormalization');
   const ids = get(action, 'meta.ids');
   const data = normalizeData(schema, ids.map((id) => ({ ...get(action, dataPath), id })));
   return Object.keys(data.entities)
@@ -88,8 +86,21 @@ function createUpdateEntityIdActions(action, getState) {
   return [{
     type: `@@entman/UPDATE_ENTITY_ID_${schema.key.toUpperCase()}`,
     payload: { oldId, newId, oldEntity: getFromState(getState(), schema.key, oldId) },
-    meta: { entmanAction: true, type: 'UPDATE_ENTITY_ID' },
   }];
+}
+
+
+function createDeleteEntityActions(action, getState) {
+  const schema = get(action, 'meta.schema');
+  const ids = get(action, 'meta.ids');
+  // Do we cascade delete?
+  return ids
+    .map((id) => ({ id, key: schema.key }))
+    .map((info) => ({ entity: getFromState(getState(), info.key, info.id), key: info.key }))
+    .map((payload) => ({
+      type: `@@entman/DELETE_ENTITY_${schema.key.toUpperCase()}`,
+      payload,
+    }));
 }
 
 
@@ -103,6 +114,9 @@ function processEntmanAction(store, next, action) {
     }
     case 'UPDATE_ENTITY_ID': {
       return createUpdateEntityIdActions(action, store.getState).forEach(next);
+    }
+    case 'DELETE_ENTITIES': {
+      return createDeleteEntityActions(action, store.getState).forEach(next);
     }
     default: {
       console.warn(`[ENTMAN] Unknown action type found ${action.meta.type}`);

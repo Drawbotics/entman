@@ -98,17 +98,14 @@ export function deleteEntities(schema, ids, action) {
   if (isEmpty(action) || ! action.hasOwnProperty('type')) {
     throw new Error('[INVALID ACTION]');
   }
-  return (dispatch, getState) => {
-    dispatch(action);
-    // Do we cascade delete?
-    const actions = ids
-      .map((id) => ({ id, key: schema.key }))
-      .map((info) => ({ entity: getFromState(getState(), info.key, info.id), key: info.key }))
-      .map((payload) => ({
-        type: `@@entman/DELETE_ENTITY_${schema.key.toUpperCase()}`,
-        payload,
-        meta: { entmanAction: true, type: 'DELETE_ENTITY' },
-      }));
-    actions.forEach(dispatch);
+  return {
+    ...action,
+    meta: {
+      ...action.meta,
+      isEntmanAction: true,
+      type: 'DELETE_ENTITIES',
+      ids,
+      schema,
+    },
   };
 }

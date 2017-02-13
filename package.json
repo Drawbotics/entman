@@ -19,8 +19,7 @@
   },
   "peerDependencies": {
     "normalizr": "^3.2.1",
-    "redux": "^3.5.2",
-    "redux-thunk": "^2.2.0"
+    "redux": "^3.5.2"
   },
   "devDependencies": {
     "babel-core": "^6.13.2",
@@ -44,7 +43,6 @@
     "normalizr": "^3.2.1",
     "phantomjs": "^2.1.7",
     "redux": "^3.5.2",
-    "redux-thunk": "^2.2.0",
     "rimraf": "^2.5.4",
     "webpack": "^1.13.1",
     "webpack-dev-server": "^1.14.1"

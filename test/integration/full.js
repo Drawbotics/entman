@@ -1,38 +1,21 @@
 import { expect } from 'chai';
-import { createStore, applyMiddleware, compose, combineReducers } from 'redux';
-import reduxThunk from 'redux-thunk';
 
 import {
-  defineSchema,
-  hasMany,
-  generateSchemas,
-  reducer as entities,
   getEntitiesSlice,
-  getEntity,
-  middleware as entman,
 } from 'index';
 
 import api from './mock-api';
-import schemas from './schemas';
 import {
   receiveGroups,
-  createGroup,
   createUser,
-  createTask,
   updateGroup,
   updateUser,
-  updateTask,
   deleteGroup,
   deleteUser,
   updateUserId,
   updateGroupId,
 } from './actions';
 import store from './store';
-
-
-// SELECTORS {{{
-const getGroup = (state, id) => getEntity(state, schemas.Group, id);
-// }}}
 
 
 describe('FULL EXAMPLE', function () {
@@ -146,7 +129,7 @@ describe('FULL EXAMPLE', function () {
     });
   });
 
-  describe.skip('when deleting an user', function () {
+  describe('when deleting an user', function () {
     let state;
     before(function () {
       const action = deleteUser(123);
@@ -161,7 +144,7 @@ describe('FULL EXAMPLE', function () {
     });
   });
 
-  describe.skip('when deleting a group', function () {
+  describe('when deleting a group', function () {
     let state;
     before(function () {
       const action = deleteGroup(1);
@@ -215,7 +198,6 @@ describe('FULL EXAMPLE', function () {
 
   describe.skip('when using selectors to retrieve a group', function () {
     it('the group should have users populated', function () {
-      const group = getGroup(store.getState(), 456);
     });
   });
 
