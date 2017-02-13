@@ -3,7 +3,7 @@ import v4 from 'uuid/v4';
 import { normalize } from 'normalizr';
 
 import { getEntitiesSlice } from './selectors';
-import { arrayFrom } from './utils';
+import { arrayFrom, log } from './utils';
 
 
 // UTILS {{{
@@ -17,7 +17,7 @@ function extractEntities(entitiesAndKey) {
   return Object.keys(entitiesAndKey.entities).map((id) => ({
     entity: {
       ...entitiesAndKey.entities[id],
-      id,
+      id: entitiesAndKey.entities[id].id ? entitiesAndKey.entities[id].id : id,
     },
     key: entitiesAndKey.key,
   }));
@@ -55,6 +55,7 @@ function createCreateEntityActions(action) {
     .map((key) => ({ entities: data.entities[key], key }))
     .reduce((memo, entitiesAndKey) => [ ...memo, ...extractEntities(entitiesAndKey) ], [])
     .sort(sortMainFirst(schema))
+    .map(log)
     .map((payload) => ({
       type: `@@entman/CREATE_ENTITY_${payload.key.toUpperCase()}`,
       payload,
