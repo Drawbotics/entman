@@ -1,3 +1,3 @@
 import 'babel-polyfill';
-import './unit';
-//import './integration';
+//import './unit';
+import './integration';
