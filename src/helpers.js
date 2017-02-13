@@ -64,24 +64,15 @@ export function createEntities(schema, dataPath, action) {
   if ( ! get(action, dataPath)) {
     console.warn(`No data found in action at ${dataPath}`);
   }
-  return (dispatch) => {
-    dispatch(action);
-    const skipNormalization = get(action, 'meta.skipNormalization');
-    const data = skipNormalization ? get(action, dataPath) : normalizeData(schema, get(action, dataPath));
-    // Create an action for every entity and dispatch it
-    const actions = Object.keys(data.entities)
-      .map((key) => ({ entities: data.entities[key], key }))
-      .reduce((memo, entitiesAndKey) => [
-        ...memo,
-        ...extractEntities(entitiesAndKey),
-      ], [])
-      .sort(sortMainFirst(schema))
-      .map((entity) => ({
-        type: `@@entman/CREATE_ENTITY_${entity.key.toUpperCase()}`,
-        payload: entity,
-        meta: { entmanAction: true, type: 'CREATE_ENTITY' },
-      }));
-    actions.forEach(dispatch);
+  return {
+    ...action,
+    meta: {
+      ...action.meta,
+      isEntmanAction: true,
+      type: 'CREATE_ENTITIES',
+      dataPath,
+      schema,
+    },
   };
 }
 

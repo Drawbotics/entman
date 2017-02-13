@@ -54,6 +54,7 @@
     "denormalizr": "https://github.com/larsbs/denormalizr",
     "karma-sourcemap-loader": "^0.3.7",
     "lodash": "^4.15.0",
-    "node-uuid": "^1.4.7"
+    "node-uuid": "^1.4.7",
+    "uuid": "^3.0.1"
   }
 }
