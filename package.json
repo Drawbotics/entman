@@ -10,7 +10,7 @@
     "test-watch": "karma start",
     "test": "karma start --single-run --browsers PhantomJS",
     "start": "npm run clean && npm run build",
-    "prepublish": "npm run build"
+    "prepublish": "npm run test && npm run build"
   },
   "keywords": [],
   "license": "MIT",
