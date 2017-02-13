@@ -2,9 +2,11 @@ import get from 'lodash/get';
 import v4 from 'uuid/v4';
 import { normalize } from 'normalizr';
 
+import { getEntitiesSlice } from './selectors';
 import { arrayFrom } from './utils';
 
 
+// UTILS {{{
 function normalizeData(schema, data) {
   let normalizedData = data;
   const dataWithIds = arrayFrom(data).map((e) => e.id ? e : { ...e, id: v4() });
@@ -38,7 +40,14 @@ function sortMainFirst(main) {
 }
 
 
-function createEntityActions(action) {
+function getFromState(state, key, id) {
+  return get(getEntitiesSlice(state), [key, id]);
+}
+// }}}
+
+
+
+function createCreateEntityActions(action) {
   const dataPath = get(action, 'meta.dataPath');
   const schema = get(action, 'meta.schema');
   const skipNormalization = get(action, 'meta.skipNormalization');
@@ -54,10 +63,31 @@ function createEntityActions(action) {
 }
 
 
+function createUpdateEntityActions(action, getState) {
+  const dataPath = get(action, 'meta.dataPath');
+  const schema = get(action, 'meta.schema');
+  const skipNormalization = get(action, 'meta.skipNormalization');
+  const ids = get(action, 'meta.ids');
+  const data = normalizeData(schema, ids.map((id) => ({ ...get(action, dataPath), id })));
+  return Object.keys(data.entities)
+    .map((key) => ({ entities: data.entities[key], key }))
+    .reduce((memo, entitiesAndKey) => [ ...memo, ...extractEntities(entitiesAndKey) ], [])
+    .map((entity) => ({ ...entity, oldEntity: getFromState(getState(), entity.key, entity.entity.id) }))
+    .sort(sortMainFirst(schema))
+    .map((payload) => ({
+      type: `@@entman/UPDATE_ENTITY_${payload.key.toUpperCase()}`,
+      payload,
+    }));
+}
+
+
 function processEntmanAction(store, next, action) {
   switch (action.meta.type) {
     case 'CREATE_ENTITIES': {
-      return createEntityActions(action).forEach(next);
+      return createCreateEntityActions(action).forEach(next);
+    }
+    case 'UPDATE_ENTITIES': {
+      return createUpdateEntityActions(action, store.getState).forEach(next);
     }
     default: {
       console.warn(`[ENTMAN] Unknown action type found ${action.meta.type}`);

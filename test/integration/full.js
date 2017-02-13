@@ -92,7 +92,7 @@ describe('FULL EXAMPLE', function () {
     });
   });
 
-  describe.skip('when updating a group', function () {
+  describe('when updating a group', function () {
     let state;
     describe('if we\'re updating a single property (no array, no relation)', function () {
       before(function () {
@@ -106,7 +106,7 @@ describe('FULL EXAMPLE', function () {
     });
   });
 
-  describe.skip('when updating an user', function () {
+  describe('when updating an user', function () {
     let state;
     before(function () {
       const action = updateUser(1, { name: 'New User Name', group: 2 });
@@ -126,7 +126,7 @@ describe('FULL EXAMPLE', function () {
     });
   });
 
-  describe.skip('when updating the tasks of an user', function () {
+  describe('when updating the tasks of an user', function () {
     let state;
     before(function () {
       // add user to task 3
