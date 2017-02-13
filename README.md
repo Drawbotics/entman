@@ -1,8 +1,9 @@
 # Entman
 
 
-A library to help you manage your entities in a [redux](http://www.github.com/)
-store. **Entman** takes care of retrieving them from the store and creating, deleting
+A library to help you manage your entities in a [redux](http://github.com/)
+store when using [normalizr](http://github.com/). **Entman** takes care of
+retrieving them from the store and creating, deleting
 and updating the entities while keeping the relations between them in sync.
 
 The idea is that everything that has a model in the *backend* should be an
