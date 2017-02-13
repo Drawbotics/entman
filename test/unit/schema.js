@@ -93,8 +93,8 @@ describe('@Schema', function () {
         }
       });
       const result = generateSchemas([user, group]);
-      expect(result.Group.getKey()).to.equal('Group');
-      expect(result.User.getKey()).to.equal('User');
+      expect(result.Group.key).to.equal('Group');
+      expect(result.User.key).to.equal('User');
     });
     it('the resulted schemas should contain the right attributes', function () {
       const user = defineSchema('User', {
@@ -111,39 +111,22 @@ describe('@Schema', function () {
         }
       });
       const result = generateSchemas([user, group]);
-      expect(result.Group).to.contain.keys(['users', '_computed']);
-      expect(result.Group._computed).to.contain.keys(['getNumberOfUsers']);
-      expect(result.User).to.contain.keys(['group']);
+      expect(result.Group.schema).to.contain.keys(['users', '_computed']);
+      expect(result.Group.schema._computed).to.contain.keys(['getNumberOfUsers']);
+      expect(result.User.schema).to.contain.keys(['group']);
     });
-    it('should add a method called `isRelatedTo` to the generated schemas', function () {
+    it('should add a method called `getRelations` to the generated schemas', function () {
       const user = defineSchema('User');
       const group = defineSchema('Group');
       const result = generateSchemas([user, group]);
-      expect(result.User.isRelatedTo).to.exist;
-      expect(result.Group.isRelatedTo).to.exist;
+      expect(result.User.getRelations).to.exist;
+      expect(result.Group.getRelations).to.exist;
     });
-    it('the method `isRelatedTo(entityName)` should return true when the entity is related to `entityName`', function () {
+    it('the method `getRelations` should return an array with the info of the relations of the schema', function () {
       const user = defineSchema('User', {
         attributes: {
           group: 'Group',
-        }
-      });
-      const group = defineSchema('Group');
-      const result = generateSchemas([user, group]);
-      expect(result.User.isRelatedTo('Group')).to.be.true;
-      expect(result.User.isRelatedTo('assdfa')).to.be.false;
-    });
-    it('should add a method called `getRelation` to the generated schemas', function () {
-      const user = defineSchema('User');
-      const group = defineSchema('Group');
-      const result = generateSchemas([user, group]);
-      expect(result.User.getRelation).to.exist;
-      expect(result.Group.getRelation).to.exist;
-    });
-    it('the method `getRelation(entity, name)` should return an object with the info for the relation between entities when single relation', function () {
-      const user = defineSchema('User', {
-        attributes: {
-          group: 'Group',
+          tasks: hasMany('Task'),
         },
       });
       const group = defineSchema('Group', {
@@ -151,17 +134,45 @@ describe('@Schema', function () {
           users: hasMany('User'),
         },
       });
-      const schemas = generateSchemas([user, group]);
-      const userEntity = { id: 1, group: 1, name: 'Lars' };
-      const expected = {
-        related: 'Group',
-        relatedPropName: 'users',
-        relatedId: 1,
-        isArray: true,
-      };
-      const result = schemas.User.getRelation(userEntity, 'Group');
-      expect(result).to.deep.equal(expected);
+      const task = defineSchema('Task', {
+        attributes: {
+          users: hasMany('User'),
+        },
+      });
+      const result = generateSchemas([ user, group, task ]);
+      const userRelations = [
+        {
+          through: 'group',
+          isMany: false,
+          foreign: 'users',
+          to: 'Group',
+        },
+        {
+          through: 'tasks',
+          isMany: true,
+          foreign: 'users',
+          to: 'Task',
+        },
+      ];
+      const groupRelations = [
+        {
+          through: 'users',
+          isMany: true,
+          foreign: 'group',
+          to: 'User',
+        },
+      ];
+      const taskRelations = [
+        {
+          through: 'users',
+          isMany: true,
+          foreign: 'tasks',
+          to: 'User',
+        },
+      ];
+      expect(result.Group.getRelations()).to.deep.equal(groupRelations);
+      expect(result.User.getRelations()).to.deep.equal(userRelations);
+      expect(result.Task.getRelations()).to.deep.equal(taskRelations);
     });
-    it('the method `getRelation(entity, name)` should return an object with the info for the relation between entities when array relation');
   });
 });

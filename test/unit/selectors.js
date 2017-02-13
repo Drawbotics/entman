@@ -34,10 +34,10 @@ describe('@Selectors', function () {
       }
     });
     schemas = generateSchemas([group, user, task]);
-    state = {
+    state = { entities: {
       Group: {
-        1: { id: 1, name: 'Group 1' },
-        2: { id: 2, name: 'Group 2' },
+        1: { id: 1, name: 'Group 1', users: [ 1, 2 ] },
+        2: { id: 2, name: 'Group 2', users: [ 3 ] },
       },
       User: {
         1: { id: 1, name: 'Lars', group: 1 },
@@ -48,7 +48,7 @@ describe('@Selectors', function () {
         1: { id: 1, title: 'Do something', user: 1 },
         2: { id: 2, title: 'Keep calm', user: 1 },
       },
-    };
+    } };
   });
   describe('getEntities(state, schema)', function () {
     let entities;
