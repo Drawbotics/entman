@@ -1,28 +1,29 @@
 # Entman
 
 
-> [NOTE]: Still a work in progress, not even in alpha state.
-
-
 A library to help you manage your entities in a [redux](http://www.github.com/)
-store. **Entman** manages everything for you. From the communication with
-the server to the access to the data in the store.
+store. **Entman** takes care of retrieving them from the store and creating, deleting
+and updating the entities while keeping the relations between them in sync.
 
 The idea is that everything that has a model in the *backend* should be an
-entity in the *frontend*. The management of entities is something very
+entity in the *frontend*. The management of entities is usually something very
 straightforward but tedious, so you leave this work to **entman** and
-you focus on the rest.
+you can focus on the rest.
 
 
 ## Install
 
-Install it as a node module as usual with [npm]():
+Install it as a node module as usual with [npm]() along its peer dependencies:
 
 ```bash
-$ npm install -S entman
+$ npm install -S entman redux normalizr
 ```
 
-Alternatively, you can link directly the build provided in a `<script>` tag.
+Or using [yarn]():
+
+```bash
+$ yarn add entman redux normalizr
+```
 
 
 ## Example
@@ -31,7 +32,8 @@ A quick example to see **entman** in action:
 
 ### schemas.js
 
-We use schemas to define relationships between our entities.
+We use schemas to define relationships between our entities. We can also define
+methods that will be available in the entity and serve like some sort of computed property.
 
 ```javascript
 import { defineSchema, hasMany, generateSchemas } from 'entman';
@@ -53,12 +55,13 @@ const User = defineSchema('User', {
 });
 
 // Generate and export the schemas. Schemas will be exported as an object
-// with the name of the schema as the key.
+// with the name of every schema as the keys and the actual schemas as values.
 export default generateSchemas([
   Group,
   User,
 ])
 ```
+
 
 ### reducer.js
 
@@ -75,10 +78,29 @@ export default combineReducers({
 })
 ```
 
+
+### store.js
+
+Connect the entman middleware to the store.
+
+```javascript
+import { createStore, applyMiddleware } from 'redux';
+import { middleware as entman } from 'entman';
+import reducer from './reducer';
+
+export default createStore(
+  store,
+  applyMiddleware(entman),
+);
+```
+
+
 ### selectors.js
 
-Create selectors for the entities. This way the entities access code is abstracted
-from the rest of the system.
+Create selectors that will retrieve the entities from the store. Selectors also
+take care of populating relationships and adding the *getter* methods defined in the
+schema. It's recommended to wrap **entman** selectors intead of using them directly
+so they're abstracted from the rest of the system.
 
 ```javascript
 import { getEntity } from 'entman';
@@ -89,28 +111,39 @@ export function getGroup(state, id) {
 }
 ```
 
+
 ### actions.js
+
+Create some actions using the helpers from **entman**. The helpers will take an action and
+wrap it with entman functionality. This way, you can still react in your reducers to your
+own actions and the entity management is just a side effect that entman will take care of.
 
 ```javascript
 import {
-  createEntity,
+  createEntities,
 } from 'entman';
 import schemas from './schemas';
 
 export const CREATE_USER = 'CREATE_USER';
 
 export function createUser(user) {
-  return createEntity(schemas.User, user);  // Add user to the store
+  return createEntities(schemas.User, 'payload.user', {
+    type: CREATE_USER,  // CREATE_USER action will be dispatched alongside entman actions
+    payload: { user },
+  });
 }
 ```
 
-### Component.jsx
+
+### Group.jsx
+
+Finally, use your actions and selectors like you would normally do.
 
 ```jsx
 import React from 'react';
 import { connect } from 'react-redux';
 import { getGroup } from './selectors';
-import { loadGroup } from './actions';
+import { loadGroup, createUser } from './actions';
 
 class Group extends React.Component {
   constructor(props) {
@@ -164,10 +197,10 @@ class Group extends React.Component {
   }
 
   _handleAddUser(e) {
-    const { group, createAndSaveUser } = this.props;
+    const { group, createUser } = this.props;
     const { name } = this.state;
-    const user = { group, name };
-    createAndSaveUser(user);
+    const user = { name, group: group.id };
+    createUser(user);
   }
 }
 
@@ -177,19 +210,18 @@ const mapStateToProps = (state, ownProps) => ({
 
 const mapDispatchToProps = {
   loadGroup,
+  createUser,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Group);
 ```
 
-A more detailed example can be found in the [entman-example](https://github.com/Drawbotics/entman-example) repository.
 
+## API
 
-## Documentation
-
- - [Introduction]()
- - [Getting Started]()
- - [Accessing Data]()
- - [Modifying Data]()
- - [Communication With The Server]()
  - [API]()
+
+
+## LICENSE
+
+TODO
