@@ -69,7 +69,7 @@ describe('FULL EXAMPLE', function () {
       expect(state.User[123]).to.exist;
     });
     it('the group should be updated with the new user', function () {
-      expect(state.Group[1].users).to.include('123');
+      expect(state.Group[1].users).to.include(123);
     });
     it.skip('if the new user contained an embedded entity, what should we do?', function () {
     });
@@ -101,10 +101,10 @@ describe('FULL EXAMPLE', function () {
     });
     describe('if updating the group of the user', function () {
       it('the original group should not contain the user in the users list', function () {
-        expect(state.Group[1].users).to.not.include('1');
+        expect(state.Group[1].users).to.not.include(1);
       });
       it('the new group should contain the user in the users list', function () {
-        expect(state.Group[2].users).to.include('1');
+        expect(state.Group[2].users).to.include(1);
       });
     });
   });
@@ -125,7 +125,7 @@ describe('FULL EXAMPLE', function () {
     it('the tasks should have its respective users updated', function () {
       expect(state.Task[1].users).to.not.include(1);
       expect(state.Task[2].users).to.include(1);
-      expect(state.Task[3].users).to.include('1');
+      expect(state.Task[3].users).to.include(1);
     });
   });
 

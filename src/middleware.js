@@ -17,7 +17,7 @@ function extractEntities(entitiesAndKey) {
   return Object.keys(entitiesAndKey.entities).map((id) => ({
     entity: {
       ...entitiesAndKey.entities[id],
-      id,
+      id: entitiesAndKey.entities[id].id ? entitiesAndKey.entities[id].id : id,
     },
     key: entitiesAndKey.key,
   }));
