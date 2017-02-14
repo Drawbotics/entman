@@ -1,4 +1,4 @@
-![Entman logo](entman-logo.png)
+<img src="https://raw.githubusercontent.com/Drawbotics/entman/79b74b1ebdfba5250a273fe9da7a3839d8c81f4e/entman-logo.png" width="50%">
 
 # Entman
 
