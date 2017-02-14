@@ -1,7 +1,7 @@
 {
   "name": "entman",
-  "version": "0.2.1",
-  "description": "A manager of entities for redux",
+  "version": "0.2.2",
+  "description": "A manager of normalizr entities for Redux",
   "author": "Lorenzo Ruiz <lars.bs@hotmail.com>",
   "main": "lib/entman.js",
   "scripts": {
