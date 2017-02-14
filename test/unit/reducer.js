@@ -102,6 +102,7 @@ describe('@Reducer', function () {
           User: {
             1: { id: 1, name: 'Lars', group: 1, tasks: [ 1 ] },
             2: { id: 2, name: 'Deathvoid', group: 2, tasks: [] },
+            3: { id: 2, name: 'Grishan', username: undefined, group: null, tasks: [] },
           },
           Task: {
             1: { id: 1, name: 'Task 1', users: [ 1 ] },
@@ -145,6 +146,24 @@ describe('@Reducer', function () {
       it('should update manyToMany relations correctly', function () {
         expect(finalState.User[2].tasks).to.include(1);
         expect(finalState.Task[1].users).to.include(2);
+      });
+      describe('if `defaultTo` in the payload is set to true', function () {
+        before(function () {
+          const updateUser3 = {
+            type: '@@entman/UPDATE_ENTITY_USER',
+            payload: {
+              entity: { id: 3, name: 'Grishan2', username: 'grishan' },
+              oldEntity: finalState.User[3],
+              key: 'User',
+              useDefault: true,
+            },
+          };
+          finalState = deepFreeze(reducer(finalState, updateUser3));
+        });
+        it('should only update undefined properties and not override existing values', function () {
+          expect(finalState.User[3].name).to.equal('Grishan');
+          expect(finalState.User[3].username).to.equal('grishan');
+        });
       });
     });
     describe('when `UPDATE_ENTITY_ID` is received as action', function () {
