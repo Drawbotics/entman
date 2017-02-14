@@ -229,4 +229,4 @@ TODO
 
 ## LICENSE
 
-TODO
+MIT. See [LICENSE](LICENSE) for details.
