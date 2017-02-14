@@ -1,8 +1,8 @@
 # Entman
 
 
-A library to help you manage your entities in a [redux](http://github.com/)
-store when using [normalizr](http://github.com/). **Entman** takes care of
+A library to help you manage your entities in a [redux](https://github.com/reactjs/redux)
+store when using [normalizr](https://github.com/paularmstrong/normalizr). **Entman** takes care of
 retrieving them from the store and creating, deleting
 and updating the entities while keeping the relations between them in sync.
 
@@ -14,13 +14,13 @@ you can focus on the rest.
 
 ## Install
 
-Install it as a node module as usual with [npm]() along its peer dependencies:
+Install it as a node module as usual with [npm](https://www.npmjs.org/) along its peer dependencies:
 
 ```bash
 $ npm install -S entman redux normalizr
 ```
 
-Or using [yarn]():
+Or using [yarn](https://yarnpkg.com/):
 
 ```bash
 $ yarn add entman redux normalizr
@@ -220,7 +220,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(Group);
 
 ## API
 
- - [API]()
+TODO
 
 
 ## LICENSE
