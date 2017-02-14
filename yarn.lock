@@ -3131,6 +3131,10 @@ rechoir@^0.6.2:
   dependencies:
     resolve "^1.1.6"
 
+redux-batched-actions@^0.1.5:
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/redux-batched-actions/-/redux-batched-actions-0.1.5.tgz#b39b84775f4499a4724f3154b882968073b58bed"
+
 redux@^3.5.2:
   version "3.6.0"
   resolved "https://registry.yarnpkg.com/redux/-/redux-3.6.0.tgz#887c2b3d0b9bd86eca2be70571c27654c19e188d"

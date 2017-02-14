@@ -1,6 +1,6 @@
 {
   "name": "entman",
-  "version": "0.2.6",
+  "version": "0.3.0",
   "description": "A manager of normalizr entities for Redux",
   "author": "Lorenzo Ruiz <lars.bs@hotmail.com>",
   "main": "lib/entman.js",
@@ -53,6 +53,7 @@
     "entman-denormalizr": "^0.5.2",
     "karma-sourcemap-loader": "^0.3.7",
     "lodash": "^4.15.0",
+    "redux-batched-actions": "^0.1.5",
     "uuid": "^3.0.1"
   }
 }
