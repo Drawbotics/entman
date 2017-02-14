@@ -28,7 +28,7 @@ export function createEntities(schema, dataPath, action) {
 }
 
 
-export function updateEntities(schema, ids, dataPath, action) {
+export function updateEntities(schema, ids, dataPath, action, useDefault) {
   if ( ! schema || ! schema.key) {
     throw new Error(`[INVALID SCHEMA]: Entity schema expected instead of ${schema}`);
   }
@@ -56,6 +56,7 @@ export function updateEntities(schema, ids, dataPath, action) {
       ids,
       dataPath,
       schema,
+      useDefault,
     },
   };
 }

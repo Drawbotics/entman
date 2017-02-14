@@ -66,6 +66,7 @@ function createUpdateEntityActions(action, getState) {
   const dataPath = get(action, 'meta.dataPath');
   const schema = get(action, 'meta.schema');
   const ids = get(action, 'meta.ids');
+  const useDefault = get(action, 'meta.useDefault');
   const data = normalizeData(schema, ids.map((id) => ({ ...get(action, dataPath), id })));
   return Object.keys(data.entities)
     .map((key) => ({ entities: data.entities[key], key }))
@@ -74,7 +75,7 @@ function createUpdateEntityActions(action, getState) {
     .sort(sortMainFirst(schema))
     .map((payload) => ({
       type: `@@entman/UPDATE_ENTITY_${payload.key.toUpperCase()}`,
-      payload,
+      payload: { ...payload, useDefault },
     }));
 }
 
