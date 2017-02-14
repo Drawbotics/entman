@@ -1,7 +1,7 @@
 <img src="https://raw.githubusercontent.com/Drawbotics/entman/79b74b1ebdfba5250a273fe9da7a3839d8c81f4e/entman-logo.png" width="50%">
 
-# Entman
 
+# Entman
 
 A library to help you manage your entities in a [redux](https://github.com/reactjs/redux)
 store when using [normalizr](https://github.com/paularmstrong/normalizr). **Entman** takes care of
@@ -12,6 +12,8 @@ The idea is that everything that has a model in the *backend* should be an
 entity in the *frontend*. The management of entities is usually something very
 straightforward but tedious, so you leave this work to **entman** and
 you can focus on the rest.
+
+[![npm version](https://img.shields.io/npm/v/entman.svg?style=flat-square)](https://www.npmjs.com/package/redux)
 
 
 ## Install
@@ -227,4 +229,4 @@ TODO
 
 ## LICENSE
 
-TODO
+MIT. See [LICENSE](LICENSE) for details.
