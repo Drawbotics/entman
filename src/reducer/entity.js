@@ -1,6 +1,6 @@
 import omit from 'lodash/omit';
 
-import { update } from 'utils';
+import { update, defaultTo } from 'utils';
 import createReactions from './create-reactions';
 
 
@@ -11,10 +11,11 @@ function createEntity(state, action) {
 
 
 function updateEntity(state, action) {
-  const { entity } = action.payload;
+  const { entity, useDefault } = action.payload;
+  const data = omit(entity, 'id');
   return {
     ...state,
-    [entity.id]: update(state[entity.id], omit(entity, 'id')),
+    [entity.id]: useDefault ? defaultTo(state[entity.id], data) : update(state[entity.id], data),
   };
 }
 
