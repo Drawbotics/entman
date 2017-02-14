@@ -1,6 +1,7 @@
 import get from 'lodash/get';
 import v4 from 'uuid/v4';
 import { normalize } from 'normalizr';
+import { batchActions } from 'redux-batched-actions';
 
 import { getEntitiesSlice } from './selectors';
 import { arrayFrom } from './utils';
@@ -105,18 +106,30 @@ function createDeleteEntityActions(action, getState) {
 }
 
 
-function processEntmanAction(store, next, action) {
+function processEntmanAction(store, next, action, enableBatching) {
   switch (action.meta.type) {
     case 'CREATE_ENTITIES': {
+      if (enableBatching) {
+        return next(batchActions(createCreateEntityActions(action)));
+      }
       return createCreateEntityActions(action).forEach(next);
     }
     case 'UPDATE_ENTITIES': {
+      if (enableBatching) {
+        return next(batchActions(createUpdateEntityActions(action, store.getState)));
+      }
       return createUpdateEntityActions(action, store.getState).forEach(next);
     }
     case 'UPDATE_ENTITY_ID': {
+      if (enableBatching) {
+        return next(batchActions(createUpdateEntityIdActions(action, store.getState)));
+      }
       return createUpdateEntityIdActions(action, store.getState).forEach(next);
     }
     case 'DELETE_ENTITIES': {
+      if (enableBatching) {
+        return next(batchActions(createDeleteEntityActions(action, store.getState)));
+      }
       return createDeleteEntityActions(action, store.getState).forEach(next);
     }
     default: {
@@ -127,12 +140,13 @@ function processEntmanAction(store, next, action) {
 }
 
 
-export default function entman(store) {
-  return (next) => (action) => {
+export default function entman(config={}) {
+  const { enableBatching } = config;
+  return (store) => (next) => (action) => {
     if ( ! get(action, 'meta.isEntmanAction', false)) {
       return next(action);
     }
     next(action);
-    return processEntmanAction(store, next, action);
+    return processEntmanAction(store, next, action, enableBatching);
   };
 }

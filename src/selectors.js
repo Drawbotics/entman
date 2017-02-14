@@ -1,7 +1,7 @@
 import pickBy from 'lodash/pickBy';
 import isEmpty from 'lodash/isEmpty';
 import values from 'lodash/values';
-import { denormalize } from 'denormalizr';
+import { denormalize } from 'entman-denormalizr';
 
 
 export function getEntitiesSlice(state) {

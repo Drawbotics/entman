@@ -93,7 +93,7 @@ import reducer from './reducer';
 
 export default createStore(
   store,
-  applyMiddleware(entman),
+  applyMiddleware(entman({ enableBatching: true })),
 );
 ```
 

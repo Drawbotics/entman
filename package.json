@@ -1,6 +1,6 @@
 {
   "name": "entman",
-  "version": "0.2.5",
+  "version": "0.3.0",
   "description": "A manager of normalizr entities for Redux",
   "author": "Lorenzo Ruiz <lars.bs@hotmail.com>",
   "main": "lib/entman.js",
@@ -19,7 +19,7 @@
     "url": "git+https://github.com/Drawbotics/entman.git"
   },
   "peerDependencies": {
-    "normalizr": "^3.2.1",
+    "normalizr": "^3.0.2",
     "redux": "^3.5.2"
   },
   "devDependencies": {
@@ -50,9 +50,10 @@
   },
   "dependencies": {
     "babel-polyfill": "^6.13.0",
-    "denormalizr": "https://github.com/larsbs/denormalizr",
+    "entman-denormalizr": "^0.5.2",
     "karma-sourcemap-loader": "^0.3.7",
     "lodash": "^4.15.0",
+    "redux-batched-actions": "^0.1.5",
     "uuid": "^3.0.1"
   }
 }
