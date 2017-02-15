@@ -22,7 +22,7 @@ module.exports = function (config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'test/index.js': ['webpack', 'sourcemap'],
+      'test/index.js': ['webpack', 'sourcemap', 'coverage'],
     },
 
     // test results reporter to use
@@ -30,6 +30,7 @@ module.exports = function (config) {
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
     reporters: [
       'mocha',
+      'coverage',
       //'dots',
       //'progress',
     ],
@@ -78,5 +79,12 @@ module.exports = function (config) {
     mochaReporter: {
       showDiff: true
     },
+
+    // Configure coverage reporter
+    coverageReporter: {
+      type: 'lcovonly',
+      dir: 'coverage/',
+      subdir: '.',
+    }
   });
 }
