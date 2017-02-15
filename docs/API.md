@@ -139,6 +139,19 @@ export default generateSchemas([ userDefinition ]);
  - **Returns**
   - *Object*: An array with all the entities of the specified schema.
   
+```javascript
+import { getEntities } from 'entman';
+import schemas from './schemas';
+
+function getGroups(state) {
+  return getEntities(state, schemas.Group);
+}
+
+// -----
+
+const groups = getGroups(state);
+```
+  
 #### `getEntitiesBy(state, schema, by={})`
 
 > Get all the entities defined by `schema` from the state that match certain conditions. The conditions are specified by the `by` parameter which is an object that takes attributes of the entities as keys and the values these have to have as values to match. It takes care of populate all the entities relationships and adding the computed properties defined in the schema.
@@ -150,6 +163,19 @@ export default generateSchemas([ userDefinition ]);
  - **Returns**
   - *Object*: An array with all the entities of the specified schema that match the conditions specified.
   
+```javascript
+import { getEntitiesBy } from 'entman';
+import schemas from './schemas';
+
+function getGroupsBy(state, by) {
+  return getEntities(state, schemas.Group, by);
+}
+
+// -----
+
+const groups = getGroupsBy(state, { name: 'Test' });
+```
+  
 #### `getEntity(state, schema, id)`
 
 > Get a single entity defined by `schema` with the specified `id` from the state. It takes care of populate all the entity relationships and adding the computed properties defined in the schema.
@@ -160,5 +186,18 @@ export default generateSchemas([ userDefinition ]);
   - `id` *String|Number*: The id of the entity to retrieve.
  - **Returns**
   - *Object*: The entity with the specified id.
+  
+```javascript
+import { getEntity } from 'entman';
+import schemas from './schemas';
+
+function getGroup(state, id) {
+  return getEntity(state, schemas.Group, id);
+}
+
+// -----
+
+const group = getGroup(state, 1);
+```
 
 ## Helpers
