@@ -201,3 +201,59 @@ const group = getGroup(state, 1);
 ```
 
 ## Helpers
+
+#### `createEntities(schema, dataPath, action)`
+
+> 
+
+ - **Parameters**:
+  - `schema` *Object*:
+  - `dataPath` *String*:
+  - `action` *Object:
+ - **Returns**:
+  - *Object*:
+  
+```javascript
+```
+
+#### `updateEntities(schema, ids, dataPath, action)`
+
+>
+
+ - **Parameters**
+  - `schema` *Object*:
+  - `ids` *Array|Number|String*:
+  - `dataPath` *String*:
+  - `action` *Object*:
+ - **Returns**:
+  - *Object*:
+
+```javascript
+```
+
+#### `updateEntityId(schema, oldId, newId, action)`
+
+>
+
+ - **Parameters**
+  - `schema` *Object*:
+  - `oldId` *Number|String*:
+  - `newId` *Number|String*:
+  - `action` *Object*:
+ - **Returns**
+  - *Object*:
+  
+```javascript
+```
+
+#### `deleteEntities(schema, id, action)`
+
+> 
+
+ - **Parameters**
+  - `schema` *Object*:
+  - `id` *Number|String*:
+  - `action` *Object*:
+  
+```javascript
+```
