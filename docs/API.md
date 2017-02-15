@@ -152,7 +152,7 @@ export default generateSchemas([ userDefinition ]);
   
 #### `getEntity(state, schema, id)`
 
-> > Get a single entity defined by `schema` with the specified `id` from the state. It takes care of populate all the entity relationships and adding the computed properties defined in the schema.
+> Get a single entity defined by `schema` with the specified `id` from the state. It takes care of populate all the entity relationships and adding the computed properties defined in the schema.
 
  - **Parameters**
   - `state` *Object*: The global state of the application or an slice that contains the key `entities` on it.
