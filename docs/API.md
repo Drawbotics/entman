@@ -65,6 +65,68 @@ export default createStore({
 
 ## Schema
 
+#### `defineSchema(name, config)`
+
+> Creates an schema definition with the given named to be used in `generateSchemas`.
+
+ - **Parameters**
+  - `name` *String*: A string indicating the name of the entity this schema defines.
+  - `config` *Object*: An object with the information to define the schema. The attributes are:
+    - `attributes`: An object containing information about the relations of this entity to other entities and computed properties to be added to the entity when it's retrieved from the store.
+ - **Returns**
+  - *Object*: Schema definition of the entity.
+
+```javascript
+import { defineSchema } from 'entman';
+
+const userDefinition = defineSchema('User', {
+  group: 'Group',  // User belongs to Group
+  
+  // When retrieving users from the store, they will contain this
+  // computed property. Inside computed properties we can compute
+  // data based on the entity and we can know for sure that in every place there's 
+  // going to be an user, the computed properties will be there, saving a lot
+  // imports around the application with functions to compute the same data.
+  getGroupName() { 
+    return this.group.name;
+  },
+);
+```
+
+#### `hasMany(name)`
+
+> Defines an array like relationship with the entity identified by `name`.
+
+ - **Parameters**
+  - `name` *String*: A string indicating the name of the related entity.
+ - **Returns**
+  - *Object*: A relationship definition.
+
+```javascript
+import { defineSchema, hasMany } from 'entman';
+
+const groupDefinition = defineSchema('Group', {
+  users: hasMany('User')  // Group has many users
+});
+```
+
+#### `generateSchemas(schemas)`
+
+> Generates entities schemas from the definitions. The generated result is ready to be passed to the entities reducer.
+
+ - **Parameters**
+  - `schemas` *Array*: An array containing schemas definitions.
+ - **Returns**
+  - *Object*: An object with the schemas of the entities.
+
+```javascript
+import { defineSchema, generateSchemas } from 'entman';
+
+const userDefinition = defineSchema('User');
+
+export default generateSchemas([ userDefinition ]);
+```
+
 ## Selectors
 
 ## Helpers
