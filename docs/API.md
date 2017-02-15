@@ -81,17 +81,17 @@ import { defineSchema } from 'entman';
 
 const userDefinition = defineSchema('User', {
   group: 'Group',  // User belongs to Group
-  
-  // When retrieving users from the store, they will contain this
-  // computed property. Inside computed properties we can compute
-  // data based on the entity and we can know for sure that in every place there's 
-  // going to be an user, the computed properties will be there, saving a lot
-  // imports around the application with functions to compute the same data.
+
+  // Define computed properties as functions
   getGroupName() { 
     return this.group.name;
   },
 );
 ```
+
+##### Note
+
+When retrieving users from the store, they will contain defined computed properties. Inside computed properties we can compute data based on the entity and its relations. We can know for sure that in every place we're going to use that entity, the computed properties will be there, saving a lot imports around the application with functions to compute the same data.
 
 #### `hasMany(name)`
 
