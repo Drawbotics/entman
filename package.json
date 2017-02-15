@@ -34,6 +34,7 @@
     "deep-freeze": "0.0.1",
     "eslint": "^3.3.1",
     "eslint-loader": "^1.5.0",
+    "istanbul-instrumenter-loader": "^2.0.0",
     "karma": "^1.2.0",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^1.0.1",
@@ -51,6 +52,7 @@
     "webpack-dev-server": "^1.14.1"
   },
   "dependencies": {
+    "babel-plugin-istanbul": "^4.0.0",
     "babel-polyfill": "^6.13.0",
     "entman-denormalizr": "^0.5.2",
     "karma-sourcemap-loader": "^0.3.7",
