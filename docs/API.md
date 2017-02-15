@@ -129,4 +129,36 @@ export default generateSchemas([ userDefinition ]);
 
 ## Selectors
 
+#### `getEntities(state, schema)`
+
+> Get all the entities defined by `schema` from the state. It takes care of populate all the entities relationships and adding the computed properties defined in the schema.
+
+ - **Parameters**
+  - `state` *Object*: The global state of the application or an slice that contains the key `entities` on it.
+  - `schema` *Object*: The schema of the entities to retrieve.
+ - **Returns**
+  - *Object*: An array with all the entities of the specified schema.
+  
+#### `getEntitiesBy(state, schema, by={})`
+
+> Get all the entities defined by `schema` from the state that match certain conditions. The conditions are specified by the `by` parameter which is an object that takes attributes of the entities as keys and the values these have to have as values to match. It takes care of populate all the entities relationships and adding the computed properties defined in the schema.
+
+ - **Parameters**
+  - `state` *Object*: The global state of the application or an slice that contains the key `entities` on it.
+  - `schema` *Object*: The schema of the entities to retrieve.
+  - `by` *Object*: An object specifying attributes of the entities and which value do they have to have. All entities matching those values are retrieved.
+ - **Returns**
+  - *Object*: An array with all the entities of the specified schema that match the conditions specified.
+  
+#### `getEntity(state, schema, id)`
+
+> > Get a single entity defined by `schema` with the specified `id` from the state. It takes care of populate all the entity relationships and adding the computed properties defined in the schema.
+
+ - **Parameters**
+  - `state` *Object*: The global state of the application or an slice that contains the key `entities` on it.
+  - `schema` *Object*: The schema of the entities to retrieve.
+  - `id` *String|Number*: The id of the entity to retrieve.
+ - **Returns**
+  - *Object*: The entity with the specified id.
+
 ## Helpers
