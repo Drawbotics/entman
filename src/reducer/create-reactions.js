@@ -80,7 +80,7 @@ function updateRelatedId(state, action, relation) {
   if (isMany) {
     return mapValues(state, (entity) => ({
       ...entity,
-      [through]: get(entity, through).map((id) => id == oldId ? newId : id),
+      [through]: get(entity, through, []).map((id) => id == oldId ? newId : id),
     }));
   }
   else {

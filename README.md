@@ -13,8 +13,9 @@ entity in the *frontend*. The management of entities is usually something very
 straightforward but tedious, so you leave this work to **entman** and
 you can focus on the rest.
 
-[![npm version](https://img.shields.io/npm/v/entman.svg?style=flat-square)](https://www.npmjs.com/package/redux)
-
+[![npm version](https://img.shields.io/npm/v/entman.svg?style=flat-square)](https://www.npmjs.com/package/entman)
+[![build status](https://img.shields.io/travis/Drawbotics/entman/master.svg?style=flat-square)](https://travis-ci.org/Drawbotics/entman)
+[![coveralls](https://img.shields.io/coveralls/Drawbotics/entman.svg?style=flat-square)](https://coveralls.io/github/Drawbotics/entman)
 
 ## Install
 
@@ -224,7 +225,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(Group);
 
 ## API
 
-TODO
+See the [API Reference](docs/API.md)
 
 
 ## LICENSE

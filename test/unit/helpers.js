@@ -151,7 +151,7 @@ describe('@Helpers', function () {
       expect(action.meta.ids).to.deep.equal([ 1 ]);
     });
   });
-  describe('updateEntityId(schema, newId, oldId, action)', function () {
+  describe('updateEntityId(schema, oldId, newId, action)', function () {
     let schemas;
     let action;
     let type;

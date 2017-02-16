@@ -172,11 +172,12 @@ describe('@Reducer', function () {
         const initialState = deepFreeze({
           Group: {
             1: { id: 1, name: 'Group 1', users: [ 1 ] },
-            2: { id: 2, name: 'Group 2', users: [ 2 ] },
+            2: { id: 2, name: 'Group 2', users: [ 2, 3 ] },
           },
           User: {
             1: { id: 1, name: 'Lars', group: 1, tasks: [ 1 ] },
             2: { id: 2, name: 'Deathvoid', group: 2, tasks: [] },
+            3: { id: 2, name: 'Grishan', group: 2 },
           },
           Task: {
             1: { id: 1, name: 'Task 1', users: [ 1 ] },
@@ -228,6 +229,10 @@ describe('@Reducer', function () {
       it('should update manyToMany relations', function () {
         expect(finalState.User[123].tasks).to.contain(123);
         expect(finalState.Task[123].users).to.contain(123);
+      });
+      it('if the attribute specified by the schema is not found on the entity, create it', function () {
+        expect(finalState.User[3].tasks).to.exist;
+        expect(finalState.User[3].tasks).to.be.instanceof(Array);
       });
     });
     describe('when `DELETE_ENTITY` is received as action', function () {
