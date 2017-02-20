@@ -1,22 +1,22 @@
 # API Reference (v0.3.1)
 
- - [Reducer]()
-  - [`reducer(schemas)`]()
- - [Middleware]()
-  - [`middleware(config)`]()
- - [Schema]()
-  - [`defineSchema(name, config)`]()
-  - [`hasMany(name)`]()
-  - [`generateSchemas(schemas)`]()
- - [Selectors]()
-  - [`getEntities(state, schema)`]()
-  - [`getEntitiesBy(state, schema, by={})`]()
-  - [`getEntity(state, schema, id)`]()
- - [Helpers]()
-  - [`createEntities(schema, dataPath, action)`]()
-  - [`updateEntities(schema, ids, dataPath, action)`]()
-  - [`updateEntityId(scehma, oldId, newId, action)`]()
-  - [`deleteEntities(schema, id, action)`]()
+ - [Reducer](#reducer)
+  - [`reducer(schemas)`](#reducerschemas)
+ - [Middleware](#middleware)
+  - [`middleware(config)`](#middlewareconfig)
+ - [Schema](#schema)
+  - [`defineSchema(name, config)`](#defineschemaname-config)
+  - [`hasMany(name)`](#hasmanyname)
+  - [`generateSchemas(schemas)`](#generateschemasschemas)
+ - [Selectors](#selectors)
+  - [`getEntities(state, schema)`](#getentitiesstate-schema)
+  - [`getEntitiesBy(state, schema, by)`](#getentitiesbystate-schema-by)
+  - [`getEntity(state, schema, id)`](#getentitystate-schema-id)
+ - [Helpers](#helpers)
+  - [`createEntities(schema, dataPath, action)`](#createentitiesschema-datapath-action)
+  - [`updateEntities(schema, ids, dataPath, action)`](#updateentitiesschema-ids-datapath-action)
+  - [`updateEntityId(schema, oldId, newId, action)`](#updateentityidschema-oldid-newid-action)
+  - [`deleteEntities(schema, ids, action)`](#deleteentitiesschema-ids-action)
   
 ## Reducer
 
@@ -152,7 +152,7 @@ function getGroups(state) {
 const groups = getGroups(state);
 ```
   
-#### `getEntitiesBy(state, schema, by={})`
+#### `getEntitiesBy(state, schema, by)`
 
 > Get all the entities defined by `schema` from the state that match certain conditions. The conditions are specified by the `by` parameter which is an object that takes attributes of the entities as keys and the values these have to have as values to match. It takes care of populate all the entities relationships and adding the computed properties defined in the schema.
 
@@ -204,56 +204,100 @@ const group = getGroup(state, 1);
 
 #### `createEntities(schema, dataPath, action)`
 
-> 
+> Wraps an action adding the necessary info for entman to understand it has to add entities to the state.
 
  - **Parameters**:
-  - `schema` *Object*:
-  - `dataPath` *String*:
-  - `action` *Object:
+  - `schema` *Object*: The schema of the entities to be created.
+  - `dataPath` *String*: The path in dot notation of where the data of the entities is located in the wrapped action.
+  - `action` *Object: The action to wrap. It has to be a valid Redux action.
  - **Returns**:
-  - *Object*:
+  - *Object*: The wrapped action.
   
 ```javascript
+import { createEntities } from 'entman';
+import schemas from 'schemas';
+
+export const CREATE_GROUPS = 'CREATE_GROUPS';
+
+export function createGroups(data) {
+  return createEntities(schemas.Group, 'payload.data', {
+    type: CREATE_GROUPS,
+    payload: { data },
+  });
+}
 ```
 
 #### `updateEntities(schema, ids, dataPath, action)`
 
->
+> Wraps an action adding the necessary info for entman to understand it has to update entities in the state. 
 
  - **Parameters**
-  - `schema` *Object*:
-  - `ids` *Array|Number|String*:
-  - `dataPath` *String*:
-  - `action` *Object*:
+  - `schema` *Object*: The schema of the entities to be updated.
+  - `ids` *Array|Number|String*: The id or ids of the entities to be updated.
+  - `dataPath` *String*: The path in dot notation of where the data of the entities is located in the wrapped action.
+  - `action` *Object*: The action to wrap. It has to be a valid Redux action.
  - **Returns**:
-  - *Object*:
+  - *Object*: The wrapped action.
 
 ```javascript
+import { updateEntities } from 'entman';
+import schemas from 'schemas';
+
+export const UPDATE_GROUP = 'UPDATE_GROUP';
+
+export function updateGroup(1, data) {
+  return updateEntities(schemas.Group, 1, 'payload.data', {
+    type: UPDATE_GROUP,
+    payload: { data },
+  });
+}
 ```
 
 #### `updateEntityId(schema, oldId, newId, action)`
 
->
+> Wraps an action adding the necessary info for entman to understand it has to update the id of an entity in the state. 
 
  - **Parameters**
-  - `schema` *Object*:
-  - `oldId` *Number|String*:
-  - `newId` *Number|String*:
-  - `action` *Object*:
+  - `schema` *Object*: The schema of the entity to be updated.
+  - `oldId` *Number|String*: The actual id of the entity.
+  - `newId` *Number|String*: The new id of the entity.
+  - `action` *Object*: The action to wrap. It has to be a valid Redux action.
  - **Returns**
-  - *Object*:
+  - *Object*: The wrapped action.
   
 ```javascript
+import { updateEntityId } from 'entman';
+import schemas from 'schemas';
+
+export const SAVE_GROUP_SUCCESS = 'SAVE_GROUP_SUCCESS';
+
+export function saveGroupSuccess(oldId, newId) {
+  return updateEntityId(schemas.Group, oldId, newId, {
+    type: SAVE_GROUP_SUCCESS,
+  });
+}
 ```
 
-#### `deleteEntities(schema, id, action)`
+#### `deleteEntities(schema, ids, action)`
 
-> 
+> Wraps an action adding the necessary info for entman to understand it has to delete entities from the state.
 
  - **Parameters**
-  - `schema` *Object*:
-  - `id` *Number|String*:
-  - `action` *Object*:
+  - `schema` *Object*: The schema of the entity to be deleted.
+  - `ids` *Array|Number|String*: The id or ids of the entities to be deleted.
+  - `action` *Object*: The action to wrap. It has to be a valid Redux action.
+ - **Returns**
+  - *Object*: The wrapped action.
   
 ```javascript
+import { deleteEntities } from 'entman';
+import schemas from 'schemas';
+
+export const DELETE_GROUP = 'DELETE_GROUP';
+
+export function deleteGroup(id) {
+  return deleteEntities(schemas.Group, id, {
+    type: DELETE_GROUP,
+  });
+}
 ```
