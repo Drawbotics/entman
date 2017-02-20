@@ -14,8 +14,8 @@
   - [`getEntity(state, schema, id)`](#getentitystate-schema-id)
  - [Helpers](#helpers)
   - [`createEntities(schema, dataPath, action)`](#createentitiesschema-datapath-action)
-  - [`updateEntities(schema, ids, dataPath, action)`](#updateentities-schema-ids-datapath-action)
-  - [`updateEntityId(schema, oldId, newId, action)`](#updateentitiesidschema-oldid-newid-action)
+  - [`updateEntities(schema, ids, dataPath, action)`](#updateentitiesschema-ids-datapath-action)
+  - [`updateEntityId(schema, oldId, newId, action)`](#updateentityidschema-oldid-newid-action)
   - [`deleteEntities(schema, id, action)`](#deleteentitiesschema-id-action)
   
 ## Reducer
