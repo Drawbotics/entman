@@ -174,7 +174,7 @@ class Group extends React.Component {
             <li>{u.name}</li>
           ))}
         </ul>
-        {this.state.showForm &this.setState({ showForm: true });&
+        {this.state.showForm &&
           this._renderUserForm()
         }
         { ! this.state.showForm &&
