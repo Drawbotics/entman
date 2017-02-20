@@ -1,7 +1,7 @@
 # API Reference (v0.3.1)
 
- - [Reducer]()
-  - [`reducer(schemas)`]()
+ - [Reducer](#reducer)
+  - [`reducer(schemas)`](#reducerschemas)
  - [Middleware]()
   - [`middleware(config)`]()
  - [Schema]()
