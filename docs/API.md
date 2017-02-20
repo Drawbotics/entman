@@ -2,21 +2,21 @@
 
  - [Reducer](#reducer)
   - [`reducer(schemas)`](#reducerschemas)
- - [Middleware]()
-  - [`middleware(config)`]()
- - [Schema]()
-  - [`defineSchema(name, config)`]()
-  - [`hasMany(name)`]()
-  - [`generateSchemas(schemas)`]()
- - [Selectors]()
-  - [`getEntities(state, schema)`]()
-  - [`getEntitiesBy(state, schema, by={})`]()
-  - [`getEntity(state, schema, id)`]()
- - [Helpers]()
-  - [`createEntities(schema, dataPath, action)`]()
-  - [`updateEntities(schema, ids, dataPath, action)`]()
-  - [`updateEntityId(scehma, oldId, newId, action)`]()
-  - [`deleteEntities(schema, id, action)`]()
+ - [Middleware](#middleware)
+  - [`middleware(config)`](#middlewareconfig)
+ - [Schema](#schema)
+  - [`defineSchema(name, config)`](#defineschemaname-config)
+  - [`hasMany(name)`](#hasmanyname)
+  - [`generateSchemas(schemas)`](#generateschemasschemas)
+ - [Selectors](#selectors)
+  - [`getEntities(state, schema)`](#getentitiesstate-schema)
+  - [`getEntitiesBy(state, schema, by)`](#getentitiesbystate-schema-by)
+  - [`getEntity(state, schema, id)`](#getentitystate-schema-id)
+ - [Helpers](#helpers)
+  - [`createEntities(schema, dataPath, action)`](#createentitiesschema-datapath-action)
+  - [`updateEntities(schema, ids, dataPath, action)`](#updateentities-schema-ids-datapath-action)
+  - [`updateEntityId(schema, oldId, newId, action)`](#updateentitiesidschema-oldid-newid-action)
+  - [`deleteEntities(schema, id, action)`](#deleteentitiesschema-id-action)
   
 ## Reducer
 
@@ -152,7 +152,7 @@ function getGroups(state) {
 const groups = getGroups(state);
 ```
   
-#### `getEntitiesBy(state, schema, by={})`
+#### `getEntitiesBy(state, schema, by)`
 
 > Get all the entities defined by `schema` from the state that match certain conditions. The conditions are specified by the `by` parameter which is an object that takes attributes of the entities as keys and the values these have to have as values to match. It takes care of populate all the entities relationships and adding the computed properties defined in the schema.
 
