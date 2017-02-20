@@ -204,56 +204,100 @@ const group = getGroup(state, 1);
 
 #### `createEntities(schema, dataPath, action)`
 
-> 
+> Wraps an action adding the necessary info for entman to understand it has to add entities to the state.
 
  - **Parameters**:
-  - `schema` *Object*:
-  - `dataPath` *String*:
-  - `action` *Object:
+  - `schema` *Object*: The schema of the entities to be created.
+  - `dataPath` *String*: The path in dot notation of where the data of the entities is located in the wrapped action.
+  - `action` *Object: The action to wrap. It has to be a valid Redux action.
  - **Returns**:
-  - *Object*:
+  - *Object*: The wrapped action.
   
 ```javascript
+import { createEntities } from 'entman';
+import schemas from 'schemas';
+
+export const CREATE_GROUPS = 'CREATE_GROUPS';
+
+export function createGroups(data) {
+  return createEntities(schemas.Group, 'payload.data', {
+    type: CREATE_GROUPS,
+    payload: { data },
+  });
+}
 ```
 
 #### `updateEntities(schema, ids, dataPath, action)`
 
->
+> Wraps an action adding the necessary info for entman to understand it has to update entities in the state. 
 
  - **Parameters**
-  - `schema` *Object*:
-  - `ids` *Array|Number|String*:
-  - `dataPath` *String*:
-  - `action` *Object*:
+  - `schema` *Object*: The schema of the entities to be updated.
+  - `ids` *Array|Number|String*: The id or ids of the entities to be updated.
+  - `dataPath` *String*: The path in dot notation of where the data of the entities is located in the wrapped action.
+  - `action` *Object*: The action to wrap. It has to be a valid Redux action.
  - **Returns**:
-  - *Object*:
+  - *Object*: The wrapped action.
 
 ```javascript
+import { updateEntities } from 'entman';
+import schemas from 'schemas';
+
+export const UPDATE_GROUP = 'UPDATE_GROUP';
+
+export function updateGroup(1, data) {
+  return updateEntities(schemas.Group, 1, 'payload.data', {
+    type: UPDATE_GROUP,
+    payload: { data },
+  });
+}
 ```
 
 #### `updateEntityId(schema, oldId, newId, action)`
 
->
+> Wraps an action adding the necessary info for entman to understand it has to update the id of an entity in the state. 
 
  - **Parameters**
-  - `schema` *Object*:
-  - `oldId` *Number|String*:
-  - `newId` *Number|String*:
-  - `action` *Object*:
+  - `schema` *Object*: The schema of the entity to be updated.
+  - `oldId` *Number|String*: The actual id of the entity.
+  - `newId` *Number|String*: The new id of the entity.
+  - `action` *Object*: The action to wrap. It has to be a valid Redux action.
  - **Returns**
-  - *Object*:
+  - *Object*: The wrapped action.
   
 ```javascript
+import { updateEntityId } from 'entman';
+import schemas from 'schemas';
+
+export const SAVE_GROUP_SUCCESS = 'SAVE_GROUP_SUCCESS';
+
+export function saveGroupSuccess(oldId, newId) {
+  return updateEntityId(schemas.Group, oldId, newId, {
+    type: SAVE_GROUP_SUCCESS,
+  });
+}
 ```
 
-#### `deleteEntities(schema, id, action)`
+#### `deleteEntities(schema, ids, action)`
 
-> 
+> Wraps an action adding the necessary info for entman to understand it has to delete entities from the state.
 
  - **Parameters**
-  - `schema` *Object*:
-  - `id` *Number|String*:
-  - `action` *Object*:
+  - `schema` *Object*: The schema of the entity to be deleted.
+  - `ids` *Array|Number|String*: The id or ids of the entities to be deleted.
+  - `action` *Object*: The action to wrap. It has to be a valid Redux action.
+ - **Returns**
+  - *Object*: The wrapped action.
   
 ```javascript
+import { deleteEntities } from 'entman';
+import schemas from 'schemas';
+
+export const DELETE_GROUP = 'DELETE_GROUP';
+
+export function deleteGroup(id) {
+  return deleteEntities(schemas.Group, id, {
+    type: DELETE_GROUP,
+  });
+}
 ```
