@@ -1,4 +1,4 @@
-# API Reference (v0.3.1)
+# API Reference (v0.3.3)
 
  - [Reducer](#reducer)
   - [`reducer(schemas)`](#reducerschemas)
