@@ -1,6 +1,6 @@
 {
   "name": "entman",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "A manager of normalizr entities for Redux",
   "author": "Lorenzo Ruiz <lars.bs@hotmail.com>",
   "main": "lib/entman.js",
@@ -19,7 +19,6 @@
     "url": "git+https://github.com/Drawbotics/entman.git"
   },
   "peerDependencies": {
-    "normalizr": "^3.0.2",
     "redux": "^3.5.2"
   },
   "devDependencies": {
@@ -44,7 +43,6 @@
     "karma-phantomjs-launcher": "^1.0.1",
     "karma-webpack": "^1.8.0",
     "mocha": "^3.0.2",
-    "normalizr": "^3.2.1",
     "phantomjs-prebuilt": "^2.1.14",
     "redux": "^3.5.2",
     "rimraf": "^2.5.4",
@@ -57,6 +55,7 @@
     "entman-denormalizr": "^0.5.2",
     "karma-sourcemap-loader": "^0.3.7",
     "lodash": "^4.15.0",
+    "normalizr": "^3.2.1",
     "redux-batched-actions": "^0.1.5",
     "uuid": "^3.0.1"
   }
