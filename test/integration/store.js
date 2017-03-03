@@ -3,7 +3,7 @@ import { createStore, applyMiddleware, compose, combineReducers } from 'redux';
 import {
   reducer as entities,
   middleware as entman,
-} from 'index';
+} from '../../lib';
 import schemas from './schemas';
 
 

@@ -18,7 +18,7 @@ module.exports = {
   },
   entry: [ './src/index.js' ],
   output: {
-    path: path.resolve(__dirname, 'lib'),
+    path: path.resolve(__dirname, 'dist'),
     publicPath: '/',
     filename: 'entman.js',
     library: 'entman',

@@ -3,7 +3,7 @@ import {
   updateEntities,
   updateEntityId,
   deleteEntities,
-} from 'index';
+} from '../../lib';
 import schemas from './schemas';
 
 

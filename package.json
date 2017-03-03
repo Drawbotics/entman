@@ -3,14 +3,17 @@
   "version": "0.3.3",
   "description": "A manager of normalizr entities for Redux",
   "author": "Lorenzo Ruiz <lars.bs@hotmail.com>",
-  "main": "lib/entman.js",
+  "main": "lib/index.js",
   "scripts": {
-    "clean": "rimraf lib/",
-    "build": "npm run clean && webpack --progress",
-    "test-watch": "karma start",
-    "test": "rimraf coverage/ && karma start --single-run --browsers PhantomJS",
-    "start": "npm run clean && npm run build",
-    "prepublish": "npm run test && npm run build"
+    "clean": "rimraf lib/ dist/",
+    "karma": "rimraf coverage/ && karma start --single-run --browsers PhantomJS",
+    "karma-watch": "karma start",
+    "build:umd": "webpack --progress",
+    "build:commonjs": "babel --presets=es2015,stage-0 --plugins=istanbul src --out-dir lib/",
+    "build": "npm run clean && npm run build:umd && npm run build:commonjs",
+    "test": "npm run build && npm run karma",
+    "start": "npm run karma-watch",
+    "prepublish": "npm run build && npm run test"
   },
   "keywords": [],
   "license": "MIT",
@@ -22,6 +25,7 @@
     "redux": "^3.5.2"
   },
   "devDependencies": {
+    "babel-cli": "^6.23.0",
     "babel-core": "^6.23.1",
     "babel-eslint": "^6.1.2",
     "babel-loader": "^6.2.4",

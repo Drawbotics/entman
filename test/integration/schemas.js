@@ -1,4 +1,4 @@
-import { defineSchema, hasMany, generateSchemas } from 'index';
+import { defineSchema, hasMany, generateSchemas } from '../../lib';
 
 
 const Group = defineSchema('Group', {
