@@ -52,7 +52,7 @@
     "webpack-bundle-analyzer": "^2.3.0"
   },
   "dependencies": {
-    "babel-polyfill": "^6.13.0",
+    "babel-polyfill": "^6.23.0",
     "entman-denormalizr": "^0.5.2",
     "lodash": "^4.15.0",
     "normalizr": "^3.2.1",
