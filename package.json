@@ -1,6 +1,6 @@
 {
   "name": "entman",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "A manager of normalizr entities for Redux",
   "author": "Lorenzo Ruiz <lars.bs@hotmail.com>",
   "main": "lib/index.js",
