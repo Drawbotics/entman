@@ -2,7 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 
 
-const jsDirs = [
+const rootDirs = [
   path.resolve(__dirname, 'src'),
   path.resolve(__dirname, 'test'),
 ];
@@ -10,27 +10,47 @@ const jsDirs = [
 
 module.exports = {
   resolve: {
-    root: jsDirs,
-    extensions: ['', '.js'],
+    modules: [
+      ...rootDirs,
+      path.resolve(__dirname, 'node_modules'),
+    ],
+    extensions: ['.js'],
   },
-  entry: './src/index.js',
+  entry: [ './src/index.js' ],
   output: {
-    path: path.resolve(__dirname, 'lib'),
+    path: path.resolve(__dirname, 'dist'),
     publicPath: '/',
     filename: 'entman.js',
     library: 'entman',
     libraryTarget: 'umd',
   },
+  plugins: [
+  ],
   module: {
-    preLoaders: [{
-      test: /\.jsx?$/,
-      include: jsDirs,
-      loaders: [ 'eslint' ]
-    }],
-    loaders: [{
-      test: /\.jsx?$/,
-      include: jsDirs,
-      loaders: [ 'babel?presets[]=es2015&presets[]=stage-0&plugins[]=istanbul' ],
-    }]
+    rules: [
+      {
+        test: /\.jsx?$/,
+        enforce: 'pre',
+        include: rootDirs,
+        use: [
+          {
+            loader: 'eslint-loader',
+          },
+        ],
+      },
+      {
+        test: /\.jsx?$/,
+        include: rootDirs,
+        use: [
+          {
+            loader: 'babel-loader',
+            options: {
+              presets: [ [ 'es2015', { modules: false } ], 'stage-0' ],
+              plugins: [ 'istanbul' ],
+            },
+          },
+        ],
+      }
+    ],
   },
 };
