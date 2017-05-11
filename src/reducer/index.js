@@ -5,7 +5,7 @@ import { enableBatching } from 'redux-batched-actions';
 import createEntityReducer from './entity';
 
 
-function createReducer(schemas, initialState) {
+function createReducer(schemas, initialState={}) {
   const entitiesReducers = Object.keys(schemas).reduce((memo, k) => ({
     ...memo,
     [k]: createEntityReducer(schemas[k], initialState[k]),
