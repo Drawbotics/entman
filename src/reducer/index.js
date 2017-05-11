@@ -5,18 +5,18 @@ import { enableBatching } from 'redux-batched-actions';
 import createEntityReducer from './entity';
 
 
-function createReducer(schemas) {
+function createReducer(schemas, initialState={}) {
   const entitiesReducers = Object.keys(schemas).reduce((memo, k) => ({
     ...memo,
-    [k]: createEntityReducer(schemas[k]),
+    [k]: createEntityReducer(schemas[k], initialState[k]),
   }), {});
   return combineReducers(entitiesReducers);
 }
 
 
-export default function entities(schemas) {
+export default function entities(schemas, initialState) {
   if (isEmpty(schemas)) {
     throw new Error('[INVALID SCHEMAS]');
   }
-  return enableBatching(createReducer(schemas));
+  return enableBatching(createReducer(schemas, initialState));
 }

@@ -30,7 +30,7 @@ describe('@Reducer', function () {
     });
     schemas = generateSchemas([group, user, task]);
   });
-  describe('entities(schemas)', function () {
+  describe('entities(schemas, initialState)', function () {
     it('should throw an error when `schemas` is empty', function () {
       expect(() => entities()).to.throw('INVALID SCHEMAS');
     });
@@ -50,6 +50,18 @@ describe('@Reducer', function () {
         User: {},
         Task: {},
       };
+      const result = reducer(undefined, {});
+      expect(result).to.deep.equal(expected);
+    });
+    it('should return the passed initialState when specified', function () {
+      const expected = {
+        Group: { 1: { id: 1 } },
+        User: {},
+        Task: {},
+      };
+      const reducer = entities(schemas, {
+        Group: { 1: { id: 1 } }
+      });
       const result = reducer(undefined, {});
       expect(result).to.deep.equal(expected);
     });
