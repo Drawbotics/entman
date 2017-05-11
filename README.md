@@ -80,7 +80,12 @@ import schemas from './schemas';
 
 export default combineReducers({
   // Other reducers,
-  entities: entities(schemas),
+  entities: entities(schemas, {
+    // An initial state can also be specified
+    Group: {
+      1: { id: 1 },
+    },
+  }),
 })
 ```
 

@@ -1,4 +1,5 @@
 import omit from 'lodash/omit';
+import isPlainObject from 'lodash/isPlainObject';
 
 import { update, defaultTo } from 'utils';
 import createReactions from './create-reactions';
@@ -35,9 +36,12 @@ function deleteEntity(state, action) {
 }
 
 
-export default function createEntityReducer(schema) {
+export default function createEntityReducer(schema, initialState={}) {
   const reactions = createReactions(schema.getRelations());
-  return (state={}, action) => {
+  if ( ! isPlainObject(initialState)) {
+    throw new Error(`Invalid initial state for ${schema.key}. Initial state of an entity should be a plain object`);
+  }
+  return (state=initialState, action) => {
     switch (action.type) {
       case `@@entman/CREATE_ENTITY_${schema.key.toUpperCase()}`: {
         return createEntity(state, action);

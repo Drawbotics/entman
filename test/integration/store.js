@@ -14,6 +14,6 @@ export default createStore(
   reducer,
   compose(
     applyMiddleware(entman({ enableBatching: true })),
-    window.devToolsExtension ? window.devToolsExtension() : f => f,
+    window.devToolsExtension ? window.devToolsExtension() : (f) => f,
   ),
 );
