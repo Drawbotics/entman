@@ -2,7 +2,7 @@ import get from 'lodash/get';
 import mapValues from 'lodash/mapValues';
 import isEqual from 'lodash/isEqual';
 
-import { arrayFrom } from 'utils';
+import { arrayFrom } from '../utils';
 
 
 function addToManyProperty(state, action, relation) {
