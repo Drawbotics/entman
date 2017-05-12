@@ -88,7 +88,10 @@ export function defineSchema(name, config={}) {
   }
   return {
     name,
-    config: { ...config, attributes: config.attributes ? config.attributes : {}},
+    config: {
+      attributes: config.attributes ? config.attributes : {},
+      options: config.options ? config.attributes : {},
+    },
   };
 }
 
@@ -116,7 +119,7 @@ export function generateSchemas(schemas) {
   }
   const schemasBag = schemas.reduce((bag, s) => ({
     ...bag,
-    [s.name]: new schema.Entity(s.name),
+    [s.name]: new schema.Entity(s.name, {}, s.config.options),
   }), {});
   const t = schemas.reduce((result, s) => ({
     ...result,

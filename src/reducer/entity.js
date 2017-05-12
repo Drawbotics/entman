@@ -1,7 +1,7 @@
 import omit from 'lodash/omit';
 import isPlainObject from 'lodash/isPlainObject';
 
-import { update, defaultTo } from 'utils';
+import { update, defaultTo } from '../utils';
 import createReactions from './create-reactions';
 
 
