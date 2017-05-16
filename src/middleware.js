@@ -74,10 +74,18 @@ function createUpdateEntityActions(action, getState) {
     .reduce((memo, entitiesAndKey) => [ ...memo, ...extractEntities(entitiesAndKey) ], [])
     .map((entity) => ({ ...entity, oldEntity: getFromState(getState(), entity.key, entity.entity.id) }))
     .sort(sortMainFirst(schema))
-    .map((payload) => ({
-      type: `@@entman/UPDATE_ENTITY_${payload.key.toUpperCase()}`,
-      payload: { ...payload, useDefault },
-    }));
+    .map((payload) => {
+      if (! payload.oldEntity) {
+        return {
+          type: `@@entman/CREATE_ENTITY_${payload.key.toUpperCase()}`,
+          payload,
+        };
+      }
+      return {
+        type: `@@entman/UPDATE_ENTITY_${payload.key.toUpperCase()}`,
+        payload: { ...payload, useDefault },
+      };
+    });
 }
 
 
