@@ -111,9 +111,5 @@ describe('@Selectors', function () {
       expect(group1.users).to.satisfy(users => users.some(u => u.id === 1));
       expect(group1.users).to.satisfy(users => users.some(u => u.id === 2));
     });
-    it('should not replace ids when related entity is not found', function () {
-      const task = getEntity(state, schemas.Task, 2);
-      expect(task.category).to.equal(1);
-    });
   });
 });
