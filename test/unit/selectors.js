@@ -30,10 +30,13 @@ describe('@Selectors', function () {
     const task = defineSchema('Task', {
       attributes: {
         user: 'User',
+        category: 'Category',
         //TODO: users: hasMany('User'),
       }
     });
-    schemas = generateSchemas([group, user, task]);
+    const category = defineSchema('Category', {
+    });
+    schemas = generateSchemas([group, user, task, category]);
     state = { entities: {
       Group: {
         1: { id: 1, name: 'Group 1', users: [ 1, 2 ] },
@@ -46,7 +49,9 @@ describe('@Selectors', function () {
       },
       Task: {
         1: { id: 1, title: 'Do something', user: 1 },
-        2: { id: 2, title: 'Keep calm', user: 1 },
+        2: { id: 2, title: 'Keep calm', user: 1, category: 1 },
+      },
+      Category: {
       },
     } };
   });
@@ -105,6 +110,10 @@ describe('@Selectors', function () {
       expect(group1.users).to.have.length(2);
       expect(group1.users).to.satisfy(users => users.some(u => u.id === 1));
       expect(group1.users).to.satisfy(users => users.some(u => u.id === 2));
+    });
+    it('should not replace ids when related entity is not found', function () {
+      const task = getEntity(state, schemas.Task, 2);
+      expect(task.category).to.equal(1);
     });
   });
 });

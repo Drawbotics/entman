@@ -1,6 +1,6 @@
 {
   "name": "entman",
-  "version": "0.4.3",
+  "version": "0.5.0",
   "description": "A manager of normalizr entities for Redux",
   "author": "Lorenzo Ruiz <lars.bs@hotmail.com>",
   "main": "lib/index.js",
@@ -57,7 +57,7 @@
   },
   "dependencies": {
     "babel-polyfill": "^6.23.0",
-    "entman-denormalizr": "^0.5.2",
+    "entman-denormalizr": "^0.6.0",
     "lodash": "^4.15.0",
     "normalizr": "^3.2.1",
     "redux-batched-actions": "^0.1.5",
