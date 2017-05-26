@@ -38,7 +38,7 @@ export function defaultTo(obj, defaults) {
 }
 
 
-export function update(obj, newData) {
+export function update(obj={}, newData) {
   const flattenedData = flatten(newData);
   return Object.keys(flattenedData).reduce((result, k) => {
     return set(result, k, flattenedData[k]);
