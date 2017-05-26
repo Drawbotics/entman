@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import { schema as Schema } from 'normalizr';
 
 import {
   defineSchema,
@@ -95,6 +96,8 @@ describe('@Schema', function () {
       const result = generateSchemas([user, group]);
       expect(result.Group.key).to.equal('Group');
       expect(result.User.key).to.equal('User');
+      expect(result.Group).to.an.instanceof(Schema.Entity);
+      expect(result.User).to.an.instanceof(Schema.Entity);
     });
     it('the resulted schemas should contain the right attributes', function () {
       const user = defineSchema('User', {

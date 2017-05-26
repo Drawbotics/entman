@@ -1585,9 +1585,9 @@ ent@~2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/ent/-/ent-2.2.0.tgz#e964219325a21d05f44466a2f686ed6ce5f5dd1d"
 
-entman-denormalizr@^0.5.2:
-  version "0.5.2"
-  resolved "https://registry.yarnpkg.com/entman-denormalizr/-/entman-denormalizr-0.5.2.tgz#f124965560928136b364dc53a440a5d4ec5e4b79"
+entman-denormalizr@^0.6.0:
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/entman-denormalizr/-/entman-denormalizr-0.6.1.tgz#0768437a978da94fbd64b822b9b8eb565bab8f38"
   dependencies:
     lodash "^4.17.4"
 
