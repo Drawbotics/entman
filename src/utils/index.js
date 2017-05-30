@@ -41,6 +41,9 @@ export function defaultTo(obj, defaults) {
 export function update(obj={}, newData) {
   const flattenedData = flatten(newData);
   return Object.keys(flattenedData).reduce((result, k) => {
+    if (flattenedData[k] === undefined) {
+      return result;
+    }
     return set(result, k, flattenedData[k]);
   }, cloneDeep(obj));
 }

@@ -1585,9 +1585,9 @@ ent@~2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/ent/-/ent-2.2.0.tgz#e964219325a21d05f44466a2f686ed6ce5f5dd1d"
 
-entman-denormalizr@^0.6.0:
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/entman-denormalizr/-/entman-denormalizr-0.6.1.tgz#0768437a978da94fbd64b822b9b8eb565bab8f38"
+entman-denormalizr@0.7.2:
+  version "0.7.2"
+  resolved "https://registry.yarnpkg.com/entman-denormalizr/-/entman-denormalizr-0.7.2.tgz#0a00f28dc3cd2668be72834e6061b7c9942c860b"
   dependencies:
     lodash "^4.17.4"
 
@@ -3314,7 +3314,7 @@ pend@~1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/pend/-/pend-1.2.0.tgz#7a57eb550a6783f9115331fcf4663d5c8e007a50"
 
-phantomjs-prebuilt@^2.1.14, phantomjs-prebuilt@^2.1.7:
+phantomjs-prebuilt@2.1.14, phantomjs-prebuilt@^2.1.7:
   version "2.1.14"
   resolved "https://registry.yarnpkg.com/phantomjs-prebuilt/-/phantomjs-prebuilt-2.1.14.tgz#d53d311fcfb7d1d08ddb24014558f1188c516da0"
   dependencies:
