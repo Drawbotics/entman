@@ -128,6 +128,14 @@ describe('@Reducer', function () {
             key: 'Group',
           },
         };
+        const updateGroup2 = {
+          type: '@@entman/UPDATE_ENTITY_GROUP',
+          payload: {
+            entity: { id: 2, name: undefined },
+            oldEntity: initialState.Group[2],
+            key: 'Group',
+          },
+        };
         const updateUser = {
           type: '@@entman/UPDATE_ENTITY_USER',
           payload: {
@@ -145,11 +153,15 @@ describe('@Reducer', function () {
           },
         };
         finalState = deepFreeze(reducer(initialState, updateGroup));
+        finalState = deepFreeze(reducer(finalState, updateGroup2));
         finalState = deepFreeze(reducer(finalState, updateUser));
         finalState = deepFreeze(reducer(finalState, updateTask));
       });
       it('should update single properties of the entity correctly', function () {
         expect(finalState.Group[1].name).to.equal('New Group 1');
+      });
+      it('should not modify properties with a value of undefined', function () {
+        expect(finalState.Group[2].name).to.equal('Group 2');
       });
       it('should update oneToMany relations correctly', function () {
         expect(finalState.User[1].group).to.equal(2);
