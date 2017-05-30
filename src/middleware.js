@@ -47,7 +47,7 @@ function getFromState(state, key, id) {
 
 
 
-function createCreateEntityActions(action) {
+function createCreateEntityActions(action, getState) {
   const dataPath = get(action, 'meta.dataPath');
   const schema = get(action, 'meta.schema');
   const skipNormalization = get(action, 'meta.skipNormalization');
@@ -55,11 +55,20 @@ function createCreateEntityActions(action) {
   return Object.keys(data.entities)
     .map((key) => ({ entities: data.entities[key], key }))
     .reduce((memo, entitiesAndKey) => [ ...memo, ...extractEntities(entitiesAndKey) ], [])
+    .map((entity) => ({ ...entity, oldEntity: getFromState(getState(), entity.key, entity.entity.id) }))
     .sort(sortMainFirst(schema))
-    .map((payload) => ({
-      type: `@@entman/CREATE_ENTITY_${payload.key.toUpperCase()}`,
-      payload,
-    }));
+    .map((payload) => {
+      if (payload.oldEntity) {
+        return {
+          type: `@@entman/UPDATE_ENTITY_${payload.key.toUpperCase()}`,
+          payload,
+        };
+      }
+      return {
+        type: `@@entman/CREATE_ENTITY_${payload.key.toUpperCase()}`,
+        payload,
+      };
+    });
 }
 
 
@@ -118,9 +127,9 @@ function processEntmanAction(store, next, action, enableBatching) {
   switch (action.meta.type) {
     case 'CREATE_ENTITIES': {
       if (enableBatching) {
-        return next(batchActions(createCreateEntityActions(action)));
+        return next(batchActions(createCreateEntityActions(action, store.getState)));
       }
-      return createCreateEntityActions(action).forEach(next);
+      return createCreateEntityActions(action, store.getState).forEach(next);
     }
     case 'UPDATE_ENTITIES': {
       if (enableBatching) {
