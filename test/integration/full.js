@@ -59,7 +59,19 @@ describe('FULL EXAMPLE', function () {
       const newUser = {
         id: 123,
         name: 'Fienhard',
-        group: 1,  // should we dispatch two actions? createUser() and addUserToGroup()?
+        group: 1,
+        tasks: [
+          {
+            id: 6,
+            name: 'Task 6',
+            users: [ 123 ],
+          },
+          {
+            id: 5,
+            name: 'Task 52',
+            users: [ 123, 4 ],
+          },
+        ],
       };
       const action = createUser(newUser);
       store.dispatch(action);
@@ -71,7 +83,13 @@ describe('FULL EXAMPLE', function () {
     it('the group should be updated with the new user', function () {
       expect(state.Group[1].users).to.include(123);
     });
-    it.skip('if the new user contained an embedded entity, what should we do?', function () {
+    describe('if the new user contained an embedded entity', function () {
+      it('add it to the store if it wasn\'t already there', function () {
+        expect(state.Task[6]).to.exist;
+      });
+      it('update the entity in the store if it was already there', function () {
+        expect(state.Task[5].name).to.equal('Task 52');
+      });
     });
   });
 
