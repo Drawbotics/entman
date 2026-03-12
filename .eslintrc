@@ -1,11 +1,11 @@
 {
   "extends": "eslint:recommended",
-  "parser": "babel-eslint",
+  "parser": "@babel/eslint-parser",
   "env": {
     "es6": true,
     "browser": true,
     "node": true,
-    "mocha": true
+    "jest": true
   },
   "rules": {
     "strict": 0,
@@ -17,8 +17,5 @@
     "quotes": [2, "single"],
     "indent": [2, 2, { "SwitchCase": 1 }],
     "semi": [2, "always"]
-  },
-  "ecmaFeatures": {
-    "experimentalObjectRestSpread": true
   }
 }

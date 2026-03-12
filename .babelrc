@@ -1,8 +1,21 @@
 {
-  "presets": [ ["es2015"], "stage-0" ],
+  "presets": [
+    ["@babel/preset-env", {
+      "targets": {
+        "node": "current"
+      }
+    }]
+  ],
+  "plugins": [
+    "@babel/plugin-proposal-export-default-from"
+  ],
   "env": {
-    "test": {
-      "plugins": [ "istanbul" ]
+    "build": {
+      "presets": [
+        ["@babel/preset-env", {
+          "modules": false
+        }]
+      ]
     }
   }
 }

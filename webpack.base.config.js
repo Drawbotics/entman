@@ -1,5 +1,4 @@
 const path = require('path');
-const webpack = require('webpack');
 
 
 const rootDirs = [
@@ -30,22 +29,13 @@ module.exports = {
     rules: [
       {
         test: /\.jsx?$/,
-        enforce: 'pre',
-        include: rootDirs,
-        use: [
-          {
-            loader: 'eslint-loader',
-          },
-        ],
-      },
-      {
-        test: /\.jsx?$/,
         include: rootDirs,
         use: [
           {
             loader: 'babel-loader',
             options: {
-              presets: [ [ 'es2015', { modules: false } ], 'stage-0' ],
+              presets: [ [ '@babel/preset-env', { modules: false } ] ],
+              plugins: [ '@babel/plugin-proposal-export-default-from' ],
             },
           },
         ],

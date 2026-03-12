@@ -13,23 +13,30 @@ entity in the *frontend*. The management of entities is usually something very
 straightforward but tedious, so you leave this work to **entman** and
 you can focus on the rest.
 
-[![npm version](https://img.shields.io/npm/v/entman.svg?style=flat-square)](https://www.npmjs.com/package/entman)
-[![build status](https://img.shields.io/travis/Drawbotics/entman/master.svg?style=flat-square)](https://travis-ci.org/Drawbotics/entman)
-[![coveralls](https://img.shields.io/coveralls/Drawbotics/entman.svg?style=flat-square)](https://coveralls.io/github/Drawbotics/entman)
-
 ## Install
 
-Install it as a node module as usual with [npm](https://www.npmjs.org/) along its peer dependencies:
+This package is published to [GitHub Packages](https://github.com/Drawbotics/entman/packages). To install it, first configure npm/yarn to use the GitHub Packages registry for the `@drawbotics` scope.
 
-```bash
-$ npm install -S entman redux normalizr
+Create or update your `.npmrc` file (in your project root or home directory):
+
+```
+@drawbotics:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=YOUR_GITHUB_TOKEN
 ```
 
-Or using [yarn](https://yarnpkg.com/):
+Then install with npm:
 
 ```bash
-$ yarn add entman redux normalizr
+$ npm install -S @drawbotics/entman redux normalizr
 ```
+
+Or using yarn:
+
+```bash
+$ yarn add @drawbotics/entman redux normalizr
+```
+
+> **Note:** You need a GitHub personal access token with `read:packages` scope to install this package.
 
 
 ## Example
@@ -42,7 +49,7 @@ We use schemas to define relationships between our entities. We can also define
 methods that will be available in the entity and serve like some sort of computed property.
 
 ```javascript
-import { defineSchema, hasMany, generateSchemas } from 'entman';
+import { defineSchema, hasMany, generateSchemas } from '@drawbotics/entman';
 
 const Group = defineSchema('Group', {
   attributes: {
@@ -75,7 +82,7 @@ Connect the entities reducer to the state.
 
 ```javascript
 import { combineReducers } from 'redux';
-import { reducer as entities } from 'entman';
+import { reducer as entities } from '@drawbotics/entman';
 import schemas from './schemas';
 
 export default combineReducers({
@@ -96,7 +103,7 @@ Connect the entman middleware to the store.
 
 ```javascript
 import { createStore, applyMiddleware } from 'redux';
-import { middleware as entman } from 'entman';
+import { middleware as entman } from '@drawbotics/entman';
 import reducer from './reducer';
 
 export default createStore(
@@ -114,7 +121,7 @@ schema. It's recommended to wrap **entman** selectors intead of using them direc
 so they're abstracted from the rest of the system.
 
 ```javascript
-import { getEntity } from 'entman';
+import { getEntity } from '@drawbotics/entman';
 import schemas from './schemas';
 
 export function getGroup(state, id) {
@@ -132,7 +139,7 @@ own actions and the entity management is just a side effect that entman will tak
 ```javascript
 import {
   createEntities,
-} from 'entman';
+} from '@drawbotics/entman';
 import schemas from './schemas';
 
 export const CREATE_USER = 'CREATE_USER';
