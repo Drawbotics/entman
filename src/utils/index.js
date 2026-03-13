@@ -1,7 +1,42 @@
-import cloneDeep from 'lodash/cloneDeep';
-import defaultsDeep from 'lodash/defaultsDeep';
-import set from 'lodash/set';
-import isPlainObject from 'lodash/isPlainObject';
+function isPlainObject(value) {
+  if (typeof value !== 'object' || value === null) return false;
+  const proto = Object.getPrototypeOf(value);
+  return proto === Object.prototype || proto === null;
+}
+
+
+function cloneDeep(obj) {
+  return JSON.parse(JSON.stringify(obj));
+}
+
+
+function defaultsDeep(target, source) {
+  const result = { ...target };
+  for (const key of Object.keys(source)) {
+    if (result[key] === undefined) {
+      result[key] = isPlainObject(source[key]) ? cloneDeep(source[key]) : source[key];
+    } else if (isPlainObject(result[key]) && isPlainObject(source[key])) {
+      result[key] = defaultsDeep(result[key], source[key]);
+    }
+  }
+  return result;
+}
+
+
+function set(obj, path, value) {
+  if (typeof path === 'string') {
+    path = path.split('.');
+  }
+  let current = obj;
+  for (let i = 0; i < path.length - 1; i++) {
+    if (current[path[i]] === undefined || current[path[i]] === null) {
+      current[path[i]] = {};
+    }
+    current = current[path[i]];
+  }
+  current[path[path.length - 1]] = value;
+  return obj;
+}
 
 
 export function flatten(obj, parentPath) {
@@ -10,14 +45,6 @@ export function flatten(obj, parentPath) {
     const currentPath = parentPath ? parentPath + '.' + k : k;
     const currentProp = obj[k];
 
-    //if (Array.isArray(currentProp)) {
-      //const arrayResult = currentProp.map((value, i) => {
-        //const arrayPath = `${currentPath}[${i}]`;
-        //if (isPlainObject(value)) return flatten(value, arrayPath);
-        //return { [arrayPath] : value };
-      //});
-      //return Object.assign({}, result, ...arrayResult);
-    //}
     if (isPlainObject(currentProp)) {
       return {
         ...result,

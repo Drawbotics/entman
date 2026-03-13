@@ -1,6 +1,3 @@
-import omit from 'lodash/omit';
-import isPlainObject from 'lodash/isPlainObject';
-
 import { update, defaultTo } from '../utils';
 import createReactions from './create-reactions';
 
@@ -13,7 +10,7 @@ function createEntity(state, action) {
 
 function updateEntity(state, action) {
   const { entity, useDefault } = action.payload;
-  const data = omit(entity, 'id');
+  const { id, ...data } = entity;
   return {
     ...state,
     [entity.id]: useDefault ? defaultTo(state[entity.id], data) : update(state[entity.id], data),
@@ -23,22 +20,24 @@ function updateEntity(state, action) {
 
 function updateEntityId(state, action) {
   const { oldId, newId } = action.payload;
+  const { [oldId]: oldEntry, ...rest } = state;
   return {
-    ...omit(state, oldId),
-    [newId]: { ...state[oldId], id: newId },
+    ...rest,
+    [newId]: { ...oldEntry, id: newId },
   };
 }
 
 
 function deleteEntity(state, action) {
   const { entity } = action.payload;
-  return omit(state, entity.id);
+  const { [entity.id]: _, ...rest } = state;
+  return rest;
 }
 
 
 export default function createEntityReducer(schema, initialState={}) {
   const reactions = createReactions(schema.getRelations());
-  if ( ! isPlainObject(initialState)) {
+  if (typeof initialState !== 'object' || initialState === null || Array.isArray(initialState)) {
     throw new Error(`Invalid initial state for ${schema.key}. Initial state of an entity should be a plain object`);
   }
   return (state=initialState, action) => {

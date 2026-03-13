@@ -1,7 +1,4 @@
-import pickBy from 'lodash/pickBy';
-import isEmpty from 'lodash/isEmpty';
-import values from 'lodash/values';
-import { denormalize } from 'entman-denormalizr';
+import { denormalize } from './denormalizr';
 
 
 export function getEntitiesSlice(state) {
@@ -12,8 +9,9 @@ export function getEntitiesSlice(state) {
 export function getEntities(state, schema, ids, raw) {
   const key = schema.key;
   const entitiesState = getEntitiesSlice(state);
+  const allValues = Object.values(entitiesState[key] || {});
   const entities = ids ?
-    values(entitiesState[key]).filter(e => ids.includes(e.id)) : values(entitiesState[key]);
+    allValues.filter(e => ids.includes(e.id)) : allValues;
 
   if (raw) {
     return entities;
@@ -28,7 +26,11 @@ export function getEntitiesBy(state, schema, by={}, raw) {
   const value = by[byKey];
   const key = schema.key;
   const entitiesState = getEntitiesSlice(state);
-  const entities = values(pickBy(entitiesState[key], e => e[byKey] === value));
+  const entities = Object.values(
+    Object.fromEntries(
+      Object.entries(entitiesState[key] || {}).filter(([, e]) => e[byKey] === value)
+    )
+  );
 
   if (raw) {
     return entities;
@@ -43,7 +45,7 @@ export function getEntity(state, schema, id, raw) {
   const key = schema.key;
   const entitiesState = getEntitiesSlice(state);
   const entities = entitiesState[key];
-  if (isEmpty(entities)) return null;
+  if (!entities || Object.keys(entities).length === 0) return null;
   const entity = entities[id];
 
   if (raw) {

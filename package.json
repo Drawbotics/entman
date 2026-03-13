@@ -1,6 +1,6 @@
 {
   "name": "@drawbotics/entman",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A manager of normalizr entities for Redux",
   "author": "Lorenzo Ruiz <lars.bs@hotmail.com>",
   "main": "lib/index.js",
@@ -13,7 +13,7 @@
     "test": "jest",
     "test:coverage": "jest --coverage",
     "start": "jest --watch",
-    "prepublish": "npm run build && npm run test"
+    "prepublishOnly": "npm run build && npm run test"
   },
   "keywords": [],
   "license": "MIT",
@@ -33,19 +33,17 @@
     "@babel/eslint-parser": "^7.24.0",
     "@babel/plugin-proposal-export-default-from": "^7.24.0",
     "@babel/preset-env": "^7.24.0",
-    "babel-loader": "^9.1.3",
+    "babel-jest": "^30",
+    "babel-loader": "^10",
     "deep-freeze": "0.0.1",
     "eslint": "^8.57.0",
-    "jest": "^29.7.0",
-    "babel-jest": "^29.7.0",
+    "jest": "^30",
     "redux": "^3.5.2",
     "rimraf": "^5.0.0",
     "webpack": "^5.91.0",
-    "webpack-cli": "^5.1.4"
+    "webpack-cli": "^6"
   },
   "dependencies": {
-    "entman-denormalizr": "0.7.2",
-    "lodash": "^4.15.0",
     "normalizr": "^3.2.1",
     "redux-batched-actions": "^0.1.5",
     "uuid": "^3.0.1"

@@ -1,8 +1,23 @@
-import get from 'lodash/get';
-import mapValues from 'lodash/mapValues';
-import isEqual from 'lodash/isEqual';
-
 import { arrayFrom } from '../utils';
+
+
+function get(obj, path, defaultValue) {
+  if (path == null) return defaultValue;
+  if (typeof path === 'string') {
+    path = path.split('.');
+  } else if (!Array.isArray(path)) {
+    path = [path];
+  }
+  const result = path.reduce((acc, key) => acc != null ? acc[key] : undefined, obj);
+  return result === undefined ? defaultValue : result;
+}
+
+
+function mapValues(obj, fn) {
+  return Object.fromEntries(
+    Object.entries(obj).map(([key, value]) => [key, fn(value, key)])
+  );
+}
 
 
 function addToManyProperty(state, action, relation) {
@@ -48,11 +63,13 @@ function deleteFromManyProperty(state, action, relation) {
 function updateRelation(state, action, relation) {
   const { entity: foreignEntity, oldEntity: oldForeignEntity } = action.payload;
   const { through, foreign } = relation;
-  if (get(foreignEntity, foreign) === undefined || isEqual(get(foreignEntity, foreign), get(oldForeignEntity, foreign))) {
+  const foreignValue = get(foreignEntity, foreign);
+  const oldForeignValue = get(oldForeignEntity, foreign);
+  if (foreignValue === undefined || JSON.stringify(foreignValue) === JSON.stringify(oldForeignValue)) {
     return state;  // No need to update because the prop has not been updated
   }
-  const newParentEntitiesIds = arrayFrom(get(foreignEntity, foreign));
-  const oldParentEntitiesIds = arrayFrom(get(oldForeignEntity, foreign));
+  const newParentEntitiesIds = arrayFrom(foreignValue);
+  const oldParentEntitiesIds = arrayFrom(oldForeignValue);
   return mapValues(state, (entity) => {
     const id = entity.id;
     if (newParentEntitiesIds.includes(id) && get(entity, through).find((id) => id == foreignEntity.id) === undefined) {

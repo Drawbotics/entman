@@ -1,5 +1,3 @@
-import isEmpty from 'lodash/isEmpty';
-import omit from 'lodash/omit';
 import { schema } from 'normalizr';
 
 
@@ -37,7 +35,8 @@ function createSchemaDefinition(config, bag) {
     }
     return memo;  // Should never come to here
   }, {});
-  return { ...definition, ...omit(config, 'attributes') };
+  const { attributes, ...rest } = config;
+  return { ...definition, ...rest };
 }
 
 
@@ -80,7 +79,7 @@ function generateSchema(schema, bag) {
 
 
 export function defineSchema(name, config={}) {
-  if (isEmpty(name)) {
+  if (!name || (typeof name === 'string' && name.length === 0)) {
     throw new Error('[INVALID NAME]');
   }
   if ((typeof config !== 'object') && config) {
@@ -97,7 +96,7 @@ export function defineSchema(name, config={}) {
 
 
 export function hasMany(schema) {
-  if (isEmpty(schema)) {
+  if (!schema || (typeof schema === 'string' && schema.length === 0)) {
     throw new Error('[INVALID SCHEMA]');
   }
   if (typeof schema !== 'string' && ! schema.hasOwnProperty('name')) {
@@ -111,7 +110,7 @@ export function hasMany(schema) {
 
 
 export function generateSchemas(schemas) {
-  if (isEmpty(schemas)) {
+  if (!schemas || (Array.isArray(schemas) && schemas.length === 0)) {
     throw new Error('[INVALID SCHEMAS]');
   }
   if ( ! Array.isArray(schemas)) {

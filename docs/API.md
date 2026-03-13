@@ -1,4 +1,4 @@
-# API Reference (v0.3.3)
+# API Reference
 
  - [Reducer](#reducer)
   - [`reducer(schemas, initialState)`](#reducerschemas)
@@ -32,7 +32,7 @@
   - *Function*: The reducer that will manage the *entities* slice of the store.
 
 ```javascript
-import { reducer as entities } from 'entman';
+import { reducer as entities } from '@drawbotics/entman';
 import { combineReducers } from 'redux';
 import { schemas } from './schemas';
 
@@ -58,7 +58,7 @@ const topReducer = combineReducers({
 
 ```javascript
 import { createStore, applyMiddleware } from 'redux';
-import { middleware as entman } from 'entman';
+import { middleware as entman } from '@drawbotics/entman';
 import reducer from './reducer';
 
 export default createStore({
@@ -81,7 +81,7 @@ export default createStore({
   - *Object*: Schema definition of the entity.
 
 ```javascript
-import { defineSchema } from 'entman';
+import { defineSchema } from '@drawbotics/entman';
 
 const userDefinition = defineSchema('User', {
   group: 'Group',  // User belongs to Group
@@ -107,7 +107,7 @@ When retrieving users from the store, they will contain defined computed propert
   - *Object*: A relationship definition.
 
 ```javascript
-import { defineSchema, hasMany } from 'entman';
+import { defineSchema, hasMany } from '@drawbotics/entman';
 
 const groupDefinition = defineSchema('Group', {
   users: hasMany('User')  // Group has many users
@@ -124,7 +124,7 @@ const groupDefinition = defineSchema('Group', {
   - *Object*: An object with the schemas of the entities.
 
 ```javascript
-import { defineSchema, generateSchemas } from 'entman';
+import { defineSchema, generateSchemas } from '@drawbotics/entman';
 
 const userDefinition = defineSchema('User');
 
@@ -144,7 +144,7 @@ export default generateSchemas([ userDefinition ]);
   - *Object*: An array with all the entities of the specified schema.
 
 ```javascript
-import { getEntities } from 'entman';
+import { getEntities } from '@drawbotics/entman';
 import schemas from './schemas';
 
 function getGroups(state) {
@@ -168,7 +168,7 @@ const groups = getGroups(state);
   - *Object*: An array with all the entities of the specified schema that match the conditions specified.
 
 ```javascript
-import { getEntitiesBy } from 'entman';
+import { getEntitiesBy } from '@drawbotics/entman';
 import schemas from './schemas';
 
 function getGroupsBy(state, by) {
@@ -192,7 +192,7 @@ const groups = getGroupsBy(state, { name: 'Test' });
   - *Object*: The entity with the specified id.
 
 ```javascript
-import { getEntity } from 'entman';
+import { getEntity } from '@drawbotics/entman';
 import schemas from './schemas';
 
 function getGroup(state, id) {
@@ -218,8 +218,8 @@ const group = getGroup(state, 1);
   - *Object*: The wrapped action.
 
 ```javascript
-import { createEntities } from 'entman';
-import schemas from 'schemas';
+import { createEntities } from '@drawbotics/entman';
+import schemas from './schemas';
 
 export const CREATE_GROUPS = 'CREATE_GROUPS';
 
@@ -244,8 +244,8 @@ export function createGroups(data) {
   - *Object*: The wrapped action.
 
 ```javascript
-import { updateEntities } from 'entman';
-import schemas from 'schemas';
+import { updateEntities } from '@drawbotics/entman';
+import schemas from './schemas';
 
 export const UPDATE_GROUP = 'UPDATE_GROUP';
 
@@ -270,8 +270,8 @@ export function updateGroup(1, data) {
   - *Object*: The wrapped action.
 
 ```javascript
-import { updateEntityId } from 'entman';
-import schemas from 'schemas';
+import { updateEntityId } from '@drawbotics/entman';
+import schemas from './schemas';
 
 export const SAVE_GROUP_SUCCESS = 'SAVE_GROUP_SUCCESS';
 
@@ -294,8 +294,8 @@ export function saveGroupSuccess(oldId, newId) {
   - *Object*: The wrapped action.
 
 ```javascript
-import { deleteEntities } from 'entman';
-import schemas from 'schemas';
+import { deleteEntities } from '@drawbotics/entman';
+import schemas from './schemas';
 
 export const DELETE_GROUP = 'DELETE_GROUP';
 

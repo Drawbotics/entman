@@ -1,15 +1,19 @@
-import get from 'lodash/get';
-import isEmpty from 'lodash/isEmpty';
+function get(obj, path) {
+  if (typeof path === 'string') {
+    return path.split('.').reduce((acc, key) => acc && acc[key], obj);
+  }
+  return path.reduce((acc, key) => acc && acc[key], obj);
+}
 
 
 export function createEntities(schema, dataPath, action) {
   if ( ! schema || ! schema.key) {
     throw new Error(`[INVALID SCHEMA]: Entity schema expected instead of ${schema}`);
   }
-  if (isEmpty(dataPath) || (typeof dataPath !== 'string')) {
+  if (!dataPath || (typeof dataPath !== 'string')) {
     throw new Error(`[INVALID DATA PATH]: Expected data path instead of ${dataPath}`);
   }
-  if (isEmpty(action) || ! action.hasOwnProperty('type')) {
+  if (!action || typeof action !== 'object' || ! action.hasOwnProperty('type')) {
     throw new Error('[INVALID ACTION]');
   }
   if ( ! get(action, dataPath)) {
@@ -38,10 +42,10 @@ export function updateEntities(schema, ids, dataPath, action, useDefault) {
   if ( ! Array.isArray(ids)) {
     ids = [ids];
   }
-  if (isEmpty(dataPath) || (typeof dataPath !== 'string')) {
+  if (!dataPath || (typeof dataPath !== 'string')) {
     throw new Error(`[INVALID DATA PATH]: Expected data path instead of ${dataPath}`);
   }
-  if (isEmpty(action) || ! action.hasOwnProperty('type')) {
+  if (!action || typeof action !== 'object' || ! action.hasOwnProperty('type')) {
     throw new Error('[INVALID ACTION]');
   }
   if ( ! get(action, dataPath)) {
@@ -72,7 +76,7 @@ export function updateEntityId(schema, oldId, newId, action) {
   if ( ! newId) {
     throw new Error('[INVALID NEW ID]');
   }
-  if (isEmpty(action) || ! action.hasOwnProperty('type')) {
+  if (!action || typeof action !== 'object' || ! action.hasOwnProperty('type')) {
     throw new Error('[INVALID ACTION]');
   }
   return {
@@ -99,7 +103,7 @@ export function deleteEntities(schema, ids, action) {
   if ( ! Array.isArray(ids)) {
     ids = [ids];
   }
-  if (isEmpty(action) || ! action.hasOwnProperty('type')) {
+  if (!action || typeof action !== 'object' || ! action.hasOwnProperty('type')) {
     throw new Error('[INVALID ACTION]');
   }
   return {

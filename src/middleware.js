@@ -1,10 +1,18 @@
-import get from 'lodash/get';
 import v4 from 'uuid/v4';
 import { normalize } from 'normalizr';
 import { batchActions } from 'redux-batched-actions';
 
 import { getEntitiesSlice } from './selectors';
 import { arrayFrom } from './utils';
+
+
+function get(obj, path, defaultValue) {
+  if (typeof path === 'string') {
+    path = path.split('.');
+  }
+  const result = path.reduce((acc, key) => acc != null ? acc[key] : undefined, obj);
+  return result === undefined ? defaultValue : result;
+}
 
 
 // UTILS {{{
@@ -41,7 +49,8 @@ function sortMainFirst(main) {
 
 
 function getFromState(state, key, id) {
-  return get(getEntitiesSlice(state), [key, id]);
+  const slice = getEntitiesSlice(state);
+  return slice && slice[key] && slice[key][id];
 }
 // }}}
 

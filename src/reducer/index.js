@@ -1,5 +1,4 @@
 import { combineReducers } from 'redux';
-import isEmpty from 'lodash/isEmpty';
 import { enableBatching } from 'redux-batched-actions';
 
 import createEntityReducer from './entity';
@@ -15,7 +14,7 @@ function createReducer(schemas, initialState={}) {
 
 
 export default function entities(schemas, initialState) {
-  if (isEmpty(schemas)) {
+  if (!schemas || (typeof schemas === 'object' && Object.keys(schemas).length === 0)) {
     throw new Error('[INVALID SCHEMAS]');
   }
   return enableBatching(createReducer(schemas, initialState));
