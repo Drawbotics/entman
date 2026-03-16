@@ -1,18 +1,31 @@
 {
   "name": "@drawbotics/entman",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "A manager of normalizr entities for Redux",
   "author": "Lorenzo Ruiz <lars.bs@hotmail.com>",
-  "main": "lib/index.js",
+  "type": "module",
+  "main": "lib/index.cjs.js",
+  "module": "lib/index.esm.js",
+  "exports": {
+    ".": {
+      "import": "./lib/index.esm.js",
+      "require": "./lib/index.cjs.js",
+      "default": "./lib/index.cjs.js"
+    }
+  },
+  "types": "lib/index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "lib",
+    "dist"
+  ],
   "scripts": {
     "clean": "rimraf lib/ dist/",
     "lint": "eslint src/ test/",
-    "build:umd": "webpack --progress",
-    "build:commonjs": "babel src --out-dir lib/",
-    "build": "npm run clean && npm run build:umd && npm run build:commonjs",
-    "test": "jest",
-    "test:coverage": "jest --coverage",
-    "start": "jest --watch",
+    "build": "npm run clean && rollup -c && cp src/index.d.ts lib/index.d.ts",
+    "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
+    "test:coverage": "NODE_OPTIONS='--experimental-vm-modules' jest --coverage",
+    "start": "NODE_OPTIONS='--experimental-vm-modules' jest --watch",
     "prepublishOnly": "npm run build && npm run test"
   },
   "keywords": [],
@@ -25,27 +38,20 @@
     "registry": "https://npm.pkg.github.com"
   },
   "peerDependencies": {
-    "redux": "^3.5.2"
+    "redux": "^3.5.2 || ^4.0.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.24.0",
-    "@babel/core": "^7.24.0",
-    "@babel/eslint-parser": "^7.24.0",
-    "@babel/plugin-proposal-export-default-from": "^7.24.0",
-    "@babel/preset-env": "^7.24.0",
-    "babel-jest": "^30",
-    "babel-loader": "^10",
+    "@rollup/plugin-node-resolve": "^16",
+    "@rollup/plugin-terser": "^1.0.0",
     "deep-freeze": "0.0.1",
     "eslint": "^8.57.0",
     "jest": "^30",
     "redux": "^3.5.2",
     "rimraf": "^5.0.0",
-    "webpack": "^5.91.0",
-    "webpack-cli": "^6"
+    "rollup": "^4"
   },
   "dependencies": {
     "normalizr": "^3.2.1",
-    "redux-batched-actions": "^0.1.5",
-    "uuid": "^3.0.1"
+    "redux-batched-actions": "^0.5.0"
   }
 }

@@ -1,9 +1,7 @@
-module.exports = {
+export default {
   testEnvironment: 'node',
   moduleDirectories: ['node_modules', 'src'],
-  transform: {
-    '^.+\\.jsx?$': 'babel-jest',
-  },
+  transform: {},
   testMatch: ['<rootDir>/test/**/*.test.js'],
   coverageDirectory: 'coverage',
   coverageReporters: ['lcov', 'html', 'text'],

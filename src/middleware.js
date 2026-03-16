@@ -1,4 +1,3 @@
-import v4 from 'uuid/v4';
 import { normalize } from 'normalizr';
 import { batchActions } from 'redux-batched-actions';
 
@@ -17,7 +16,7 @@ function get(obj, path, defaultValue) {
 
 // UTILS {{{
 function normalizeData(schema, data) {
-  const dataWithIds = arrayFrom(data).map((e) => e.id ? e : { ...e, id: v4() });
+  const dataWithIds = arrayFrom(data).map((e) => e.id ? e : { ...e, id: crypto.randomUUID() });
   return normalize(dataWithIds, [ schema ]);
 }
 

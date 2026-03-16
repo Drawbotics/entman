@@ -1,8 +1,11 @@
 {
   "extends": "eslint:recommended",
-  "parser": "@babel/eslint-parser",
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "module"
+  },
   "env": {
-    "es6": true,
+    "es2022": true,
     "browser": true,
     "node": true,
     "jest": true
@@ -12,6 +15,7 @@
     "no-console": 0,
     "comma-dangle": 0,
     "no-constant-condition": 0,
+    "no-prototype-builtins": 0,
     "no-unused-vars": 1,
     "jsx-quotes": 1,
     "quotes": [2, "single"],
